@@ -52,9 +52,9 @@
       touch-action: none;
     }
   </style>
-   <script src="babylon.js"></script>
-   <!-- <script src="hand.js"></script> -->
-   <script src="cannon.js"></script>
+  <script src="babylon.js"></script>
+  <!-- <script src="hand.js"></script> -->
+  <script src="cannon.js"></script>
 </head>
 
 <body>
@@ -86,9 +86,33 @@
         var sphere = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, scene);
         // Move the sphere upward 1/2 its height
         sphere.position.y = 1;
+        //Change the texture of the sphere to wireframe to show rotation
+        var materialSphere = new BABYLON.StandardMaterial("texture1", scene);
+        materialSphere.wireframe = true;
+        sphere.material = materialSphere;
         // Let's try our built-in 'ground' shape. Params: name, width, depth, subdivisions, scene
         var ground = BABYLON.Mesh.CreateGround("ground1", 6, 6, 2, scene);
         // Leave this function
+        // Allows for basic movement control with the keyboard
+        window.onkeydown = function (e) {
+          if (e.keyCode === 37) {
+            sphere.rotate(BABYLON.Axis.Z, .25, BABYLON.Space.LOCAL)
+            // sphere.rotate(BABYLON.Axis.Y, -.1, BABYLON.Space.LOCAL)
+            sphere.translate(BABYLON.Axis.X, -.25, BABYLON.Space.WORLD);
+          }
+          if (e.keyCode === 39) {
+            sphere.rotate(BABYLON.Axis.Z, -.25, BABYLON.Space.LOCAL)
+            sphere.translate(BABYLON.Axis.X, .25, BABYLON.Space.WORLD);
+          }
+          if (e.keyCode === 38) {
+            sphere.rotate(BABYLON.Axis.X, .25, BABYLON.Space.LOCAL);
+            sphere.translate(BABYLON.Axis.Z, .25, BABYLON.Space.WORLD);
+          }
+          if (e.keyCode === 40) {
+            sphere.rotate(BABYLON.Axis.X, -.25, BABYLON.Space.LOCAL)
+            sphere.translate(BABYLON.Axis.Z, -.25, BABYLON.Space.WORLD);
+          }
+        }
         return scene;
       }; // End of createScene function
       // -------------------------------------------------------------
