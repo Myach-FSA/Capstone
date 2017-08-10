@@ -1,7 +1,6 @@
 'use strict'
 import React from 'react'
-import {Route, IndexRedirect, IndexRoute, Link} from 'react-router'
-
+import {Route, Switch, Redirect, Link} from 'react-router-dom'
 import Scratchpad from './scratchpad'
 import Whiteboard from './whiteboard'
 import Chat from './chat'
@@ -26,9 +25,9 @@ const Index = ({children}) => <div>
   </p>
 </div>
 
-export default <Route path="/demos" component={({children}) => children}>
-  <IndexRoute component={Index}/>
-  <Route path='scratchpad/:title' component={Scratchpad}/>
-  <Route path='whiteboard/:title' component={Whiteboard}/>
-  <Route path='chat/:room' component={Chat}/>
-</Route>
+export default <Switch path="/demos">
+    <Route path="/demos/scratchpad/:title" component={Scratchpad}/>
+    <Route path="/demos/whiteboard/:title" component={Whiteboard}/>
+    <Route path="/demos/chat/:room" component={Chat}/>
+    <Route exact path="/demos" component={Index}/>
+  </Switch>

@@ -1,6 +1,6 @@
 'use strict'
 import React from 'react'
-import {Router, Route, IndexRedirect, browserHistory} from 'react-router'
+import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom'
 import {render} from 'react-dom'
 
 import WhoAmI from './components/WhoAmI'
@@ -48,16 +48,18 @@ const App = ({children}) =>
       <WhoAmI auth={auth}/>
     </nav>
     {/* Render our children (whatever the router gives us) */}
-    {children}
+    <Switch>
+      {Demos}
+      <Redirect exact from="/" to="/demos"/>
+    </Switch>
   </div>
 
 render(
-  <Router history={browserHistory}>
-    <Route path="/" component={App}>
-      <IndexRedirect to="demos"/>
-      {Demos /* Put all the demos and a description page at /demos */}
-    </Route>
-    <Route path='*' component={NotFound}/>
+  <Router>
+    <Switch>
+      <Route path="/" component={App}/>
+      <Route component={NotFound}/>
+    </Switch>
   </Router>,
   document.getElementById('main')
 )

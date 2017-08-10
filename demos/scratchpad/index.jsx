@@ -1,5 +1,4 @@
 import React from 'react'
-import {Route} from 'react-router'
 import firebase from 'APP/fire'
 const db = firebase.database()
 
@@ -8,7 +7,7 @@ import Scratchpad from './Scratchpad'
 // This component is a little piece of glue between React router
 // and our Scratchpad component. It takes in props.params.title, and
 // shows the Scratchpad along with that title.
-export default ({params: {title}}) =>
+export default ({match: {params: {title}}}) =>
   <div>
     <h1>{title}</h1>
     {/* Here, we're passing in a Firebase reference to
