@@ -73,18 +73,38 @@
         // Change the scene background color to green.
         scene.clearColor = new BABYLON.Color3(0, 1, 0);
         // This creates and positions a free camera
-        var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), scene);
-        // This targets the camera to scene origin
-        camera.setTarget(BABYLON.Vector3.Zero());
-        // This attaches the camera to the canvas
-        camera.attachControl(canvas, false);
-        // This creates a light, aiming 0,1,0 - to the sky.
+        // var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), scene);
+        // // This targets the camera to scene origin
+        // camera.setTarget(BABYLON.Vector3.Zero());
+        // // This attaches the camera to the canvas
+        // camera.attachControl(canvas, false);
+        // // This creates a light, aiming 0,1,0 - to the sky.
         var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
         // Dim the light a small amount
         light.intensity = .5;
         // Let's try our built-in 'sphere' shape. Params: name, subdivisions, size, scene
         var sphere = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, scene);
         // Move the sphere upward 1/2 its height
+
+    // FollowCamera >> Follow a mesh through your scene
+    // Parameters : name, position, scene
+    var followCamera = new BABYLON.FollowCamera("followCam", new BABYLON.Vector3(0, 15, -45), scene);
+    // camera.lockedTarget = sphere; // target any mesh or object with a "position" Vector3
+    followCamera.radius = 10; // how far from the object to follow
+    followCamera.heightOffset = 5; // how high above the object to place the camera
+    followCamera.rotationOffset = 180; // the viewing angle
+    followCamera.cameraAcceleration = 0.05 // how fast to move
+    followCamera.maxCameraSpeed = 10 // speed limit
+    followCamera.attachControl(canvas,true);
+    scene.activeCamera = followCamera;
+    followCamera.lockedTarget = sphere;
+
+    // // Create a very small simple mesh.
+    // var followObject = BABYLON.Mesh.CreateSphere("followObject", 0.001, scene);
+    // // Set its position to be the same as the ball's position.
+    // followObject.position = ball.position;
+    
+
         sphere.position.y = 1;
         //Change the texture of the sphere to wireframe to show rotation
         var materialSphere = new BABYLON.StandardMaterial("texture1", scene);
