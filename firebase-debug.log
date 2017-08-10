@@ -1,0 +1,28 @@
+[debug] [2017-08-10T19:17:07.543Z] ----------------------------------------------------------------------
+[debug] [2017-08-10T19:17:07.545Z] Command:       /usr/local/bin/node /usr/local/bin/firebase serve
+[debug] [2017-08-10T19:17:07.545Z] CLI Version:   3.9.2
+[debug] [2017-08-10T19:17:07.545Z] Platform:      darwin
+[debug] [2017-08-10T19:17:07.545Z] Node Version:  v8.2.1
+[debug] [2017-08-10T19:17:07.546Z] Time:          Thu Aug 10 2017 15:17:07 GMT-0400 (EDT)
+[debug] [2017-08-10T19:17:07.546Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2017-08-10T19:17:07.558Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2017-08-10T19:17:07.559Z] > authorizing via signed-in user
+[debug] [2017-08-10T19:17:07.561Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/capstone-466c2  
+ Thu Aug 10 2017 15:17:07 GMT-0400 (EDT)
+[debug] [2017-08-10T19:17:08.190Z] <<< HTTP RESPONSE 200
+[debug] [2017-08-10T19:17:08.191Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/database/capstone-466c2/tokens  
+ Thu Aug 10 2017 15:17:08 GMT-0400 (EDT)
+[debug] [2017-08-10T19:17:08.474Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from '/Users/yu/capstone'...
+[info] 
+[debug] [2017-08-10T19:17:08.476Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/capstone-466c2  
+ Thu Aug 10 2017 15:17:08 GMT-0400 (EDT)
+[debug] [2017-08-10T19:17:08.800Z] <<< HTTP RESPONSE 200
+[debug] [2017-08-10T19:17:08.800Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/1073805838813/clients/_:getWebAppConfig  
+ Thu Aug 10 2017 15:17:08 GMT-0400 (EDT)
+[debug] [2017-08-10T19:17:09.102Z] <<< HTTP RESPONSE 200
+[info] i  hosting: Serving hosting files from: public
+[info] ✔  hosting: Local server: http://localhost:5000
+

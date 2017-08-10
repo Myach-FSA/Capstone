@@ -1,11 +1,12 @@
 import * as firebase from "firebase";
+const secret = './secret.js'
 
 var config = {
-  apiKey: "AIzaSyD9X0omDWFjc474Br6nAQfcNwBvB4ZhQ98",
-  authDomain: "capstone-466c2.firebaseapp.com",
-  databaseURL: "https://capstone-466c2.firebaseio.com",
-  projectId: "capstone-466c2",
-  storageBucket: "capstone-466c2.appspot.com",
-  messagingSenderId: "1073805838813"
+  apiKey: secret.apiKey,
+  authDomain: secret.authDomain,
+  databaseURL: secret.databaseURL,
+  projectId: secret.projectId,
+  storageBucket: secret.storageBucket,
+  messagingSenderId: secret.messagingSenderId,
 };
 firebase.initializeApp(config);
