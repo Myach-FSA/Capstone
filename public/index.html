@@ -61,17 +61,16 @@
   <div>
     <canvas id="renderCanvas"></canvas>
     <script type="text/javascript">
-      // Get the canvas element from our HTML below
       var canvas = document.querySelector("#renderCanvas");
-      // Load the BABYLON 3D engine
       var engine = new BABYLON.Engine(canvas, true);
-      // -------------------------------------------------------------
-      // Here begins a function that we will 'call' just after it's built
+
       var createScene = function () {
-        // Now create a basic Babylon Scene object
         var scene = new BABYLON.Scene(engine);
-        // Change the scene background color to green.
+        var gravityVector = new BABYLON.Vector3(0, -9.81, 0);
+        var physicsPlugin = new BABYLON.CannonJSPlugin();
+        scene.enablePhysics(gravityVector, physicsPlugin);
         scene.clearColor = new BABYLON.Color3(0, 1, 0);
+
         // This creates and positions a free camera
         // var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), scene);
         // // This targets the camera to scene origin
@@ -83,7 +82,7 @@
         // Dim the light a small amount
         light.intensity = .5;
         // Let's try our built-in 'sphere' shape. Params: name, subdivisions, size, scene
-        var sphere = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, scene);
+        var sphere = BABYLON.Mesh.CreateSphere("sphere1", 8, 1, scene);
         // Move the sphere upward 1/2 its height
 
     // FollowCamera >> Follow a mesh through your scene
@@ -111,26 +110,31 @@
         materialSphere.wireframe = true;
         sphere.material = materialSphere;
         // Let's try our built-in 'ground' shape. Params: name, width, depth, subdivisions, scene
-        var ground = BABYLON.Mesh.CreateGround("ground1", 6, 6, 2, scene);
-        // Leave this function
-        // Allows for basic movement control with the keyboard
+        var ground = BABYLON.Mesh.CreateGround("ground1", 10, 10, 2, scene);
+
+        sphere.physicsImpostor = new BABYLON.PhysicsImpostor(sphere, BABYLON.PhysicsImpostor.SphereImpostor, { mass: 1, restitution: 0.9 }, scene);
+        ground.physicsImpostor = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.9 }, scene);
+
+        sphere.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(0, 0, 0, 0));
+
+        let zAxis = 0;
+        let xAxis = 0;
         window.onkeydown = function (e) {
           if (e.keyCode === 37) {
-            sphere.rotate(BABYLON.Axis.Z, .25, BABYLON.Space.LOCAL)
-            // sphere.rotate(BABYLON.Axis.Y, -.1, BABYLON.Space.LOCAL)
-            sphere.translate(BABYLON.Axis.X, -.25, BABYLON.Space.WORLD);
+            xAxis += .25;
+            sphere.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(zAxis, 0, xAxis, 0));
           }
           if (e.keyCode === 39) {
-            sphere.rotate(BABYLON.Axis.Z, -.25, BABYLON.Space.LOCAL)
-            sphere.translate(BABYLON.Axis.X, .25, BABYLON.Space.WORLD);
+            xAxis -= .25;
+            sphere.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(zAxis, 0, xAxis, 0));
           }
           if (e.keyCode === 38) {
-            sphere.rotate(BABYLON.Axis.X, .25, BABYLON.Space.LOCAL);
-            sphere.translate(BABYLON.Axis.Z, .25, BABYLON.Space.WORLD);
+            zAxis += .25;
+            sphere.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(zAxis, 0, xAxis, 0));
           }
           if (e.keyCode === 40) {
-            sphere.rotate(BABYLON.Axis.X, -.25, BABYLON.Space.LOCAL)
-            sphere.translate(BABYLON.Axis.Z, -.25, BABYLON.Space.WORLD);
+            zAxis -= .25;
+            sphere.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(zAxis, 0, xAxis, 0));
           }
         }
         return scene;
