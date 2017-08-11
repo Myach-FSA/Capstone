@@ -61,20 +61,16 @@
   <div>
     <canvas id="renderCanvas"></canvas>
     <script type="text/javascript">
-      window.addEventListener('DOMContentLoaded', function () {
+window.addEventListener('DOMContentLoaded', function () {
       // your code here
       var canvas = document.getElementById('renderCanvas');
       var engine = new BABYLON.Engine(canvas, true);
       var createScene = function () {
-
         // This creates a basic Babylon Scene object (non-mesh)
         var scene = new BABYLON.Scene(engine);
-        var gravityVector = new BABYLON.Vector3(0, -9.81, 0);
-        var physicsPlugin = new BABYLON.CannonJSPlugin();
-        scene.enablePhysics(gravityVector, physicsPlugin);
+        scene.enablePhysics();
         scene.collisionsEnabled = true;
         // scene.setGravity(new BABYLON.Vector3(0, -9.8, 0));
-
         var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 20, -40), scene);
         // This targets the camera to scene origin
         camera.setTarget(BABYLON.Vector3.Zero());
@@ -88,7 +84,6 @@
         var sphere = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, scene);
         sphere.position.y = 2;
         var ground = BABYLON.Mesh.CreateGround("ground1", 40, 40, 2, scene);
-
         var curvePoints = function (l, t) {
           var path = [];
           var step = l / t;
@@ -99,9 +94,7 @@
           return path;
         };
         var curve = curvePoints(40, 100);
-
         var tube = BABYLON.Mesh.CreateTube("tube", curve, 2, 60, null, 0, scene);
-
         // var camera = new BABYLON.FollowCamera("FollowCam", new BABYLON.Vector3(0, 0, 0), scene, sphere);
         sphere.physicsImpostor = new BABYLON.PhysicsImpostor(sphere, BABYLON.PhysicsImpostor.SphereImpostor, {
           mass: 0.01,
@@ -112,34 +105,26 @@
           mass: 0,
           restitution: 0.9
         }, scene);
-
         sphere.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(0, 0, 0, 0));
-
         let zAxis = 0;
         let xAxis = 0;
         let yAxis = 0;
-
         function moveLeft(obj) {
-          xAxis += .25;
+          xAxis += .5;
           obj.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(zAxis, 0, xAxis, 0));
         }
-
         function moveRight(obj) {
-          xAxis -= .25;
+          xAxis -= .5;
           obj.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(zAxis, 0, xAxis, 0));
         }
-
         function moveUp(obj) {
-          zAxis += .25;
+          zAxis += .5;
           obj.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(zAxis, 0, xAxis, 0));
         }
-
         function moveDown(obj) {
-          zAxis -= .25;
+          zAxis -= .5;
           obj.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(zAxis, 0, xAxis, 0));
         }
-
-
         window.onkeydown = function (e) {
           if (e.key === ' ') {
             sphere.position.y = 4;
@@ -157,27 +142,21 @@
             moveDown(sphere);
           }
         }
-
         var ballMaterial = new BABYLON.StandardMaterial('material', scene);
         var tubeMaterial = new BABYLON.StandardMaterial('material', scene);
         var textureTube = new BABYLON.Texture('stone.png', scene);
         var textureBall = new BABYLON.Texture('net.png', scene);
-
         ballMaterial.diffuseColor = new BABYLON.Color3(2.0, 1, 0.7);
         ballMaterial.diffuseTexture = textureBall;
         ballMaterial.diffuseTexture.hasAlpha = true;
         sphere.material = ballMaterial;
-
         tubeMaterial.diffuseTexture = textureTube;
         tube.material = tubeMaterial;
-
         var groundMaterial = new BABYLON.StandardMaterial('material', scene);
         var textureGrass = new BABYLON.Texture('grass-large.png', scene);
         groundMaterial.diffuseTexture = textureGrass;
         ground.material = groundMaterial;
-
         return scene;
-
       };
       var scene = createScene();
       engine.runRenderLoop(function () {
