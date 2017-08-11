@@ -1,7 +1,7 @@
 import * as firebase from "firebase";
 const secret = './secret.js'
 
-var config = {
+const config = {
   apiKey: secret.apiKey,
   authDomain: secret.authDomain,
   databaseURL: secret.databaseURL,
