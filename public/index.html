@@ -66,26 +66,26 @@
         var canvas = document.getElementById('renderCanvas');
         var engine = new BABYLON.Engine(canvas, true);
         var createScene = function () {
-
           var scene = new BABYLON.Scene(engine);
-          scene.enablePhysics();
+          var gravityVector = new BABYLON.Vector3(0, -9.81, 0);
+          var physicsPlugin = new BABYLON.CannonJSPlugin();
+          scene.enablePhysics(gravityVector, physicsPlugin);
           scene.collisionsEnabled = true;
-          scene.gravity = new BABYLON.Vector3(0, -9.81, 0);
-          console.log(scene.getPhysicsEngine());
-          // scene.setGravity(new BABYLON.Vector3(0, -9.8, 0));
+
           var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 20, -40), scene);
-          // This targets the camera to scene origin
           camera.setTarget(BABYLON.Vector3.Zero());
-          // This attaches the camera to the canvas
           camera.attachControl(canvas, false);
-          // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
           var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
-          // Default intensity is 1. Let's dim the light a small amount
           light.intensity = 0.7;
+
           // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
           var sphere = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, scene);
           sphere.position.y = 2;
-          var ground = BABYLON.Mesh.CreateGround("ground1", 40, 40, 2, scene);
+          sphere.checkCollisions = true;
+
+          var ground = BABYLON.Mesh.CreateGround("ground1", 50, 50, 2, scene);
+          ground.checkCollisions = true;
+
           var curvePoints = function (l, t) {
             var path = [];
             var step = l / t;
@@ -96,8 +96,10 @@
             return path;
           };
           var curve = curvePoints(40, 100);
+
           var tube = BABYLON.Mesh.CreateTube("tube", curve, 2, 60, null, 0, scene);
-          // var camera = new BABYLON.FollowCamera("FollowCam", new BABYLON.Vector3(0, 0, 0), scene, sphere);
+          tube.checkCollisions = true;
+
           sphere.physicsImpostor = new BABYLON.PhysicsImpostor(sphere, BABYLON.PhysicsImpostor.SphereImpostor, {
             mass: 0.01,
             friction: 0.5,
@@ -107,7 +109,7 @@
             mass: 0,
             restitution: 0.9
           }, scene);
-          // sphere.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(0, 0, 0, 0));
+
           let zAxis = 0;
           let xAxis = 0;
           let yAxis = 0;
