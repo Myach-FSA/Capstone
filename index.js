@@ -9,5 +9,5 @@ const config = {
   storageBucket: secret.storageBucket,
   messagingSenderId: secret.messagingSenderId,
 };
-firebase.initializeApp(config);
 
+firebase.initializeApp(config);
