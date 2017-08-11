@@ -79,12 +79,17 @@
           light.intensity = 0.7;
 
           // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
-          var sphere = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, scene);
-          sphere.position.y = 2;
-          sphere.checkCollisions = true;
+          var sphere1 = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, scene);
+          sphere1.position.y = 2;
+          sphere1.checkCollisions = true;
 
           var ground = BABYLON.Mesh.CreateGround("ground1", 50, 50, 2, scene);
           ground.checkCollisions = true;
+
+          var sphere2 = BABYLON.Mesh.CreateSphere("sphere2", 32, 2, scene);
+          sphere2.position.y = 4;
+          sphere2.position.x = 4;
+          sphere2.checkCollisions = true;
 
           var curvePoints = function (l, t) {
             var path = [];
@@ -97,10 +102,7 @@
           };
           var curve = curvePoints(40, 100);
 
-          var tube = BABYLON.Mesh.CreateTube("tube", curve, 2, 60, null, 0, scene);
-          tube.checkCollisions = true;
-
-          sphere.physicsImpostor = new BABYLON.PhysicsImpostor(sphere, BABYLON.PhysicsImpostor.SphereImpostor, {
+          sphere1.physicsImpostor = new BABYLON.PhysicsImpostor(sphere1, BABYLON.PhysicsImpostor.SphereImpostor, {
             mass: 0.01,
             friction: 0.5,
             restitution: 0.7
@@ -108,6 +110,11 @@
           ground.physicsImpostor = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, {
             mass: 0,
             restitution: 0.9
+          }, scene);
+          sphere2.physicsImpostor = new BABYLON.PhysicsImpostor(sphere2, BABYLON.PhysicsImpostor.SphereImpostor, {
+            mass: 0.01,
+            friction: 0.5,
+            restitution: 0.7
           }, scene);
 
           let zAxis = 0;
@@ -139,19 +146,19 @@
           }
           window.onkeydown = function (e) {
             if (e.key === ' ') {
-              sphere.position.y = 4;
+              sphere1.position.y = 4;
             }
             if (e.key === 'ArrowLeft') {
-              moveLeft(sphere)
+              moveLeft(sphere1)
             }
             if (e.key === 'ArrowRight') {
-              moveRight(sphere);
+              moveRight(sphere1);
             }
             if (e.key === 'ArrowUp') {
-              moveUp(sphere);
+              moveUp(sphere1);
             }
             if (e.key === 'ArrowDown') {
-              moveDown(sphere);
+              moveDown(sphere1);
             }
           }
           var ballMaterial = new BABYLON.StandardMaterial('material', scene);
@@ -161,9 +168,9 @@
           ballMaterial.diffuseColor = new BABYLON.Color3(2.0, 1, 0.7);
           ballMaterial.diffuseTexture = textureBall;
           ballMaterial.diffuseTexture.hasAlpha = true;
-          sphere.material = ballMaterial;
+          sphere1.material = ballMaterial;
           tubeMaterial.diffuseTexture = textureTube;
-          tube.material = tubeMaterial;
+          sphere2.material = tubeMaterial;
           var groundMaterial = new BABYLON.StandardMaterial('material', scene);
           var textureGrass = new BABYLON.Texture('grass-large.png', scene);
           groundMaterial.diffuseTexture = textureGrass;
