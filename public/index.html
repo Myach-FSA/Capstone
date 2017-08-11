@@ -61,138 +61,147 @@
   <div>
     <canvas id="renderCanvas"></canvas>
     <script type="text/javascript">
-window.addEventListener('DOMContentLoaded', function () {
-      // your code here
-      var canvas = document.getElementById('renderCanvas');
-      var engine = new BABYLON.Engine(canvas, true);
-      var createScene = function () {
-        // This creates a basic Babylon Scene object (non-mesh)
-        var scene = new BABYLON.Scene(engine);
-        scene.enablePhysics();
-        scene.collisionsEnabled = true;
-        // scene.setGravity(new BABYLON.Vector3(0, -9.8, 0));
-        var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 20, -40), scene);
-        // This targets the camera to scene origin
-        camera.setTarget(BABYLON.Vector3.Zero());
-        // This attaches the camera to the canvas
-        camera.attachControl(canvas, false);
-        // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
-        var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
-        // Default intensity is 1. Let's dim the light a small amount
-        light.intensity = 0.7;
-        // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
-        var sphere = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, scene);
-        sphere.position.y = 2;
-        var ground = BABYLON.Mesh.CreateGround("ground1", 40, 40, 2, scene);
-        var curvePoints = function (l, t) {
-          var path = [];
-          var step = l / t;
-          var a = 5;
-          for (var i = -l / 2; i < l / 2; i += step) {
-            path.push(new BABYLON.Vector3(5 * Math.sin(i * t / 400), i, 5 * Math.cos(i * t / 400)));
+      window.addEventListener('DOMContentLoaded', function () {
+        // your code here
+        var canvas = document.getElementById('renderCanvas');
+        var engine = new BABYLON.Engine(canvas, true);
+        var createScene = function () {
+          // This creates a basic Babylon Scene object (non-mesh)
+          var scene = new BABYLON.Scene(engine);
+          scene.enablePhysics();
+          scene.collisionsEnabled = true;
+          scene.gravity = new BABYLON.Vector3(0, -9.81, 0);
+          console.log(scene.getPhysicsEngine());
+          // scene.setGravity(new BABYLON.Vector3(0, -9.8, 0));
+          var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 20, -40), scene);
+          // This targets the camera to scene origin
+          camera.setTarget(BABYLON.Vector3.Zero());
+          // This attaches the camera to the canvas
+          camera.attachControl(canvas, false);
+          // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
+          var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
+          // Default intensity is 1. Let's dim the light a small amount
+          light.intensity = 0.7;
+          // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
+          var sphere = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, scene);
+          sphere.position.y = 2;
+          var ground = BABYLON.Mesh.CreateGround("ground1", 40, 40, 2, scene);
+          var curvePoints = function (l, t) {
+            var path = [];
+            var step = l / t;
+            var a = 5;
+            for (var i = -l / 2; i < l / 2; i += step) {
+              path.push(new BABYLON.Vector3(5 * Math.sin(i * t / 400), i, 5 * Math.cos(i * t / 400)));
+            }
+            return path;
+          };
+          var curve = curvePoints(40, 100);
+          var tube = BABYLON.Mesh.CreateTube("tube", curve, 2, 60, null, 0, scene);
+          // var camera = new BABYLON.FollowCamera("FollowCam", new BABYLON.Vector3(0, 0, 0), scene, sphere);
+          sphere.physicsImpostor = new BABYLON.PhysicsImpostor(sphere, BABYLON.PhysicsImpostor.SphereImpostor, {
+            mass: 0.01,
+            friction: 0.5,
+            restitution: 0.7
+          }, scene);
+          ground.physicsImpostor = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, {
+            mass: 0,
+            restitution: 0.9
+          }, scene);
+          // sphere.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(0, 0, 0, 0));
+          let zAxis = 0;
+          let xAxis = 0;
+          let yAxis = 0;
+          function moveLeft(obj) {
+            if (xAxis < 3) {
+              xAxis += 1;
+            }
+            obj.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(yAxis, 0, xAxis, 0));
           }
-          return path;
+          function moveRight(obj) {
+            if (xAxis > -3) {
+              xAxis -= 1;
+            }
+            obj.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(yAxis, 0, xAxis, 0));
+          }
+          function moveUp(obj) {
+            if (yAxis < 3) {
+              yAxis += 1;
+            }
+            obj.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(yAxis, 0, xAxis, 0));
+          }
+          function moveDown(obj) {
+            if (yAxis > -3) {
+              yAxis -= 1;
+            }
+            obj.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(yAxis, 0, xAxis, 0));
+          }
+          window.onkeydown = function (e) {
+            if (e.key === ' ') {
+              sphere.position.y = 4;
+            }
+            if (e.key === 'ArrowLeft') {
+              moveLeft(sphere)
+            }
+            if (e.key === 'ArrowRight') {
+              moveRight(sphere);
+            }
+            if (e.key === 'ArrowUp') {
+              moveUp(sphere);
+            }
+            if (e.key === 'ArrowDown') {
+              moveDown(sphere);
+            }
+          }
+          var ballMaterial = new BABYLON.StandardMaterial('material', scene);
+          var tubeMaterial = new BABYLON.StandardMaterial('material', scene);
+          var textureTube = new BABYLON.Texture('stone.png', scene);
+          var textureBall = new BABYLON.Texture('net.png', scene);
+          ballMaterial.diffuseColor = new BABYLON.Color3(2.0, 1, 0.7);
+          ballMaterial.diffuseTexture = textureBall;
+          ballMaterial.diffuseTexture.hasAlpha = true;
+          sphere.material = ballMaterial;
+          tubeMaterial.diffuseTexture = textureTube;
+          tube.material = tubeMaterial;
+          var groundMaterial = new BABYLON.StandardMaterial('material', scene);
+          var textureGrass = new BABYLON.Texture('grass-large.png', scene);
+          groundMaterial.diffuseTexture = textureGrass;
+          ground.material = groundMaterial;
+          return scene;
         };
-        var curve = curvePoints(40, 100);
-        var tube = BABYLON.Mesh.CreateTube("tube", curve, 2, 60, null, 0, scene);
-        // var camera = new BABYLON.FollowCamera("FollowCam", new BABYLON.Vector3(0, 0, 0), scene, sphere);
-        sphere.physicsImpostor = new BABYLON.PhysicsImpostor(sphere, BABYLON.PhysicsImpostor.SphereImpostor, {
-          mass: 0.01,
-          friction: 0.5,
-          restitution: 0.7
-        }, scene);
-        ground.physicsImpostor = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, {
-          mass: 0,
-          restitution: 0.9
-        }, scene);
-        sphere.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(0, 0, 0, 0));
-        let zAxis = 0;
-        let xAxis = 0;
-        let yAxis = 0;
-        function moveLeft(obj) {
-          xAxis += .5;
-          obj.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(zAxis, 0, xAxis, 0));
-        }
-        function moveRight(obj) {
-          xAxis -= .5;
-          obj.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(zAxis, 0, xAxis, 0));
-        }
-        function moveUp(obj) {
-          zAxis += .5;
-          obj.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(zAxis, 0, xAxis, 0));
-        }
-        function moveDown(obj) {
-          zAxis -= .5;
-          obj.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(zAxis, 0, xAxis, 0));
-        }
-        window.onkeydown = function (e) {
-          if (e.key === ' ') {
-            sphere.position.y = 4;
-          }
-          if (e.key === 'ArrowLeft') {
-            moveLeft(sphere)
-          }
-          if (e.key === 'ArrowRight') {
-            moveRight(sphere);
-          }
-          if (e.key === 'ArrowUp') {
-            moveUp(sphere);
-          }
-          if (e.key === 'ArrowDown') {
-            moveDown(sphere);
-          }
-        }
-        var ballMaterial = new BABYLON.StandardMaterial('material', scene);
-        var tubeMaterial = new BABYLON.StandardMaterial('material', scene);
-        var textureTube = new BABYLON.Texture('stone.png', scene);
-        var textureBall = new BABYLON.Texture('net.png', scene);
-        ballMaterial.diffuseColor = new BABYLON.Color3(2.0, 1, 0.7);
-        ballMaterial.diffuseTexture = textureBall;
-        ballMaterial.diffuseTexture.hasAlpha = true;
-        sphere.material = ballMaterial;
-        tubeMaterial.diffuseTexture = textureTube;
-        tube.material = tubeMaterial;
-        var groundMaterial = new BABYLON.StandardMaterial('material', scene);
-        var textureGrass = new BABYLON.Texture('grass-large.png', scene);
-        groundMaterial.diffuseTexture = textureGrass;
-        ground.material = groundMaterial;
-        return scene;
-      };
-      var scene = createScene();
-      engine.runRenderLoop(function () {
-        scene.render();
+        var scene = createScene();
+        engine.runRenderLoop(function () {
+          scene.render();
+        });
+        window.addEventListener('resize', function () {
+          engine.resize();
+        });
       });
-      window.addEventListener('resize', function () {
-        engine.resize();
-      });
-    });
-
     </script>
   </div>
   <p id="load">Firebase SDK Loading&hellip;</p>
 
-  
-  <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
 
-        try {
-          let app = firebase.app();
-          let features = ['auth', 'database', 'messaging', 'storage'].filter(feature => typeof app[feature] === 'function');
-          document.getElementById('load').innerHTML = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
-        }
-      });
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+      // // The Firebase SDK is initialized and available here!
+      //
+      // firebase.auth().onAuthStateChanged(user => { });
+      // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
+      // firebase.messaging().requestPermission().then(() => { });
+      // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
+      //
+      // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+
+      try {
+        let app = firebase.app();
+        let features = ['auth', 'database', 'messaging', 'storage'].filter(feature => typeof app[feature] === 'function');
+        document.getElementById('load').innerHTML = `Firebase SDK loaded with ${features.join(', ')}`;
+      } catch (e) {
+        console.error(e);
+        document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
+      }
+    });
   </script>
 </body>
 
