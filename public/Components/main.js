@@ -66,39 +66,41 @@ window.addEventListener('DOMContentLoaded', () => {
     let xAxis = 0;
     let yAxis = 0;
 
-    function moveBall(direction, obj) {
-      if (direction === 'left' && xAxis < 3) {
-        xAxis += 1;
-      }
-      if (direction === 'right' && xAxis > -3) {
-        xAxis -= 1;
-      }
-      if (direction === 'up' && yAxis < 3) {
-        yAxis += 1;
-      }
-      if (direction === 'down' && yAxis > -3) {
-        yAxis -= 1;
-      }
-      obj.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(yAxis, 0, xAxis, 0));
-    }
+    const keyState = {};
 
-    window.onkeydown = function (e) {
-      if (e.key === ' ') {
-        sphere1.position.y = 4;
+    window.addEventListener('keydown', function (e) {
+      keyState[e.keyCode || e.which] = true;
+    }, true);
+    window.addEventListener('keyup', function (e) {
+      keyState[e.keyCode || e.which] = false;
+    }, true);
+
+    function gameLoop() {
+      if (keyState[37] || keyState[65]) {
+        if (xAxis < 5) {
+          xAxis += .5;
+        }
       }
-      if (e.key === 'ArrowLeft') {
-        moveBall('left', sphere1)
+      if (keyState[39] || keyState[68]) {
+        if (xAxis > -5) {
+          xAxis -= .5;
+        }
       }
-      if (e.key === 'ArrowRight') {
-        moveBall('right', sphere1);
+      if (keyState[38] || keyState[87]) {
+        if (yAxis < 5) {
+          yAxis += .5;
+        }
       }
-      if (e.key === 'ArrowUp') {
-        moveBall('up', sphere1);
+      if (keyState[40] || keyState[83]) {
+        if (yAxis > -5) {
+          yAxis -= .5;
+        }
       }
-      if (e.key === 'ArrowDown') {
-        moveBall('down', sphere1);
-      }
+      sphere1.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(yAxis, 0, xAxis, 0));
+
+      setTimeout(gameLoop, 50);
     }
+    gameLoop();
 
     // ---- CAMERA ----
 
