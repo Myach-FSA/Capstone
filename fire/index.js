@@ -2,7 +2,12 @@ const firebase = require('firebase')
 
 // -- // -- // -- // Firebase Config // -- // -- // -- //
 const config = {
-
+  apiKey: "AIzaSyBYhxMkpdLLv3Ze187wNleejBtDTOAJvUA",
+  authDomain: "myachnv.firebaseapp.com",
+  databaseURL: "https://myachnv.firebaseio.com",
+  projectId: "myachnv",
+  storageBucket: "",
+  messagingSenderId: "149250633671"
 }
 // -- // -- // -- // -- // -- // -- // -- // -- // -- //
 
