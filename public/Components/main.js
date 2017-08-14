@@ -109,18 +109,6 @@ window.addEventListener('DOMContentLoaded', () => {
         if (confirm("You Won!\nNext Level?") == true) {
           sceneNum++
           sceneChange=true;
-          sphere1 = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, scene); //Params: name, subdivs, size, scene
-          sphere1.position.y = 3;
-          sphere1.physicsImpostor = new BABYLON.PhysicsImpostor(sphere1, BABYLON.PhysicsImpostor.SphereImpostor, {
-            mass: 0.01,
-            friction: 0.5,
-            restitution: 0.7
-          }, scene);
-          head.parent = sphere1;
-          zAxis = 0;
-          xAxis = 0;
-          yAxis = 0;
-          sphere1.material = ballMaterial;
           return;
         }else{
           sphere1.dispose();
@@ -136,6 +124,16 @@ window.addEventListener('DOMContentLoaded', () => {
           xAxis = 0;
           yAxis = 0;
           sphere1.material = ballMaterial;
+          sphere2.dispose();
+          sphere2 = BABYLON.Mesh.CreateSphere("sphere2", 32, 2, scene);
+          sphere2.position.y = 3;
+          sphere2.position.x = -4;
+          sphere2.physicsImpostor = new BABYLON.PhysicsImpostor(sphere2, BABYLON.PhysicsImpostor.SphereImpostor, {
+            mass:0.01,
+            friction:0.5,
+            restitution: 0.7
+          }, scene);
+          sphere2.material = tubeMaterial;
         }
       }
       if (sphere1.position.y<-20) {
@@ -152,6 +150,16 @@ window.addEventListener('DOMContentLoaded', () => {
           xAxis = 0;
           yAxis = 0;
           sphere1.material = ballMaterial;
+          sphere2.dispose();
+          sphere2 = BABYLON.Mesh.CreateSphere("sphere2", 32, 2, scene);
+          sphere2.position.y = 3;
+          sphere2.position.x = -4;
+          sphere2.physicsImpostor = new BABYLON.PhysicsImpostor(sphere2, BABYLON.PhysicsImpostor.SphereImpostor, {
+            mass:0.01,
+            friction:0.5,
+            restitution: 0.7
+          }, scene);
+          sphere2.material = tubeMaterial;
         } else {
           scene = createScene();
         }
@@ -341,6 +349,16 @@ window.addEventListener('DOMContentLoaded', () => {
           xAxis = 0;
           yAxis = 0;
           sphere1.material = ballMaterial;
+          sphere2.dispose();
+          sphere2 = BABYLON.Mesh.CreateSphere("sphere2", 32, 2, scene);
+          sphere2.position.y = 3;
+          sphere2.position.x = -4;
+          sphere2.physicsImpostor = new BABYLON.PhysicsImpostor(sphere2, BABYLON.PhysicsImpostor.SphereImpostor, {
+            mass:0.01,
+            friction:0.5,
+            restitution: 0.7
+          }, scene);
+          sphere2.material = tubeMaterial;
         }
       }
       if (sphere1.position.y<-20) {
@@ -357,6 +375,16 @@ window.addEventListener('DOMContentLoaded', () => {
           xAxis = 0;
           yAxis = 0;
           sphere1.material = ballMaterial;
+          sphere2.dispose();
+          sphere2 = BABYLON.Mesh.CreateSphere("sphere2", 32, 2, scene);
+          sphere2.position.y = 3;
+          sphere2.position.x = -4;
+          sphere2.physicsImpostor = new BABYLON.PhysicsImpostor(sphere2, BABYLON.PhysicsImpostor.SphereImpostor, {
+            mass:0.01,
+            friction:0.5,
+            restitution: 0.7
+          }, scene);
+          sphere2.material = tubeMaterial;
         } else {
           scene = createScene();
         }
@@ -546,6 +574,16 @@ window.addEventListener('DOMContentLoaded', () => {
           xAxis = 0;
           yAxis = 0;
           sphere1.material = ballMaterial;
+          sphere2.dispose();
+          sphere2 = BABYLON.Mesh.CreateSphere("sphere2", 32, 2, scene);
+          sphere2.position.y = 3;
+          sphere2.position.x = -4;
+          sphere2.physicsImpostor = new BABYLON.PhysicsImpostor(sphere2, BABYLON.PhysicsImpostor.SphereImpostor, {
+            mass:0.01,
+            friction:0.5,
+            restitution: 0.7
+          }, scene);
+          sphere2.material = tubeMaterial;
         }
       }
       if (sphere1.position.y<-20) {
@@ -562,6 +600,16 @@ window.addEventListener('DOMContentLoaded', () => {
           xAxis = 0;
           yAxis = 0;
           sphere1.material = ballMaterial;
+          sphere2.dispose();
+          sphere2 = BABYLON.Mesh.CreateSphere("sphere2", 32, 2, scene);
+          sphere2.position.y = 3;
+          sphere2.position.x = -4;
+          sphere2.physicsImpostor = new BABYLON.PhysicsImpostor(sphere2, BABYLON.PhysicsImpostor.SphereImpostor, {
+            mass:0.01,
+            friction:0.5,
+            restitution: 0.7
+          }, scene);
+          sphere2.material = tubeMaterial;
         } else {
           scene = createScene();
         }
