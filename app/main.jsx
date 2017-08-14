@@ -22,8 +22,8 @@ const App = ({children}) =>
       <WhoAmI auth={auth}/>
     </nav>
     <Switch>
-      <Route exact path="/game" component={Game}/>
       <Route exact path="/" component={Home}/>
+      <Route exact path="/game" component={Game}/>
       <Route component={NotFound}/>
     </Switch>
   </div>
