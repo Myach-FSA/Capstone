@@ -1,5 +1,5 @@
 {
-  "name": "__BONES_NEEDS_A_NAME__",
+  "name": "myach",
   "version": "0.0.1",
   "description": "A happy little burning skeleton.",
   "main": "index.js",
@@ -41,6 +41,7 @@
   "dependencies": {
     "axios": "^0.15.2",
     "babel-preset-stage-2": "^6.18.0",
+    "babylonjs": "^3.1.0-alpha1",
     "bcryptjs": "^2.4.0",
     "body-parser": "^1.15.2",
     "chai-enzyme": "^0.5.2",
