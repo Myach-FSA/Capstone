@@ -25,42 +25,7 @@
   <!-- initialize the SDK after all desired features are loaded -->
   <script defer src="/__/firebase/init.js"></script>
   <script src="bundle.js" defer></script>
-  <style media="screen">
-    body {
-      background: #ECEFF1;
-      color: rgba(0, 0, 0, 0.87);
-      font-family: Roboto, Helvetica, Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-
-    @media (max-width: 600px) {
-      body,
-      #message {
-        margin-top: 0;
-        background: white;
-        box-shadow: none;
-      }
-      body {
-        border-top: 16px solid #ffa100;
-      }
-    }
-
-    html,
-    body {
-      overflow: hidden;
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
-
-    #renderCanvas {
-      width: 100%;
-      height: 100%;
-      touch-action: none;
-    }
-  </style>
+  <link rel="stylesheet" type='text/css' href='/styles.css' />
   <script src="babylon.js"></script>
    <!-- <script src="hand.js"></script>  -->
   <script src="cannon.js"></script>
@@ -68,10 +33,10 @@
 
 <body>
   <div id="content"></div>
-    <canvas id="renderCanvas"></canvas>
+    <!-- <canvas id="renderCanvas"></canvas> -->
+    <!-- <script src='../app/components/Game.js'></script> -->
     <script src="/bundle.js"></script>
   <p id="load">Firebase SDK Loading&hellip;</p>
-
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
