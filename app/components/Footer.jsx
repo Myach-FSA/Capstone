@@ -3,11 +3,11 @@ import { NavLink } from 'react-router-dom';
 
 const FooterSection = () => {
     return (
-      <footer id="footersec" className="footer">
+      <footer id="footersec">
         <div className="container">
-          <div className="content has-text-centered">
+          <div className="has-text-centered">
             <h4>
-              <strong className="title">Myach</strong> 
+              <strong className="title">Myach</strong>
             </h4>
             <p><a href="http://jgthms.com">By Dan, Denis, Yu, and Nancy</a></p>
             <p>

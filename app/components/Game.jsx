@@ -18,7 +18,7 @@ class Game extends React.Component {
 
   render() {
     return (
-      <canvas ref="renderCanvas" width={window.innerWidth} height={window.innerHeight * 0.8}></canvas>
+      <canvas className='gameDisplay 'ref="renderCanvas"></canvas>
     )
   }
 }
