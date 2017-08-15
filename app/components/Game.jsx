@@ -16,21 +16,6 @@ class Game extends React.Component {
     });
   }
 
-  // updateCanvasSize() {
-  //   var w = window,
-  //       d = document,
-  //       documentElement = d.documentElement,
-  //       body = d.getElementsByTagName('body')[0],
-  //       width = w.innerWidth || documentElement.clientWidth || body.clientWidth,
-  //       height = w.innerHeight|| documentElement.clientHeight|| body.clientHeight;
-
-  //   this.setState({ width, height});
-  // }
-
-  // componentWillMount() {
-  //   this.updateCanvasSize();
-  // }
-
   render() {
     return (
       <canvas ref="renderCanvas" width={window.innerWidth} height={window.innerHeight * 0.8}></canvas>
@@ -63,8 +48,6 @@ function createScene(engine, canvas) {
   var headTexture = new BABYLON.Texture("./assets/textures/net.png", scene);
   headMaterial.diffuseTexture = headTexture;
   headMaterial.diffuseColor = new BABYLON.Color3(2.0, 1, 0.7);
-  // var headTexture = new BABYLON.StandardMaterial('material', scene);
-  // var textureTube = new BABYLON.Texture('stone.png', scene);
   headMaterial.diffuseTexture.hasAlpha = true;
   head.position.x = sphere1.position.x;
   head.position.y = 0;
@@ -151,10 +134,6 @@ function createScene(engine, canvas) {
 
   // ---- CAMERA ----
 
-  // var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 20, -40), scene);
-  // camera.setTarget(BABYLON.Vector3.Zero());
-  // camera.attachControl(canvas, false);
-
   const followCamera = new BABYLON.FollowCamera("followCam", new BABYLON.Vector3(0, 15, -45), scene);
   followCamera.radius = 10; // how far from the object to follow
   followCamera.heightOffset = 7; // how high above the object to place the camera
@@ -164,26 +143,6 @@ function createScene(engine, canvas) {
   followCamera.attachControl(canvas, true);
   scene.activeCamera = followCamera;
   followCamera.lockedTarget = head;
-
-
-  // camera
-  //var camera = new BABYLON.TargetCamera("targetCam", BABYLON.Vector3.Zero(), scene);
-  // var camera = new BABYLON.ArcRotateCamera("camera1",  0, 0, 0, new BABYLON.Vector3(0, 0, -0), scene);
-  // camera.setPosition(new BABYLON.Vector3(0, 50, -200));
-  // camera.attachControl(canvas, true);
-
-  // Follow Cam
-  // var followCam = new BABYLON.FollowCamera("fcam", new BABYLON.Vector3(0, 15, -45), scene);
-  // followCam.setTarget = sphere1;
-  // followCam.radius = 10;
-
-  // scene.activeCamera = followCam;
-
-
-  // var targetCam = new BABYLON.TargetCamera("tcam", new BABYLON.Vector3(0, 15, -45), scene);
-  // targetCam.setTarget(sphere1.position);
-  // scene.activeCamera = targetCam;
-  // var target = BABYLON.Vector3.Zero();
 
   // ---- MATERIAL ----
 
