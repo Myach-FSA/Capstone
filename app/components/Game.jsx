@@ -1,6 +1,8 @@
 /* global BABYLON */
 
-import React from 'react'
+import React from 'react';
+import firebase from '../../fire';
+const database = firebase.database();
 
 class Game extends React.Component {
   componentDidMount() {
@@ -127,7 +129,8 @@ function createScene(engine, canvas) {
       }
     }
     sphere1.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(yAxis, 0, xAxis, 0));
-
+    database.ref("user1").set(sphere1.position);
+    database.ref("user2").set(sphere2.position);
     setTimeout(gameLoop, 50);
   }
   gameLoop();
