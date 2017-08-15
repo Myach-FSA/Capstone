@@ -11,6 +11,7 @@ import NavbarSection from './components/Navbar'
 import FooterSection from './components/Footer'
 import Scores from './components/Scores'
 import ChooseBall from './components/ChooseBall'
+import Login from './components/Login'
 
 import firebase from 'APP/fire'
 
@@ -31,6 +32,7 @@ const App = ({children}) =>
       <Route exact path="/game" component={Game}/>
       <Route exact path="/choose" component={ChooseBall}/>
       <Route exact path="/scores" component={Scores}/>
+      <Route exact path="/login" component={WhoAmI}/>
       <Route component={NotFound}/>
     </Switch>
     <FooterSection />
