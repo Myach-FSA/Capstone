@@ -38,15 +38,18 @@ export default class Register extends React.Component {
     this.unsubscribe()
   }
 
-  handleSignUp(name, email, password, motto) {
-    console.log('email, pw', name, email, password, motto)
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        console.log('User is signed in')
-      } else {
-        firebase.auth().createUserWithEmailAndPassword(email, password)
-      }
-    });
+  handleSignUp(username, name, email, password, motto) {
+    firebase.auth().createUserWithEmailAndPassword({
+      email: email,
+      password: password
+    })
+      .then(function(userRecord) {
+        // See the UserRecord reference doc for the contents of userRecord.
+        console.log("Successfully created new user:", userRecord.uid);
+      })
+      .catch(function(error) {
+        console.log("Error creating new user:", error);
+      });
 
     this.props.history.push('/')
   }
