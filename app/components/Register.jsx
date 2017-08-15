@@ -22,10 +22,10 @@ import { NavLink } from 'react-router-dom';
 //         : <button className='logout' onClick={() => auth.signOut()}>logout</button>}
 //   </div>
 
-export default class LoginUser extends React.Component {
+export default class Register extends React.Component {
   constructor(props) {
     super(props);
-    this.handleLogin = this.handleLogin.bind(this);
+    this.handleSignUp = this.handleSignUp.bind(this);
   }
 
   componentDidMount() {
@@ -38,19 +38,16 @@ export default class LoginUser extends React.Component {
     this.unsubscribe()
   }
 
-  handleLogin(email, password) {
-    console.log('email, pw', email, password)
-    firebase.auth().signInWithEmailAndPassword(email, password)
-    .then(function(user){
-      console.log('Signed in with user: ', user);
-    })
-    .catch(function(error) {
-      console.log("omg this didn't work")
-      var errorCode = error.code;
-      var errorMessage = error.message;
+  handleSignUp(name, email, password, motto) {
+    console.log('email, pw', name, email, password, motto)
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        console.log('User is signed in')
+      } else {
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+      }
     });
-    let person = user ? console.log('user', user) : console.log('nobody');
-    console.log('this person', person)
+
     this.props.history.push('/')
   }
 
@@ -61,7 +58,37 @@ export default class LoginUser extends React.Component {
         <div className="column is-one-third">
         </div>
         <div className="column is-one-third columnspace formspacing">
-          <form className="formspacing" onSubmit={evt => this.handleLogin(evt.target.email.value, evt.target.password.value)}>
+          <form className="formspacing" 
+            onSubmit={evt => 
+                this.handleSignUp(
+                    evt.target.username.value,
+                    evt.target.name.value,
+                    evt.target.email.value, 
+                    evt.target.password.value,
+                    evt.target.motto.value 
+                )}>
+            <div className="field">
+              <p className="control has-icons-left has-icons-right">
+                <input name="username" className="input" type="username" placeholder="User Name" />
+                <span className="icon is-small is-left">
+                  <i className="fa fa-envelope"></i>
+                </span>
+                <span className="icon is-small is-right">
+                  <i className="fa fa-check"></i>
+                </span>
+              </p>
+            </div>
+            <div className="field">
+              <p className="control has-icons-left has-icons-right">
+                <input name="name" className="input" type="name" placeholder="Name" />
+                <span className="icon is-small is-left">
+                  <i className="fa fa-envelope"></i>
+                </span>
+                <span className="icon is-small is-right">
+                  <i className="fa fa-check"></i>
+                </span>
+              </p>
+            </div>
             <div className="field">
               <p className="control has-icons-left has-icons-right">
                 <input name="email" className="input" type="email" placeholder="Email" />
@@ -82,27 +109,22 @@ export default class LoginUser extends React.Component {
               </p>
             </div>
             <div className="field">
+              <p className="control has-icons-left">
+                <input name="motto" className="input" type="motto" placeholder="Motto" />
+                <span className="icon is-small is-left">
+                  <i className="fa fa-lock"></i>
+                </span>
+              </p>
+            </div>
+            <div className="field">
               <p className="control ">
                 <button type="submit"
                   className="button is-primary">
-                  Login
+                  Submit
             </button>
               </p>
             </div>
           </form>
-          {/* 
-            <div className="or buffer">
-              <div className="back-line">
-                <span>OR</span>
-              </div>
-            </div>
-          </form>
-          <div className="buffer oauth">
-            <button className="button is-danger"
-            onClick={() => auth.signInWithPopup(facebook)}>Sign in with Google
-            </button>
-          </div> */}
-
           <div className="column is-one-third"></div>
         </div>
       </div>
