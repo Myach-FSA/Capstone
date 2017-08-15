@@ -1,7 +1,8 @@
+/* global BABYLON */
+
 import React from 'react'
 
 class Game extends React.Component {
-
   componentDidMount() {
     let canvas = this.refs.renderCanvas
     let engine = new BABYLON.Engine(canvas, true)
@@ -33,6 +34,7 @@ class Game extends React.Component {
   render() {
     return (
       <canvas ref="renderCanvas" width="1000px" height="600px"></canvas>
+      // <canvas ref="renderCanvas" width={window.innerWidth} height={window.innerHeight * 0.8}></canvas>
     )
   }
 }
