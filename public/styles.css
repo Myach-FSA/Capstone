@@ -75,6 +75,11 @@ body {
   padding: 0;
 }
 
+#forms {
+  padding-top: 10%;
+  margin-top: 10%;
+}
+
 #renderCanvas {
   width: 100%;
   height: 100%;
