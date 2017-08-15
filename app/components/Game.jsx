@@ -58,9 +58,17 @@ function createScene(engine, canvas) {
   sphere2.position.x = 4;
   sphere2.checkCollisions = true;
 
-  const head = BABYLON.MeshBuilder.CreateBox("box", 1, scene);
+  const head = BABYLON.MeshBuilder.CreateSphere("1", 1, scene);
+  var headMaterial = new BABYLON.StandardMaterial("material", scene);
+  var headTexture = new BABYLON.Texture("./assets/textures/net.png", scene);
+  headMaterial.diffuseTexture = headTexture;
+  headMaterial.diffuseColor = new BABYLON.Color3(2.0, 1, 0.7);
+  // var headTexture = new BABYLON.StandardMaterial('material', scene);
+  // var textureTube = new BABYLON.Texture('stone.png', scene);
+  headMaterial.diffuseTexture.hasAlpha = true;
   head.position.x = sphere1.position.x;
   head.position.y = 0;
+  head.material = headMaterial;
 
   head.parent = sphere1;
 
@@ -181,8 +189,8 @@ function createScene(engine, canvas) {
 
   var ballMaterial = new BABYLON.StandardMaterial('material', scene);
   var tubeMaterial = new BABYLON.StandardMaterial('material', scene);
-  var textureTube = new BABYLON.Texture('stone.png', scene);
-  var textureBall = new BABYLON.Texture('net.png', scene);
+  var textureTube = new BABYLON.Texture('./assets/textures/stone.png', scene);
+  var textureBall = new BABYLON.Texture('./assets/textures/net.png', scene);
   ballMaterial.diffuseColor = new BABYLON.Color3(2.0, 1, 0.7);
   ballMaterial.diffuseTexture = textureBall;
   ballMaterial.diffuseTexture.hasAlpha = true;
@@ -190,7 +198,7 @@ function createScene(engine, canvas) {
   tubeMaterial.diffuseTexture = textureTube;
   sphere2.material = tubeMaterial;
   var groundMaterial = new BABYLON.StandardMaterial('material', scene);
-  var textureGrass = new BABYLON.Texture('grass-large.png', scene);
+  var textureGrass = new BABYLON.Texture('./assets/textures/grass-large.png', scene);
   groundMaterial.diffuseTexture = textureGrass;
   ground.material = groundMaterial;
 
