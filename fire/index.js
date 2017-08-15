@@ -5,7 +5,7 @@ const config = {
   apiKey: "AIzaSyBYhxMkpdLLv3Ze187wNleejBtDTOAJvUA",
   authDomain: "myachnv.firebaseapp.com",
   databaseURL: "https://myachnv.firebaseio.com",
-  projectId: "myachnv",
+  projectId: "myach-fsa",
   storageBucket: "",
   messagingSenderId: "149250633671"
 }
