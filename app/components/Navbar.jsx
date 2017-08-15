@@ -30,8 +30,8 @@ const NavbarSection = () => {
               <NavLink className="navbar-item " to="/login">
                 Login
               </NavLink>
-              <NavLink className="navbar-item " to="/profile">
-                Profile
+              <NavLink className="navbar-item " to="/logout">
+                Logout
               </NavLink>
             </div>
           </div>

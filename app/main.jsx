@@ -11,7 +11,8 @@ import NavbarSection from './components/Navbar'
 import FooterSection from './components/Footer'
 import Scores from './components/Scores'
 import ChooseBall from './components/ChooseBall'
-import Login from './components/Login'
+import Register from './components/Register'
+// import Login from './components/Login'
 
 import firebase from 'APP/fire'
 
@@ -20,19 +21,18 @@ import Demos from 'APP/demos'
 const auth = firebase.auth()
 
 auth.onAuthStateChanged(user => user || auth.signInAnonymously())
+console.log('auth', auth)
 
 const App = ({children}) =>
   <div>
-    {/* <nav>
-      <WhoAmI auth={auth}/>
-    </nav> */}
     <NavbarSection />
     <Switch>
       <Route exact path="/" component={Home}/>
       <Route exact path="/game" component={Game}/>
       <Route exact path="/choose" component={ChooseBall}/>
       <Route exact path="/scores" component={Scores}/>
-      <Route exact path="/login" component={WhoAmI}/>
+      <Route exact path="/login" render={() => <WhoAmI auth={auth} />} />
+      <Route exact path="/signup" render={() => <Register auth={auth} />} />
       <Route component={NotFound}/>
     </Switch>
     <FooterSection />
