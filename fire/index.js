@@ -3,10 +3,10 @@ const firebase = require('firebase')
 // -- // -- // -- // Firebase Config // -- // -- // -- //
 const config = {
   apiKey: "AIzaSyD5CuKXBrzpUH_m8ovpCdXCNbQ5uRKkPmI",
-  authDomain: "myachnv.firebaseapp.com",
-  databaseURL: "https://myach-fsa.firebaseio.com/",
+  authDomain: "myach-fsa.firebaseapp.com",
+  databaseURL: "https://myach-fsa.firebaseio.com",
   projectId: "myach-fsa",
-  storageBucket: "",
+  storageBucket: "myach-fsa.appspot.com",
   messagingSenderId: "51959276382"
 }
 // -- // -- // -- // -- // -- // -- // -- // -- // -- //

@@ -20,7 +20,7 @@ class Game extends React.Component {
 
   render() {
     return (
-      <canvas ref="renderCanvas" width={window.innerWidth} height={window.innerHeight * 0.8}></canvas>
+      <canvas className='gameDisplay ' ref="renderCanvas"></canvas>
     )
   }
 }
@@ -102,6 +102,9 @@ function createScene(engine, canvas) {
 
   window.addEventListener('keydown', function (e) {
     keyState[e.keyCode || e.which] = true;
+    if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+      e.preventDefault();
+    }
   }, true);
   window.addEventListener('keyup', function (e) {
     keyState[e.keyCode || e.which] = false;
