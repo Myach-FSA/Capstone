@@ -21,6 +21,7 @@ class Game extends React.Component {
   render() {
     return (
       <canvas className='gameDisplay ' ref="renderCanvas"></canvas>
+      //ref= // takes in callback (canvas)
     )
   }
 }
@@ -64,16 +65,16 @@ function createScene(engine, canvas) {
 
   // ---- CURVE POINTS ----
 
-  const curvePoints = (l, t) => {
-    const path = [];
-    let step = l / t;
-    let a = 5;
-    for (let i = -l / 2; i < l / 2; i += step) {
-      path.push(new BABYLON.Vector3(5 * Math.sin(i * t / 400), i, 5 * Math.cos(i * t / 400)));
-    }
-    return path;
-  };
-  const curve = curvePoints(40, 100);
+  // const curvePoints = (l, t) => {
+  //   const path = [];
+  //   let step = l / t;
+  //   let a = 5;
+  //   for (let i = -l / 2; i < l / 2; i += step) {
+  //     path.push(new BABYLON.Vector3(5 * Math.sin(i * t / 400), i, 5 * Math.cos(i * t / 400)));
+  //   }
+  //   return path;
+  // };
+  // const curve = curvePoints(40, 100);
 
   // ---- PHYSICS ----
 
@@ -98,6 +99,15 @@ function createScene(engine, canvas) {
   let xAxis = 0;
   let yAxis = 0;
 
+  // database.ref('user1').on('value', function(val) {
+  //   zAxis = val.val().zAxis
+  // });
+
+  // database.ref('user1').on('value', function(val) {
+  //   console.log(val.val().xAxis)
+  //   return val.val().xAxis
+  // });
+
   const keyState = {};
 
   window.addEventListener('keydown', function (e) {
@@ -114,28 +124,36 @@ function createScene(engine, canvas) {
     if (keyState[37] || keyState[65]) {
       if (xAxis < 5) {
         xAxis += .5;
+        database.ref("user1").set({xAxis, zAxis});
       }
     }
     if (keyState[39] || keyState[68]) {
       if (xAxis > -5) {
         xAxis -= .5;
+        database.ref("user1").set({xAxis, zAxis});
       }
     }
     if (keyState[38] || keyState[87]) {
-      if (yAxis < 5) {
-        yAxis += .5;
+      if (zAxis < 5) {
+        zAxis += .5;
+        database.ref("user1").set({xAxis, zAxis});
       }
     }
     if (keyState[40] || keyState[83]) {
-      if (yAxis > -5) {
-        yAxis -= .5;
+      if (zAxis > -5) {
+        zAxis -= .5;
+        database.ref("user1").set({xAxis, zAxis});
       }
     }
-    sphere1.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(yAxis, 0, xAxis, 0));
-    database.ref("user1").set(sphere1.position);
-    database.ref("user2").set(sphere2.position);
     setTimeout(gameLoop, 50);
   }
+
+  database.ref('user1').on('value', function(val) {
+    // console.log(val.val().xAxis);
+    // console.log(val.val().zAxis);
+    sphere1.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(val.val().zAxis, 0, val.val().xAxis, 0));
+  });
+
   gameLoop();
 
   // ---- CAMERA ----
