@@ -28,9 +28,7 @@ console.log('auth', auth)
 const App = ({ children }) =>
   <Router>
       <div>
-        <nav>
-          {/* <WhoAmI auth={auth} /> */}
-        </nav>
+        <NavbarSection />
         <Switch>
           <Route exact path="/" component={Home} />
           <Route exact path="/game" component={Game} />
