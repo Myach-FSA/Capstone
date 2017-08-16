@@ -47,7 +47,6 @@ import { connect } from 'react-redux'
 import store from '../store';
 
 const mapStateToProps = (state) => {
-  console.log('state', state)
   return { user: state.auth.user
 }}
 

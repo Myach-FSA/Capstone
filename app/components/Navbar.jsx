@@ -1,5 +1,5 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
+import React from 'react'
+import { NavLink } from 'react-router-dom'
 
 class NavbarSection extends React.Component {
   constructor() {
@@ -50,14 +50,10 @@ class NavbarSection extends React.Component {
   }
 };
 
-// export default NavbarSection;
-
-
 /* -----------------    CONTAINER     ------------------ */
 
 import { logOut } from '../reducers/auth'
 import {connect} from 'react-redux'
-// import store from '../store';
 
 const mapState = (state, componentProps) => (
   {user: state.auth }
