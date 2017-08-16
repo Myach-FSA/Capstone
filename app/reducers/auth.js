@@ -18,6 +18,9 @@ const reducer = (state = initialState, action) => {
       newState.user = action.user; break
     case SIGN_OUT_USER:
       newState.user = {}; break
+    case LOGIN: 
+      newState.user = action.user; 
+      break      
     default:
       return state
   }
@@ -37,7 +40,10 @@ const set = user => ({ type: SET, user })
 const SIGN_OUT_USER = 'SIGN_OUT_USER'
 const signOutUser = () => ({ type: SIGN_OUT_USER })
 
-/* --------- THUNK CREATORS --------- */
+const LOGIN = 'LOGIN'
+const loginUser = (user) => ({ type: LOGIN, user })
+
+/* --------- THUNK CREATORS --------- */  
 
 export const signUp = (user) => {
     const userObj = {
@@ -50,24 +56,22 @@ export const signUp = (user) => {
         ball: ''
     }
     const ref = firebase.database().ref("users/"+user.userId)
-    console.log(ref)
     ref.set(userObj)
 
    return set(userObj);
 }
 
 export const login = (user) => {
+    let loginObj = {}
 
-    console.log('This is the id in auth', user)
-
-    const ref = firebase.database().ref('users' + user.id + totalScore)
-
-    console.log('This is the ref', ref)
-
-    ref.once("value").then((snapshot) => {
-        const key = snapshot.key;
-    })
-    
+    const ref = firebase.database().ref('users/' + user.id)
+    ref.on("value", (snapshot) => {
+        console.log('Snapshot', snapshot.val());
+        Object.assign(loginObj, snapshot.val())
+    }, function (errorObject) {
+        console.log("The read failed: " + errorObject.code);
+    });
+    return loginUser(loginObj);
 }
 
 export function logOut() {
