@@ -28,13 +28,18 @@ console.log('auth', auth)
 const App = ({ children }) =>
   <Router>
       <div>
-        <NavbarSection />
-        <Switch>
-          <Route exact path="/" component={Home} />
-          <Route exact path="/game" component={Game} />
-          <Route component={NotFound} />
-        </Switch>
-      </div>
+      <NavbarSection />
+      <Switch>
+        <Route exact path="/" component={Home}/>
+        <Route exact path="/game" component={Game}/>
+        <Route exact path="/choose" component={ChooseBall}/>
+        <Route exact path="/scores" component={Scores}/>
+        <Route exact path="/login" render={() => <WhoAmI auth={auth} />} />
+        <Route exact path="/signup" render={() => <Register auth={auth} />} />
+        <Route component={NotFound}/>
+      </Switch>
+      <FooterSection />
+    </div>
   </Router>
 
 render(
