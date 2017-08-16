@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux'
-import game from './game'
+import auth from './auth'
 const reducer = combineReducers({
-  game
+  auth
 })
 
 export default reducer
-export * from './game'
+export * from './auth'
