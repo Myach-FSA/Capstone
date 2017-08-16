@@ -1,8 +1,7 @@
 import React from 'react'
 import firebase from 'APP/fire'
 const auth = firebase.auth()
-import { NavLink } from 'react-router-dom';
-import { BrowserRouter } from 'react-router'
+import { Router, BrowserHistory, NavLink, withRouter } from 'react-router-dom';
 
 class Register extends React.Component {
   constructor(props) {
@@ -23,8 +22,10 @@ class Register extends React.Component {
     .then(user => {
       this.props.signUp({ userId: user.uid, email, username})
     })
+    .then(() => {
+      this.props.history.push('/choose')    
+    })
     .catch(error => console.log(error))
-    // this.props.history.push('/profile')
   }
 
   render() {
@@ -93,4 +94,4 @@ const mapState = (state, componentProps) => (
 
 const mapDispatch = ({signUp})
 
-export default connect(mapState, mapDispatch)(Register)
+export default withRouter(connect(mapState, mapDispatch)(Register))

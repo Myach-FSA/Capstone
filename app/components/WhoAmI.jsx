@@ -1,7 +1,7 @@
 import React from 'react'
 import firebase from 'APP/fire'
 const auth = firebase.auth()
-import { NavLink } from 'react-router-dom';
+import { Router, BrowserHistory, NavLink, withRouter } from 'react-router-dom';
 
 class LoginUser extends React.Component {
   constructor(props) {
@@ -18,12 +18,12 @@ class LoginUser extends React.Component {
     const password = evt.target.password.value
     auth.signInWithEmailAndPassword(email, password)
     .then(response => {
-      console.log('Hey props', this.props)
-      console.log('response id', response.uid)
-      this.props.login({ id: response.uid })
+      this.props.login({ id: response.uid })    
+    })
+    .then(() => {
+      this.props.history.push('/choose')    
     })
     .catch(error => console.log(error))
-    // this.props.history.push('/profile')
   }
 
   render() {
@@ -59,7 +59,7 @@ class LoginUser extends React.Component {
                 <button type="submit"
                   className="button is-primary">
                   Login
-            </button>
+              </button>
               </p>
             </div>
           </form>
@@ -75,10 +75,10 @@ class LoginUser extends React.Component {
 import { login } from '../reducers/auth'
 import {connect} from 'react-redux'
 
-const mapState = (state, componentProps) => (
+const mapState = (state) => (
   {user: state.user }
 )
 
 const mapDispatch = ({login})
 
-export default connect(mapState, mapDispatch)(LoginUser)
+export default withRouter(connect(mapState, mapDispatch)(LoginUser))
