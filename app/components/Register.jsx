@@ -31,7 +31,7 @@ export default class Register extends React.Component {
   componentDidMount() {
     console.log('these are the props', this.props)
     const { auth } = this.props
-    this.unsubscribe = auth.onAuthStateChanged(user => this.setState({ user }))
+    // this.unsubscribe = auth.onAuthStateChanged(user => this.setState({ user }))
   }
 
   componentWillUnmount() {
@@ -39,6 +39,7 @@ export default class Register extends React.Component {
   }
 
   handleSignUp(username, name, email, password, motto) {
+    console.log('username', username, name, email)
     firebase.auth().createUserWithEmailAndPassword({
       email: email,
       password: password

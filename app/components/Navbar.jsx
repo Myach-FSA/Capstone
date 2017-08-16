@@ -9,7 +9,7 @@ class NavbarSection extends React.Component {
 
   componentDidMount() {
     const { auth } = this.props
-    this.unsubscribe = auth.onAuthStateChanged(user => this.setState({ user }))
+    // this.unsubscribe = auth.onAuthStateChanged(user => this.setState({ user }))
   }
 
   componentWillUnmount() {
