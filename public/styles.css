@@ -97,3 +97,34 @@ body {
 .playnow {
   padding: 2%;
 }
+
+a.halflink:hover { 
+  cursor: pointer; 
+}
+
+.image-container {
+  position: relative;
+  width: 200px;
+  height: 300px;
+}
+.image-container .after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  color: #FFF;
+}
+.image-container:hover .after {
+  display: block;
+  background: rgba(0, 0, 0, .6);
+}
+
+.columnspace {
+  padding-top: 5%;
+}
+
+.formspacing {
+  padding-bottom: 5%;
+}
