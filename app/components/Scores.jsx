@@ -54,7 +54,6 @@ const mapStateToProps = (state) => ({
   user: state.auth.user
 })
 
-
 const mapDispatch = ({ fetchUser })
 
 export default connect(mapStateToProps, mapDispatch)(Scores)
