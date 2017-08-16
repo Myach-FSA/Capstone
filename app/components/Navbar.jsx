@@ -1,8 +1,7 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
+import React from 'react'
+import { NavLink } from 'react-router-dom'
 
-const NavbarSection = () => {
-    return (
+const NavbarSection = () => (
         <header className="nav headersec">
         <div className="container navbarsec">
         <NavLink className="navbar-item itemsec" to="/">
@@ -38,7 +37,6 @@ const NavbarSection = () => {
         </div>
         </div>
         </header>
-    );
-};
+    )
 
-export default NavbarSection;
+export default NavbarSection
