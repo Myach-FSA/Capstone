@@ -3,38 +3,27 @@ import firebase from 'APP/fire'
 const auth = firebase.auth()
 import { NavLink } from 'react-router-dom';
 
-export default class LoginUser extends React.Component {
+class LoginUser extends React.Component {
   constructor(props) {
     super(props);
     this.handleLogin = this.handleLogin.bind(this);
   }
+        
+  handleLogin(evt) {
+    evt.preventDefault()    
 
-  componentDidMount() {
-    console.log('these are the props', this.props)
-    const { auth } = this.props
-    // this.unsubscribe = auth.onAuthStateChanged(user => this.setState({ user }))
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe()
-  }
-
-  handleLogin(email, password) {
-    console.log('email, pw', email, password)
-    firebase.auth().signInWithEmailAndPassword(email, password)
-    .catch(function(error) {
-      var errorCode = error.code;
-      var errorMessage = error.message;
-    });
-
-    firebase.auth().onAuthStateChanged(function(user) {
-      if (user) {
-        console.log('This is the user', user)
-      } else {
-        console.log('No user')
-      }
-    });
-    this.props.history.push('/')
+    let id = '';
+    
+    const email = evt.target.email.value;
+    const password = evt.target.password.value
+    auth.signInWithEmailAndPassword(email, password)
+    .then(response => {
+      console.log('Hey props', this.props)
+      console.log('response id', response.uid)
+      this.props.login({ id: response.uid })
+    })
+    .catch(error => console.log(error))
+    // this.props.history.push('/profile')
   }
 
   render() {
@@ -44,7 +33,7 @@ export default class LoginUser extends React.Component {
         <div className="column is-one-third">
         </div>
         <div className="column is-one-third columnspace formspacing">
-          <form className="formspacing" onSubmit={evt => this.handleLogin(evt.target.email.value, evt.target.password.value)}>
+          <form className="formspacing" onSubmit={evt => this.handleLogin(evt)}>
             <div className="field">
               <p className="control has-icons-left has-icons-right">
                 <input name="email" className="input" type="email" placeholder="Email" />
@@ -64,6 +53,7 @@ export default class LoginUser extends React.Component {
                 </span>
               </p>
             </div>
+            {/* { this.renderAuthenticationError() } */}
             <div className="field">
               <p className="control ">
                 <button type="submit"
@@ -82,12 +72,13 @@ export default class LoginUser extends React.Component {
 
 /* -----------------    CONTAINER     ------------------ */
 
-// import {connect} from 'react-redux'
+import { login } from '../reducers/auth'
+import {connect} from 'react-redux'
 
-// const mapState = (state, componentProps) => (
-//   {user: state.auth }
-// )
+const mapState = (state, componentProps) => (
+  {user: state.user }
+)
 
-// const mapDispatch = ({login})
+const mapDispatch = ({login})
 
-// export default connect(mapState, mapDispatch)(Login)
+export default connect(mapState, mapDispatch)(LoginUser)

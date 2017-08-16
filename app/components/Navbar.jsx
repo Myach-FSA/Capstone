@@ -7,21 +7,8 @@ class NavbarSection extends React.Component {
     this.handleLogout = this.handleLogout.bind(this);
   }
 
-  componentDidMount() {
-    const { auth } = this.props
-    // this.unsubscribe = auth.onAuthStateChanged(user => this.setState({ user }))
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe()
-  }
-
   handleLogout() {
-    firebase.auth().signOut().then(function() {
-      console.log('Sign out successful')
-    }).catch(function(error) {
-      console.log('Error occured while attempting to sign out')
-    })
+    this.props.logOut()    
   };
   
   render() {
@@ -53,9 +40,7 @@ class NavbarSection extends React.Component {
                 <NavLink className="navbar-item " to="/login">
                   Login
                 </NavLink>
-                <button className="navbar-item" onClick={evt => this.handleLogin(evt.target.email.value, evt.target.password.value)}>
-                  Logout
-                </button>
+                <a className='halflink' onClick={this.handleLogout}>Logout</a>
               </div>
             </div>
           </div>
@@ -65,4 +50,19 @@ class NavbarSection extends React.Component {
   }
 };
 
-export default NavbarSection;
+// export default NavbarSection;
+
+
+/* -----------------    CONTAINER     ------------------ */
+
+import { logOut } from '../reducers/auth'
+import {connect} from 'react-redux'
+// import store from '../store';
+
+const mapState = (state, componentProps) => (
+  {user: state.auth }
+)
+
+const mapDispatch = ({logOut})
+
+export default connect(mapState, mapDispatch)(NavbarSection)

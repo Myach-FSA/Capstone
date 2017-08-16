@@ -2,6 +2,9 @@
 import React from 'react'
 import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom'
 import {render} from 'react-dom'
+import { Provider, connect } from 'react-redux'
+
+import store from './store'
 
 import WhoAmI from './components/WhoAmI'
 import NotFound from './components/NotFound'
@@ -12,7 +15,6 @@ import FooterSection from './components/Footer'
 import Scores from './components/Scores'
 import ChooseBall from './components/ChooseBall'
 import Register from './components/Register'
-// import Login from './components/Login'
 
 import firebase from 'APP/fire'
 
@@ -21,7 +23,8 @@ import Demos from 'APP/demos'
 const auth = firebase.auth()
 
 auth.onAuthStateChanged(user => user || auth.signInAnonymously())
-console.log('auth', auth)
+console.log('auth', auth.currentUser)
+console.log('user', store.getState())
 
 const App = ({children}) =>
   <div>
@@ -39,10 +42,10 @@ const App = ({children}) =>
   </div>
 
 render(
-  <Router>
-    <Switch>
+  <Provider store={store}>
+    <Router>
       <App />
-    </Switch>
-  </Router>,
+    </Router>
+  </Provider>,
   document.getElementById('content')
 )

@@ -2,57 +2,29 @@ import React from 'react'
 import firebase from 'APP/fire'
 const auth = firebase.auth()
 import { NavLink } from 'react-router-dom';
+import { BrowserRouter } from 'react-router'
 
-// import Login from './Login'
-
-// export const name = user => {
-//   if (!user) return 'Nobody'
-//   if (user.isAnonymous) return 'Anonymous'
-//   return user.displayName || user.email
-// }
-
-// export const WhoAmI = ({ user, auth }) =>
-//   <div className="whoami">
-//     <span className="whoami-user-name">Hello, {name(user)}</span>
-//     { // If nobody is logged in, or the current user is anonymous,
-//       (!user || user.isAnonymous) ?
-//         // ...then show signin links...
-//         <Login auth={auth} />
-//         /// ...otherwise, show a logout button.
-//         : <button className='logout' onClick={() => auth.signOut()}>logout</button>}
-//   </div>
-
-export default class Register extends React.Component {
+class Register extends React.Component {
   constructor(props) {
     super(props);
     this.handleSignUp = this.handleSignUp.bind(this);
   }
 
-  componentDidMount() {
-    console.log('these are the props', this.props)
-    const { auth } = this.props
-    // this.unsubscribe = auth.onAuthStateChanged(user => this.setState({ user }))
-  }
+  handleSignUp(evt) {
+    evt.preventDefault()    
 
-  componentWillUnmount() {
-    this.unsubscribe()
-  }
+    let id = '';
+    
+    const email = evt.target.email.value;
+    const password = evt.target.password.value
+    const username = evt.target.username.value
 
-  handleSignUp(username, name, email, password, motto) {
-    console.log('username', username, name, email)
-    firebase.auth().createUserWithEmailAndPassword({
-      email: email,
-      password: password
+    auth.createUserWithEmailAndPassword(email, password)
+    .then(user => {
+      this.props.signUp({ userId: user.uid, email, username})
     })
-      .then(function(userRecord) {
-        // See the UserRecord reference doc for the contents of userRecord.
-        console.log("Successfully created new user:", userRecord.uid);
-      })
-      .catch(function(error) {
-        console.log("Error creating new user:", error);
-      });
-
-    this.props.history.push('/')
+    .catch(error => console.log(error))
+    // this.props.history.push('/profile')
   }
 
   render() {
@@ -62,29 +34,10 @@ export default class Register extends React.Component {
         <div className="column is-one-third">
         </div>
         <div className="column is-one-third columnspace formspacing">
-          <form className="formspacing" 
-            onSubmit={evt => 
-                this.handleSignUp(
-                    evt.target.username.value,
-                    evt.target.name.value,
-                    evt.target.email.value, 
-                    evt.target.password.value,
-                    evt.target.motto.value 
-                )}>
-            <div className="field">
+          <form className="formspacing" onSubmit={evt => this.handleSignUp(evt)}>
+          <div className="field">
               <p className="control has-icons-left has-icons-right">
-                <input name="username" className="input" type="username" placeholder="User Name" />
-                <span className="icon is-small is-left">
-                  <i className="fa fa-envelope"></i>
-                </span>
-                <span className="icon is-small is-right">
-                  <i className="fa fa-check"></i>
-                </span>
-              </p>
-            </div>
-            <div className="field">
-              <p className="control has-icons-left has-icons-right">
-                <input name="name" className="input" type="name" placeholder="Name" />
+                <input name="username" className="input" type="username" placeholder="Username" />
                 <span className="icon is-small is-left">
                   <i className="fa fa-envelope"></i>
                 </span>
@@ -113,18 +66,10 @@ export default class Register extends React.Component {
               </p>
             </div>
             <div className="field">
-              <p className="control has-icons-left">
-                <input name="motto" className="input" type="motto" placeholder="Motto" />
-                <span className="icon is-small is-left">
-                  <i className="fa fa-lock"></i>
-                </span>
-              </p>
-            </div>
-            <div className="field">
               <p className="control ">
                 <button type="submit"
                   className="button is-primary">
-                  Submit
+                  Register
             </button>
               </p>
             </div>
@@ -138,13 +83,14 @@ export default class Register extends React.Component {
 
 // /* -----------------    CONTAINER     ------------------ */
 
-// import {login} from 'APP/app/reducers/auth'
-// import {connect} from 'react-redux'
+import {signUp} from '../reducers/auth'
+import {connect} from 'react-redux'
+import store from '../store';
 
-// const mapState = (state, componentProps) => (
-//   {user: state.auth }
-// )
+const mapState = (state, componentProps) => (
+  {user: state.user }
+)
 
-// const mapDispatch = ({login})
+const mapDispatch = ({signUp})
 
-// export default connect(mapState, mapDispatch)(Login)
+export default connect(mapState, mapDispatch)(Register)
