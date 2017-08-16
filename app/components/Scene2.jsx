@@ -159,7 +159,8 @@ const createScene2=(canvas, engine) => {
         }, scene)
         sphere2.material = tubeMaterial
       } else {
-        // scene = createScene()
+        window.location.replace(window.location.origin)
+        return
       }
     } else { sphere1.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(yAxis, 0, xAxis, 0)) };
 
