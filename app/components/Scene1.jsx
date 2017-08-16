@@ -1,7 +1,10 @@
 import React from 'react'
-import {createScene} from '../reducers'
-/* global BABYLON*/
+import game, {createScene, getScene} from '../reducers'
+import createScene2 from './Scene2'
+import {changeScene} from './Game'
+/* global BABYLON */
 const createScene1 = (canvas, engine) => {
+  var sceneval=game.action
   console.log('creating scene 1')
   const scene = new BABYLON.Scene(engine) // creates a basic Babylon scene object
   scene.enablePhysics()
@@ -11,7 +14,7 @@ const createScene1 = (canvas, engine) => {
 
   // ---- SHAPES ----
 
-  let sphere1 = BABYLON.Mesh.CreateSphere('sphere1', 16, 2, scene) //Params: name, subdivs, size, scene
+  let sphere1 = BABYLON.Mesh.CreateSphere('sphere1', 16, 2, scene) // Params: name, subdivs, size, scene
   sphere1.position.y = 3
   sphere1.position.x= 4
   sphere1.checkCollisions = true
@@ -104,13 +107,12 @@ const createScene1 = (canvas, engine) => {
     }
     if ((Math.round(sphere1.position.x) === torus.position.x) && (Math.round(sphere1.position.y - 1) === torus.position.y) && (Math.round(sphere1.position.z) === torus.position.z)) {
       if (window.confirm('You Won!\nNext Level?') === true) {
-        console.log('next')
-        sphere1.dispose()
-        createScene(2)
+        // sphere1.dispose()
+        changeScene()
         return
       } else {
         sphere1.dispose()
-        sphere1 = BABYLON.Mesh.CreateSphere('sphere1', 16, 2, scene) //Params: name, subdivs, size, scene
+        sphere1 = BABYLON.Mesh.CreateSphere('sphere1', 16, 2, scene) // Params: name, subdivs, size, scene
         sphere1.position.y = 3
         sphere1.physicsImpostor = new BABYLON.PhysicsImpostor(sphere1, BABYLON.PhysicsImpostor.SphereImpostor, {
           mass: 0.01,
@@ -136,7 +138,7 @@ const createScene1 = (canvas, engine) => {
     }
     if (sphere1.position.y<-20) {
       if (window.confirm('You Lose :(\nTry Again?') === true) {
-        sphere1 = BABYLON.Mesh.CreateSphere('sphere1', 16, 2, scene) //Params: name, subdivs, size, scene
+        sphere1 = BABYLON.Mesh.CreateSphere('sphere1', 16, 2, scene) // Params: name, subdivs, size, scene
         sphere1.position.y = 3
         sphere1.physicsImpostor = new BABYLON.PhysicsImpostor(sphere1, BABYLON.PhysicsImpostor.SphereImpostor, {
           mass: 0.01,
@@ -184,7 +186,7 @@ const createScene1 = (canvas, engine) => {
   followCamera.lockedTarget = head
 
   // camera
-  //var camera = new BABYLON.TargetCamera("targetCam", BABYLON.Vector3.Zero(), scene);
+  // var camera = new BABYLON.TargetCamera("targetCam", BABYLON.Vector3.Zero(), scene);
   // var camera = new BABYLON.ArcRotateCamera("camera1",  0, 0, 0, new BABYLON.Vector3(0, 0, -0), scene);
   // camera.setPosition(new BABYLON.Vector3(0, 50, -200));
   // camera.attachControl(canvas, true);

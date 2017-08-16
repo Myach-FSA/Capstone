@@ -1,5 +1,5 @@
 const initialState={
-  sceneNum: 0,
+  sceneNum: 1,
   ball: ''
 }
 const CREATE_SCENE = 'CREATE_SCENE'
@@ -12,8 +12,11 @@ export default function gameReducer(state=initialState, action) {
   const newState = Object.assign({}, state)
   switch (action.type) {
   case CREATE_SCENE:
-    console.log(action.sceneNum)
+    console.log('create scene', action.sceneNum)
     newState.sceneNum=action.sceneNum
+    break
+  case GET_SCENE:
+    newState.sceneNum=state.sceneNum
     break
   default: return state
   }
@@ -36,5 +39,5 @@ export default function gameReducer(state=initialState, action) {
   //   console.log('I should not hit this')
   //   return state
   // console.log('newState', newState)
-  //return newState
+  // return newState
 }

@@ -25,12 +25,11 @@ const auth = firebase.auth()
 auth.onAuthStateChanged(user => user || auth.signInAnonymously())
 console.log('auth', auth)
 
-<<<<<<< HEAD
 const App = ({ children }) =>
   <Router>
       <div>
         <nav>
-          <WhoAmI auth={auth} />
+          {/* <WhoAmI auth={auth} /> */}
         </nav>
         <Switch>
           <Route exact path="/" component={Home} />
@@ -39,38 +38,10 @@ const App = ({ children }) =>
         </Switch>
       </div>
   </Router>
-=======
-const App = ({children}) =>
-  <div>
-    <NavbarSection />
-    <Switch>
-      <Route exact path="/" component={Home}/>
-      <Route exact path="/game" component={Game}/>
-      <Route exact path="/choose" component={ChooseBall}/>
-      <Route exact path="/scores" component={Scores}/>
-      <Route exact path="/login" render={() => <WhoAmI auth={auth} />} />
-      <Route exact path="/signup" render={() => <Register auth={auth} />} />
-      <Route component={NotFound}/>
-    </Switch>
-    <FooterSection />
-  </div>
->>>>>>> ba5655ac6376c2a281ab4da05635360a674614dc
 
 render(
   <Provider store={store}>
     <App />
   </Provider>,
   document.getElementById('content')
-<<<<<<< HEAD
 )
-// render(
-//   <Router>
-//     <Switch>
-//       <App />
-//     </Switch>
-//   </Router>,
-//   document.getElementById('content')
-// )
-=======
-)
->>>>>>> ba5655ac6376c2a281ab4da05635360a674614dc
