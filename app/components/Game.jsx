@@ -99,15 +99,6 @@ function createScene(engine, canvas) {
   let xAxis = 0;
   let yAxis = 0;
 
-  // database.ref('user1').on('value', function(val) {
-  //   zAxis = val.val().zAxis
-  // });
-
-  // database.ref('user1').on('value', function(val) {
-  //   console.log(val.val().xAxis)
-  //   return val.val().xAxis
-  // });
-
   const keyState = {};
 
   window.addEventListener('keydown', function (e) {
@@ -119,6 +110,8 @@ function createScene(engine, canvas) {
   window.addEventListener('keyup', function (e) {
     keyState[e.keyCode || e.which] = false;
   }, true);
+
+  database.ref('user1').set({xAxis: 0, zAxis: 0});
 
   function gameLoop() {
     if (keyState[37] || keyState[65]) {
@@ -149,8 +142,6 @@ function createScene(engine, canvas) {
   }
 
   database.ref('user1').on('value', function(val) {
-    // console.log(val.val().xAxis);
-    // console.log(val.val().zAxis);
     sphere1.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(val.val().zAxis, 0, val.val().xAxis, 0));
   });
 
