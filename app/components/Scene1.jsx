@@ -5,7 +5,7 @@ import {changeScene} from './Game'
 /* global BABYLON */
 const createScene1 = (canvas, engine) => {
   var sceneval=game.action
-  console.log('creating scene 1')
+  console.log('creating scene 1', window.location.origin)
   const scene = new BABYLON.Scene(engine) // creates a basic Babylon scene object
   scene.enablePhysics()
   scene.collisionsEnabled = true
@@ -161,7 +161,8 @@ const createScene1 = (canvas, engine) => {
         }, scene)
         sphere2.material = tubeMaterial
       } else {
-        // scene = createScene()
+        window.location.replace(window.location.origin)
+        return
       }
     } else { sphere1.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(yAxis, 0, xAxis, 0)) };
 
