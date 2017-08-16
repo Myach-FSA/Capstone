@@ -1,57 +1,29 @@
 import React from 'react'
 import firebase from 'APP/fire'
 const auth = firebase.auth()
-import { NavLink } from 'react-router-dom';
+import { Router, BrowserHistory, NavLink, withRouter } from 'react-router-dom';
 
-// import Login from './Login'
-
-// export const name = user => {
-//   if (!user) return 'Nobody'
-//   if (user.isAnonymous) return 'Anonymous'
-//   return user.displayName || user.email
-// }
-
-// export const WhoAmI = ({ user, auth }) =>
-//   <div className="whoami">
-//     <span className="whoami-user-name">Hello, {name(user)}</span>
-//     { // If nobody is logged in, or the current user is anonymous,
-//       (!user || user.isAnonymous) ?
-//         // ...then show signin links...
-//         <Login auth={auth} />
-//         /// ...otherwise, show a logout button.
-//         : <button className='logout' onClick={() => auth.signOut()}>logout</button>}
-//   </div>
-
-export default class LoginUser extends React.Component {
+class LoginUser extends React.Component {
   constructor(props) {
     super(props);
     this.handleLogin = this.handleLogin.bind(this);
   }
+        
+  handleLogin(evt) {
+    evt.preventDefault()    
 
-  componentDidMount() {
-    console.log('these are the props', this.props)
-    const { auth } = this.props
-    this.unsubscribe = auth.onAuthStateChanged(user => this.setState({ user }))
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe()
-  }
-
-  handleLogin(email, password) {
-    console.log('email, pw', email, password)
-    firebase.auth().signInWithEmailAndPassword(email, password)
-    .then(function(user){
-      console.log('Signed in with user: ', user);
+    let id = '';
+    
+    const email = evt.target.email.value;
+    const password = evt.target.password.value
+    auth.signInWithEmailAndPassword(email, password)
+    .then(response => {
+      this.props.login({ id: response.uid })    
     })
-    .catch(function(error) {
-      console.log("omg this didn't work")
-      var errorCode = error.code;
-      var errorMessage = error.message;
-    });
-    let person = user ? console.log('user', user) : console.log('nobody');
-    console.log('this person', person)
-    this.props.history.push('/')
+    .then(() => {
+      this.props.history.push('/choose')    
+    })
+    .catch(error => console.log(error))
   }
 
   render() {
@@ -61,7 +33,7 @@ export default class LoginUser extends React.Component {
         <div className="column is-one-third">
         </div>
         <div className="column is-one-third columnspace formspacing">
-          <form className="formspacing" onSubmit={evt => this.handleLogin(evt.target.email.value, evt.target.password.value)}>
+          <form className="formspacing" onSubmit={evt => this.handleLogin(evt)}>
             <div className="field">
               <p className="control has-icons-left has-icons-right">
                 <input name="email" className="input" type="email" placeholder="Email" />
@@ -81,28 +53,16 @@ export default class LoginUser extends React.Component {
                 </span>
               </p>
             </div>
+            {/* { this.renderAuthenticationError() } */}
             <div className="field">
               <p className="control ">
                 <button type="submit"
                   className="button is-primary">
                   Login
-            </button>
+              </button>
               </p>
             </div>
           </form>
-          {/* 
-            <div className="or buffer">
-              <div className="back-line">
-                <span>OR</span>
-              </div>
-            </div>
-          </form>
-          <div className="buffer oauth">
-            <button className="button is-danger"
-            onClick={() => auth.signInWithPopup(facebook)}>Sign in with Google
-            </button>
-          </div> */}
-
           <div className="column is-one-third"></div>
         </div>
       </div>
@@ -110,15 +70,15 @@ export default class LoginUser extends React.Component {
   }
 }
 
-// /* -----------------    CONTAINER     ------------------ */
+/* -----------------    CONTAINER     ------------------ */
 
-// import {login} from 'APP/app/reducers/auth'
-// import {connect} from 'react-redux'
+import { login } from '../reducers/auth'
+import {connect} from 'react-redux'
 
-// const mapState = (state, componentProps) => (
-//   {user: state.auth }
-// )
+const mapState = (state) => (
+  {user: state.user }
+)
 
-// const mapDispatch = ({login})
+const mapDispatch = ({login})
 
-// export default connect(mapState, mapDispatch)(Login)
+export default withRouter(connect(mapState, mapDispatch)(LoginUser))

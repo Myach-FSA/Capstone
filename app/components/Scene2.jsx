@@ -1,10 +1,8 @@
 import React from 'react'
-import { connect } from 'react-redux'
-import {createScene} from '../reducers'
 import {changeScene} from './Game'
+
 /* global BABYLON */
 const createScene2=(canvas, engine) => {
-  console.log('Creating Scene 2')
   const scene = new BABYLON.Scene(engine) // creates a basic Babylon scene object
   scene.enablePhysics()
   scene.collisionsEnabled = true
@@ -30,8 +28,8 @@ const createScene2=(canvas, engine) => {
   head.parent = sphere1
 
   const torus = BABYLON.Mesh.CreateTorus('torus', 2, 0.5, 10, scene)
-  torus.position.z = -19
-  torus.position.x = -19
+  torus.position.z = -5
+  torus.position.x = -5
 
     // ---- GROUND ----
 
@@ -170,10 +168,6 @@ const createScene2=(canvas, engine) => {
 
     // ---- CAMERA ----
 
-    // var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 20, -40), scene);
-    // camera.setTarget(BABYLON.Vector3.Zero());
-    // camera.attachControl(canvas, false);
-
   const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene)
   followCamera.radius = 10 // how far from the object to follow
   followCamera.heightOffset = 7 // how high above the object to place the camera
@@ -183,24 +177,6 @@ const createScene2=(canvas, engine) => {
   followCamera.attachControl(canvas, true)
   scene.activeCamera = followCamera
   followCamera.lockedTarget = head
-
-    // camera
-    // var camera = new BABYLON.TargetCamera("targetCam", BABYLON.Vector3.Zero(), scene);
-    // var camera = new BABYLON.ArcRotateCamera("camera1",  0, 0, 0, new BABYLON.Vector3(0, 0, -0), scene);
-    // camera.setPosition(new BABYLON.Vector3(0, 50, -200));
-    // camera.attachControl(canvas, true);
-
-    // Follow Cam
-    // var followCam = new BABYLON.FollowCamera("fcam", new BABYLON.Vector3(0, 15, -45), scene);
-    // followCam.setTarget = sphere1;
-    // followCam.radius = 10;
-
-    // scene.activeCamera = followCam;
-
-    // var targetCam = new BABYLON.TargetCamera("tcam", new BABYLON.Vector3(0, 15, -45), scene);
-    // targetCam.setTarget(sphere1.position);
-    // scene.activeCamera = targetCam;
-    // var target = BABYLON.Vector3.Zero();
 
     // ---- MATERIAL ----
 

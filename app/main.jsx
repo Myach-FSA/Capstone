@@ -1,9 +1,10 @@
 'use strict'
 import React from 'react'
-import { render } from 'react-dom'
-import { Provider } from 'react-redux'
+import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom'
+import {render} from 'react-dom'
+import { Provider, connect } from 'react-redux'
+
 import store from './store'
-import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom'
 
 import WhoAmI from './components/WhoAmI'
 import NotFound from './components/NotFound'
@@ -14,7 +15,6 @@ import FooterSection from './components/Footer'
 import Scores from './components/Scores'
 import ChooseBall from './components/ChooseBall'
 import Register from './components/Register'
-// import Login from './components/Login'
 
 import firebase from 'APP/fire'
 
@@ -22,8 +22,7 @@ import Demos from 'APP/demos'
 
 const auth = firebase.auth()
 
-auth.onAuthStateChanged(user => user || auth.signInAnonymously())
-console.log('auth', auth)
+// auth.onAuthStateChanged(user => user || auth.signInAnonymously())
 
 const App = ({ children }) =>
   <Router>
@@ -44,7 +43,9 @@ const App = ({ children }) =>
 
 render(
   <Provider store={store}>
-    <App />
+    <Router>
+      <App />
+    </Router>
   </Provider>,
   document.getElementById('content')
 )
