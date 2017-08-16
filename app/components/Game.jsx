@@ -17,10 +17,14 @@ class Game extends React.Component {
       var playersObj = players.val();
       var playerPosition = 4;
       for (let player in playersObj) {
-        if(!playersInGame[player]) {
+        if (!playersInGame[player]) {
           var newPlayer = this.createPlayerOnConnect(scene, player, null, playerPosition);
+          this.createCamera(scene, newPlayer )
+          database.ref(newPlayer.id).on('value', (val) => {
+            newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(val.val().zAxis, 0, val.val().xAxis, 0));
+          });
           objects.push(newPlayer)
-          playerPosition+=2;
+          playerPosition += 2;
           playersInGame[player] = true;
         }
       }
@@ -36,7 +40,6 @@ class Game extends React.Component {
   }
 
   createPlayerOnConnect(sce, id, color, pos) {
-    console.log('make')
     const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); //Params: name, subdivs, size, scene
     player.position.y = 1;
     player.position.z = pos;
@@ -49,8 +52,21 @@ class Game extends React.Component {
       friction: 0.5,
       restitution: 0.7
     }, sce);
-   return player;
-}
+    return player;
+  }
+
+  createCamera(scene, par) {
+    const head = BABYLON.MeshBuilder.CreateSphere("1", 1, scene);
+    var headMaterial = new BABYLON.StandardMaterial("material", scene);
+    var headTexture = new BABYLON.Texture("./assets/textures/net.png", scene);
+    headMaterial.diffuseTexture = headTexture;
+    headMaterial.diffuseColor = new BABYLON.Color3(2.0, 1, 0.7);
+    headMaterial.diffuseTexture.hasAlpha = true;
+    head.position.x = par.position.x;
+    head.position.y = 0;
+    head.material = headMaterial;
+    head.parent = par;
+  }
 
   render() {
     return (
@@ -62,23 +78,6 @@ class Game extends React.Component {
 
 export default Game;
 
-function createPlayerOnConnect(sce, id, color) {
-  console.log('make outside')
-  const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); //Params: name, subdivs, size, scene
-  player.position.y = 1;
-  player.checkCollisions = true;
-  var ballMaterial = new BABYLON.StandardMaterial('material', sce);
-  ballMaterial.diffuseColor = BABYLON.Color3.Blue();
-  player.material = ballMaterial;
-  player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.SphereImpostor, {
-    mass: 0.01,
-    friction: 0.5,
-    restitution: 0.7
-  }, sce);
-
-  return player;
-}
-
 function createScene(engine, canvas) {
   const scene = new BABYLON.Scene(engine); // creates a basic Babylon scene object
   scene.enablePhysics();
@@ -88,10 +87,6 @@ function createScene(engine, canvas) {
 
   // ---- GROUND ----
 
-  // IDs.map(id => {
-  //   objects.push(createPlayerOnConnect(scene, id))
-  // })
-
   const ground = BABYLON.Mesh.CreateGround("ground1", 50, 50, 2, scene);
   ground.checkCollisions = true;
 
@@ -100,11 +95,6 @@ function createScene(engine, canvas) {
     mass: 0,
     restitution: 0.9
   }, scene);
-  // sphere2.physicsImpostor = new BABYLON.PhysicsImpostor(sphere2, BABYLON.PhysicsImpostor.SphereImpostor, {
-  //   mass: 0.01,
-  //   friction: 0.5,
-  //   restitution: 0.7
-  // }, scene);
 
   // ---- Players ---- //
 
@@ -118,36 +108,26 @@ function createScene(engine, canvas) {
     return text;
   }
 
-  // function generatePlayer() {
-  // }
   // ---- Keys ----
 
   let zAxis = 0;
   let xAxis = 0;
   let yAxis = 0;
 
-  var user = createPlayerOnConnect(scene, makeid());
+  var user = makeid();
 
-  //   function writeUserData(userId, name, email, imageUrl) {
-  //   firebase.database().ref('users/' + userId).set({
-  //     username: name,
-  //     email: email,
-  //     profile_picture : imageUrl
-  //   });
-  // }
+  database.ref('players/' + user).set({ id: user });
 
-  database.ref('players/' + user.id).set({id: user.id});
-
-  const head = BABYLON.MeshBuilder.CreateSphere("1", 1, scene);
-  var headMaterial = new BABYLON.StandardMaterial("material", scene);
-  var headTexture = new BABYLON.Texture("./assets/textures/net.png", scene);
-  headMaterial.diffuseTexture = headTexture;
-  headMaterial.diffuseColor = new BABYLON.Color3(2.0, 1, 0.7);
-  headMaterial.diffuseTexture.hasAlpha = true;
-  head.position.x = user.position.x;
-  head.position.y = 0;
-  head.material = headMaterial;
-  head.parent = user;
+  // const head = BABYLON.MeshBuilder.CreateSphere("1", 1, scene);
+  // var headMaterial = new BABYLON.StandardMaterial("material", scene);
+  // var headTexture = new BABYLON.Texture("./assets/textures/net.png", scene);
+  // headMaterial.diffuseTexture = headTexture;
+  // headMaterial.diffuseColor = new BABYLON.Color3(2.0, 1, 0.7);
+  // headMaterial.diffuseTexture.hasAlpha = true;
+  // head.position.x = objects[user].position.x;
+  // head.position.y = 0;
+  // head.material = headMaterial;
+  // head.parent = objects[user];
 
   const keyState = {};
 
@@ -161,45 +141,35 @@ function createScene(engine, canvas) {
     keyState[e.keyCode || e.which] = false;
   }, true);
 
-  database.ref(user.id).set({ xAxis: 0, zAxis: 0 });
+  database.ref(user).set({ xAxis: 0, zAxis: 0 });
 
   function gameLoop() {
     if (keyState[37] || keyState[65]) {
       if (xAxis < 5) {
         xAxis += .5;
-        database.ref(user.id).set({ xAxis, zAxis });
+        database.ref(user).set({ xAxis, zAxis });
       }
     }
     if (keyState[39] || keyState[68]) {
       if (xAxis > -5) {
         xAxis -= .5;
-        database.ref(user.id).set({ xAxis, zAxis });
+        database.ref(user).set({ xAxis, zAxis });
       }
     }
     if (keyState[38] || keyState[87]) {
       if (zAxis < 5) {
         zAxis += .5;
-        database.ref(user.id).set({ xAxis, zAxis });
+        database.ref(user).set({ xAxis, zAxis });
       }
     }
     if (keyState[40] || keyState[83]) {
       if (zAxis > -5) {
         zAxis -= .5;
-        database.ref(user.id).set({ xAxis, zAxis });
+        database.ref(user).set({ xAxis, zAxis });
       }
     }
     setTimeout(gameLoop, 50);
   }
-
-  database.ref(user.id).on('value', function (val) {
-    user.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(val.val().zAxis, 0, val.val().xAxis, 0));
-  });
-
-  objects.map(user => {
-    database.ref(user.id).on('value', (val) => {
-      user.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(val.val().zAxis, 0, val.val().xAxis, 0));
-    });
-  })
 
   gameLoop();
 
@@ -217,16 +187,6 @@ function createScene(engine, canvas) {
 
   // ---- MATERIAL ----
 
-  // var ballMaterial = new BABYLON.StandardMaterial('material', scene);
-  // // var tubeMaterial = new BABYLON.StandardMaterial('material', scene);
-  // // var textureTube = new BABYLON.Texture('./assets/textures/stone.png', scene);
-  // var textureBall = new BABYLON.Texture('./assets/textures/net.png', scene);
-  // ballMaterial.diffuseColor = new BABYLON.Color3(2.0, 1, 0.7);
-  // ballMaterial.diffuseTexture = textureBall;
-  // ballMaterial.diffuseTexture.hasAlpha = true;
-  // user.material = ballMaterial;
-  // tubeMaterial.diffuseTexture = textureTube;
-  // sphere2.material = tubeMaterial;
   var groundMaterial = new BABYLON.StandardMaterial('material', scene);
   var textureGrass = new BABYLON.Texture('./assets/textures/grass-large.png', scene);
   groundMaterial.diffuseTexture = textureGrass;
