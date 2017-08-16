@@ -45,7 +45,7 @@ class Game extends React.Component {
     player.position.z = pos;
     player.checkCollisions = true;
     var ballMaterial = new BABYLON.StandardMaterial('material', sce);
-    ballMaterial.diffuseColor = BABYLON.Color3.Blue();
+    ballMaterial.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random());
     player.material = ballMaterial;
     player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.SphereImpostor, {
       mass: 0.01,
