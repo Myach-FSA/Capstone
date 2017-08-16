@@ -2,10 +2,10 @@ import React from 'react'
 import game, {createScene, getScene} from '../reducers'
 import createScene2 from './Scene2'
 import {changeScene} from './Game'
+
 /* global BABYLON */
 const createScene1 = (canvas, engine) => {
   var sceneval=game.action
-  console.log('creating scene 1', window.location.origin)
   const scene = new BABYLON.Scene(engine) // creates a basic Babylon scene object
   scene.enablePhysics()
   scene.collisionsEnabled = true
@@ -24,7 +24,7 @@ const createScene1 = (canvas, engine) => {
   sphere2.position.x = -4
   sphere2.checkCollisions = true
 
-  const head = BABYLON.MeshBuilder.CreateBox('box', 1, scene)
+  const head = BABYLON.Mesh.CreateSphere('sphere3', 1, 1, scene)
   head.position.x = 0
   head.position.y = 0
 
@@ -172,10 +172,6 @@ const createScene1 = (canvas, engine) => {
 
   // ---- CAMERA ----
 
-  // var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 20, -40), scene);
-  // camera.setTarget(BABYLON.Vector3.Zero());
-  // camera.attachControl(canvas, false);
-
   const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene)
   followCamera.radius = 10 // how far from the object to follow
   followCamera.heightOffset = 7 // how high above the object to place the camera
@@ -186,30 +182,12 @@ const createScene1 = (canvas, engine) => {
   scene.activeCamera = followCamera
   followCamera.lockedTarget = head
 
-  // camera
-  // var camera = new BABYLON.TargetCamera("targetCam", BABYLON.Vector3.Zero(), scene);
-  // var camera = new BABYLON.ArcRotateCamera("camera1",  0, 0, 0, new BABYLON.Vector3(0, 0, -0), scene);
-  // camera.setPosition(new BABYLON.Vector3(0, 50, -200));
-  // camera.attachControl(canvas, true);
-
-  // Follow Cam
-  // var followCam = new BABYLON.FollowCamera("fcam", new BABYLON.Vector3(0, 15, -45), scene);
-  // followCam.setTarget = sphere1;
-  // followCam.radius = 10;
-
-  // scene.activeCamera = followCam;
-
-  // var targetCam = new BABYLON.TargetCamera("tcam", new BABYLON.Vector3(0, 15, -45), scene);
-  // targetCam.setTarget(sphere1.position);
-  // scene.activeCamera = targetCam;
-  // var target = BABYLON.Vector3.Zero();
-
   // ---- MATERIAL ----
 
   var ballMaterial = new BABYLON.StandardMaterial('material', scene)
   var tubeMaterial = new BABYLON.StandardMaterial('material', scene)
-  var textureTube = new BABYLON.Texture('marblept.png', scene)
-  var textureBall = new BABYLON.Texture('woodpt.png', scene)
+  var textureTube = new BABYLON.Texture('./assets/textures/stone.png', scene)
+  var textureBall = new BABYLON.Texture('./assets/textures/net.png', scene)
   ballMaterial.diffuseColor = new BABYLON.Color3(2.0, 1, 0.7)
   ballMaterial.diffuseTexture = textureBall
   ballMaterial.diffuseTexture.hasAlpha = true
@@ -219,7 +197,7 @@ const createScene1 = (canvas, engine) => {
   sphere2.material = tubeMaterial
   torus.material = tubeMaterial
   var groundMaterial = new BABYLON.StandardMaterial('material', scene)
-  var textureGrass = new BABYLON.Texture('marblept.png', scene)
+  var textureGrass = new BABYLON.Texture('./assets/textures/grass-large.png', scene)
   groundMaterial.diffuseTexture = textureGrass
   ground.material = groundMaterial
 

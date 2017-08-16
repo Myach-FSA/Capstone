@@ -23,8 +23,6 @@ import Demos from 'APP/demos'
 const auth = firebase.auth()
 
 // auth.onAuthStateChanged(user => user || auth.signInAnonymously())
-// console.log('auth', auth.currentUser)
-// console.log('user', store.getState())
 
 const App = ({ children }) =>
   <Router>
