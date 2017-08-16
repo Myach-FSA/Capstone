@@ -93,11 +93,27 @@ function createScene(engine, canvas) {
     restitution: 0.7
   }, scene);
 
+  // ---- Players ---- //
+
+  function makeid() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for (var i = 0; i < 5; i++)
+      { text += possible.charAt(Math.floor(Math.random() * possible.length)) }
+
+    return text;
+  }
+
+  // function generatePlayer() {
+  // }
   // ---- Keys ----
 
   let zAxis = 0;
   let xAxis = 0;
   let yAxis = 0;
+
+  var user = makeid();
 
   const keyState = {};
 
@@ -111,37 +127,37 @@ function createScene(engine, canvas) {
     keyState[e.keyCode || e.which] = false;
   }, true);
 
-  database.ref('user1').set({xAxis: 0, zAxis: 0});
+  database.ref(user).set({ xAxis: 0, zAxis: 0 });
 
   function gameLoop() {
     if (keyState[37] || keyState[65]) {
       if (xAxis < 5) {
         xAxis += .5;
-        database.ref("user1").set({xAxis, zAxis});
+        database.ref(user).set({ xAxis, zAxis });
       }
     }
     if (keyState[39] || keyState[68]) {
       if (xAxis > -5) {
         xAxis -= .5;
-        database.ref("user1").set({xAxis, zAxis});
+        database.ref(user).set({ xAxis, zAxis });
       }
     }
     if (keyState[38] || keyState[87]) {
       if (zAxis < 5) {
         zAxis += .5;
-        database.ref("user1").set({xAxis, zAxis});
+        database.ref(user).set({ xAxis, zAxis });
       }
     }
     if (keyState[40] || keyState[83]) {
       if (zAxis > -5) {
         zAxis -= .5;
-        database.ref("user1").set({xAxis, zAxis});
+        database.ref(user).set({ xAxis, zAxis });
       }
     }
     setTimeout(gameLoop, 50);
   }
 
-  database.ref('user1').on('value', function(val) {
+  database.ref(user).on('value', function (val) {
     sphere1.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(val.val().zAxis, 0, val.val().xAxis, 0));
   });
 
