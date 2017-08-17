@@ -20,8 +20,6 @@ class ChooseBall extends React.Component {
     console.log('This is hte player', player)
 
     return (
-      <div>
-      { this.props.user.username &&
       <div className="content has-text-centered">
         <h1>Hi! { this.props.user.username }! Choose Your Ball</h1>
         <div className="horiz-marg">
@@ -43,8 +41,6 @@ class ChooseBall extends React.Component {
             )}
           </div>
         </div>
-      </div>
-      }
       </div>
     );
   }
