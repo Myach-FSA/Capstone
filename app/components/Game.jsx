@@ -57,8 +57,12 @@ class Game extends React.Component {
 
   createPlayerOnConnect(sce, id, color) {
     const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); //Params: name, subdivs, size, scene
+    function randomPosition(min) {
+      return Math.floor(Math.random() * min - min/2);
+    }
     player.position.y = 1;
-    player.position.z = 0;
+    player.position.x = randomPosition(50);
+    player.position.z = randomPosition(50);
     player.checkCollisions = true;
     var ballMaterial = new BABYLON.StandardMaterial('material', sce);
     ballMaterial.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random());
