@@ -29,6 +29,13 @@ const createScene1 = (canvas, engine) => {
   torus.position.z = -19
   torus.position.x = -10
 
+  // ---- BACKGROUND ----
+
+  var background = new BABYLON.Layer("back", "./assets/textures/3dcubes.jpg", scene);
+	background.isBackground = true;
+	background.texture.level = 0;
+	background.texture.wAng = .2;
+
   // ---- GROUND ----
 
   const ground = BABYLON.Mesh.CreateGround('ground1', 50, 50, 2, scene)
@@ -165,7 +172,7 @@ const createScene1 = (canvas, engine) => {
   tubeMaterial.diffuseTexture.hasAlpha = true
   torus.material = tubeMaterial
   var groundMaterial = new BABYLON.StandardMaterial('material', scene)
-  var textureGrass = new BABYLON.Texture('./assets/textures/grass-large.png', scene)
+  var textureGrass = new BABYLON.Texture('./assets/textures/chuttersnap.jpg', scene)
   groundMaterial.diffuseTexture = textureGrass
   ground.material = groundMaterial
 
