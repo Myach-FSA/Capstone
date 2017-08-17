@@ -9,13 +9,21 @@ const balls = [
   { name: 'Fifth Ball', description: 'Fifth ball description' }]
 
 class ChooseBall extends React.Component {
+  constructor(props) {
+    super(props)
+  }
+
   render() {
-    const { user } = this.props
-    console.log('This is the user', user)
+
+    console.log('Hey props', this.props)
+    const player = this.props.user.username;
+    console.log('This is hte player', player)
 
     return (
+      <div>
+      { this.props.user.username &&
       <div className="content has-text-centered">
-        <h1>Choose Your Ball</h1>
+        <h1>Hi! { this.props.user.username }! Choose Your Ball</h1>
         <div className="horiz-marg">
           <div className="columns is-multiline">
             {balls && balls.map((ball, i) => (
@@ -36,6 +44,8 @@ class ChooseBall extends React.Component {
           </div>
         </div>
       </div>
+      }
+      </div>
     );
   }
 }
@@ -46,9 +56,9 @@ import { fetchUser } from '../reducers/auth'
 import { connect } from 'react-redux'
 import store from '../store';
 
-const mapStateToProps = (state) => {
-  return { user: state.auth.user
-}}
+const mapStateToProps = (state) => ({
+  user: state.auth.user 
+})
 
 
 const mapDispatch = ({ fetchUser })
