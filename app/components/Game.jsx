@@ -6,6 +6,7 @@ const database = firebase.database();
 var objects = [];
 var thisPlayer = '';
 var playersInGame = {};
+var executed = false;
 
 class Game extends React.Component {
   componentDidMount() {
@@ -20,17 +21,18 @@ class Game extends React.Component {
           thisPlayer = player;
           var newPlayer = this.createPlayerOnConnect(scene, player, null);
           const followCamera = new BABYLON.FollowCamera("followCam", new BABYLON.Vector3(0, 15, -45), scene);
-          const playerDummy = this.createCameraObj(scene, newPlayer);
-
-          followCamera.lockedTarget = playerDummy;
-          scene.activeCamera = followCamera;
-          followCamera.radius = 10; // how far from the object to follow
-          followCamera.heightOffset = 7; // how high above the object to place the camera
-          followCamera.rotationOffset = 180; // the viewing angle / 180
-          followCamera.cameraAcceleration = 0.05; // how fast to move
-          followCamera.maxCameraSpeed = 10; // speed limit / 0.05
-          followCamera.attachControl(canvas, true);
-
+          if (!executed) {
+            const playerDummy = this.createCameraObj(scene, newPlayer);
+            executed = true;
+            followCamera.lockedTarget = playerDummy;
+            scene.activeCamera = followCamera;
+            followCamera.radius = 15; // how far from the object to follow
+            followCamera.heightOffset = 7; // how high above the object to place the camera
+            followCamera.rotationOffset = 180; // the viewing angle / 180
+            followCamera.cameraAcceleration = 0.05; // how fast to move
+            followCamera.maxCameraSpeed = 10; // speed limit / 0.05
+            followCamera.attachControl(canvas, true);
+          }
           database.ref(newPlayer.id).on('value', (val) => {
             newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(val.val().zAxis, 0, val.val().xAxis, 0));
           });
@@ -64,7 +66,7 @@ class Game extends React.Component {
     player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.SphereImpostor, {
       mass: 0.01,
       friction: 0.5,
-      restitution: 0.7
+      // restitution: 0.1
     }, sce);
     return player;
   }
@@ -90,6 +92,14 @@ class Game extends React.Component {
 }
 
 export default Game;
+
+// function once(func) {
+//   if (!executed) {
+//     console.log('hit');
+//     executed = true;
+//     return func;
+//   }
+// }
 
 function createScene(engine, canvas) {
   const scene = new BABYLON.Scene(engine); // creates a basic Babylon scene object
@@ -133,13 +143,13 @@ function createScene(engine, canvas) {
 
   const keyState = {};
 
-  window.addEventListener('keydown', function(e) {
+  window.addEventListener('keydown', function (e) {
     keyState[e.keyCode || e.which] = true;
     if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
       e.preventDefault();
     }
   }, true);
-  window.addEventListener('keyup', function(e) {
+  window.addEventListener('keyup', function (e) {
     keyState[e.keyCode || e.which] = false;
   }, true);
 
