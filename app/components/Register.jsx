@@ -23,7 +23,7 @@ class Register extends React.Component {
       this.props.signUp({ userId: user.uid, email, username})
     })
     .then(() => {
-      this.props.history.push('/choose')    
+      this.props.history.push('/')    
     })
     .catch(error => console.log(error))
   }

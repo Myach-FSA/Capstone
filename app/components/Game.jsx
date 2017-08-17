@@ -1,58 +1,123 @@
-import React, {Component} from 'react'
-import createScene1 from './Scene1'
-import createScene2 from './Scene2'
-import InfoScreen from './InfoScreen'
-import ScoreTable from './ScoreTable'
-
 /* global BABYLON */
-let sceneNum = 1
-const changeScene = () => {
-  sceneNum++
-}
+
+import React, { Component } from 'react';
+import firebase from '../../fire';
+import createScene1 from './Scene1';
+import createScene2 from './Scene2';
+import InfoScreen from './InfoScreen';
+import ScoreTable from './ScoreTable';
+
+const database = firebase.database();
+const objects = [];
+const thisPlayer = '';
+const playersInGame = {};
+let sceneNum = 1;
+const changeScene = (num) => {
+  sceneNum=num;
+};
+
 class Game extends Component {
   componentDidMount() {
-    window.onkeydown = function(e) {
-      e.preventDefault();
-      if (e.keyCode === 9){
-        document.getElementById('ScoreTable').className = "scoreTable visible has-text-centered"
-        document.getElementById('InfoScreen').className = "infoScreen invisible has-text-centered"
+    const canvas = this.refs.renderCanvas;
+    const engine = new BABYLON.Engine(canvas, true);
+    let num = sceneNum;
+    let scene = createScene1(canvas, engine);
+    const user = this.makeId();
+    database.ref('players').on('value', (players) => {
+      const playersObj = players.val();
+      for (const playerId in playersObj) {
+        if (!playersInGame[playerId] || playersInGame.scene) {
+          const newPlayer = this.createPlayerOnConnect(scene, playerId, null);
+          const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene);
+          if (playerId === user) {
+            const playerDummy = this.createCameraObj(scene, newPlayer);
+            control(newPlayer);
+            followCamera.lockedTarget = playerDummy;
+            scene.activeCamera = followCamera;
+            followCamera.radius = 15; // how far from the object to follow
+            followCamera.heightOffset = 7; // how high above the object to place the camera
+            followCamera.rotationOffset = 180; // the viewing angle / 180
+            followCamera.cameraAcceleration = 0.05; // how fast to move
+            followCamera.maxCameraSpeed = 10; // speed limit / 0.05
+            followCamera.attachControl(canvas, true);
+          }
+          database.ref(newPlayer.id).on('value', (val) => {
+            newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(val.val().zAxis, 0, val.val().xAxis, 0));
+          });
+          objects.push(newPlayer);
+          playersInGame[playerId] = true;
+        }
       }
-    }
+    });
+    database.ref('players/' + user).set({ id: user });
 
-    window.onkeyup = function(e) {
-      e.preventDefault();
-      if (e.keyCode === 9){
-        document.getElementById('ScoreTable').className = "scoreTable invisible has-text-centered"
-        document.getElementById('InfoScreen').className = "infoScreen visible has-text-centered"
-      }
-    }
-
-    const canvas = this.refs.renderCanvas
-    const engine = new BABYLON.Engine(canvas, true)
-    let num = sceneNum
-    let scene = null
     engine.runRenderLoop(() => {
       if (!scene || (sceneNum !== num)) {
-        num = sceneNum
+        num = sceneNum;
         switch (num) {
-          case 2:
-            scene = createScene2(canvas, engine)
-            break
-          case 3:
-            scene = createScene3(canvas, engine)
-            break
-          default:
-            scene = createScene1(canvas, engine)
+        case 2:
+          scene = createScene2(canvas, engine);
+          break;
+        default: scene = createScene1(canvas, engine);
         }
-        setTimeout(scene.render(), 500)
+        setTimeout(scene.render(), 500);
+        playersInGame.scene = true;
+        database.ref('players/' + user).push({ id: 'test' });
+        playersInGame.scene = false;
       } else {
-        scene.render()
+        scene.render();
       }
-    })
+    });
 
     window.addEventListener('resize', () => {
-      engine.resize()
-    })
+      engine.resize();
+    });
+  }
+
+  // componentWillUnmount() {
+  //   database.ref('players/' + thisPlayer).set(null);
+  // }
+
+  createPlayerOnConnect(sce, id, color) {
+    const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); // Params: name, subdivs, size, scene
+    function randomPosition(min) {
+      return Math.floor(Math.random() * min - min / 2);
+    }
+    player.position.y = 1;
+    player.position.x = randomPosition(50);
+    player.position.z = randomPosition(50);
+    player.checkCollisions = true;
+    const ballMaterial = new BABYLON.StandardMaterial('material', sce);
+    ballMaterial.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random());
+    player.material = ballMaterial;
+    player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.SphereImpostor, {
+      mass: 0.01,
+      friction: 0.5,
+      // restitution: 0.1
+    }, sce);
+    return player;
+  }
+
+  createCameraObj(scene, par) {
+    const head = BABYLON.MeshBuilder.CreateSphere('camera', 16, scene);
+    const headMaterial = new BABYLON.StandardMaterial('material', scene);
+    const headTexture = new BABYLON.Texture('./assets/textures/net.png', scene);
+    headMaterial.diffuseTexture = headTexture;
+    headMaterial.diffuseColor = new BABYLON.Color3(2.0, 1, 0.7);
+    headMaterial.diffuseTexture.hasAlpha = true;
+    head.material = headMaterial;
+    head.parent = par;
+    return head;
+  }
+
+  makeId() {
+    let text = '';
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+    for (let i = 0; i < 8; i++) {
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
   }
 
   render() {
@@ -62,10 +127,74 @@ class Game extends Component {
         <ScoreTable/>
         <canvas className='gameDisplay ' ref="renderCanvas"></canvas>
       </div>
-    )
+    );
   }
 }
 
-export default Game
+function control(user) {
+  let zAxis = 0;
+  let xAxis = 0;
+  const yAxis = 0;
 
-export {changeScene}
+  const keyState = {};
+
+  window.onkeydown = function(e) {
+    e.preventDefault();
+    if (e.keyCode === 9) {
+      document.getElementById('ScoreTable').className = 'scoreTable visible has-text-centered';
+      document.getElementById('InfoScreen').className = 'infoScreen invisible has-text-centered';
+    }
+  };
+
+  window.onkeyup = function(e) {
+    e.preventDefault();
+    if (e.keyCode === 9) {
+      document.getElementById('ScoreTable').className = 'scoreTable invisible has-text-centered';
+      document.getElementById('InfoScreen').className = 'infoScreen visible has-text-centered';
+    }
+  };
+
+  window.addEventListener('keydown', function(e) {
+    keyState[e.keyCode || e.which] = true;
+    if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+      e.preventDefault();
+    }
+  }, true);
+  window.addEventListener('keyup', function(e) {
+    keyState[e.keyCode || e.which] = false;
+  }, true);
+
+  database.ref(user.id).set({ xAxis: 0, zAxis: 0 });
+
+  function gameLoop() {
+    if (keyState[37] || keyState[65]) {
+      if (xAxis < 5) {
+        xAxis += 0.5;
+        database.ref(user.id).set({ xAxis, zAxis });
+      }
+    }
+    if (keyState[39] || keyState[68]) {
+      if (xAxis > -5) {
+        xAxis -= 0.5;
+        database.ref(user.id).set({ xAxis, zAxis });
+      }
+    }
+    if (keyState[38] || keyState[87]) {
+      if (zAxis < 5) {
+        zAxis += 0.5;
+        database.ref(user.id).set({ xAxis, zAxis });
+      }
+    }
+    if (keyState[40] || keyState[83]) {
+      if (zAxis > -5) {
+        zAxis -= 0.5;
+        database.ref(user.id).set({ xAxis, zAxis });
+      }
+    }
+    setTimeout(gameLoop, 50);
+  }
+  gameLoop();
+}
+export default Game;
+
+export { changeScene };
