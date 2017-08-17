@@ -20,7 +20,8 @@ class Game extends React.Component {
           thisPlayer = player;
           var newPlayer = this.createPlayerOnConnect(scene, player, null);
           const followCamera = new BABYLON.FollowCamera("followCam", new BABYLON.Vector3(0, 15, -45), scene);
-          let playerDummy = this.createCameraObj(scene, newPlayer);
+          const playerDummy = this.createCameraObj(scene, newPlayer);
+
           followCamera.lockedTarget = playerDummy;
           scene.activeCamera = followCamera;
           followCamera.radius = 10; // how far from the object to follow
@@ -75,25 +76,10 @@ class Game extends React.Component {
     headMaterial.diffuseTexture = headTexture;
     headMaterial.diffuseColor = new BABYLON.Color3(2.0, 1, 0.7);
     headMaterial.diffuseTexture.hasAlpha = true;
-    head.position.x = par.position.x;
-    head.position.y = par.position.y;
-    head.position.z = par.position.z;
     head.material = headMaterial;
     head.parent = par;
+    return head;
   }
-
-  // ---- CAMERA ----
-  // setUpCamera(currPlayer) {
-  //   const followCamera = new BABYLON.FollowCamera("followCam", new BABYLON.Vector3(0, 15, -45), scene);
-  //   followCamera.radius = 10; // how far from the object to follow
-  //   followCamera.heightOffset = 7; // how high above the object to place the camera
-  //   followCamera.rotationOffset = 180; // the viewing angle / 180
-  //   followCamera.cameraAcceleration = 0.05 // how fast to move
-  //   followCamera.maxCameraSpeed = 10; // speed limit / 0.05
-  //   followCamera.attachControl(canvas, true);
-  //   scene.activeCamera = followCamera;
-  //   followCamera.lockedTarget = currPlayer;
-  // }
 
   render() {
     return (
@@ -145,17 +131,6 @@ function createScene(engine, canvas) {
 
   database.ref('players/' + user).set({ id: user });
 
-  // const head = BABYLON.MeshBuilder.CreateSphere("1", 1, scene);
-  // var headMaterial = new BABYLON.StandardMaterial("material", scene);
-  // var headTexture = new BABYLON.Texture("./assets/textures/net.png", scene);
-  // headMaterial.diffuseTexture = headTexture;
-  // headMaterial.diffuseColor = new BABYLON.Color3(2.0, 1, 0.7);
-  // headMaterial.diffuseTexture.hasAlpha = true;
-  // head.position.x = objects[user].position.x;
-  // head.position.y = 0;
-  // head.material = headMaterial;
-  // head.parent = objects[user];
-
   const keyState = {};
 
   window.addEventListener('keydown', function(e) {
@@ -204,15 +179,6 @@ function createScene(engine, canvas) {
   camera.setTarget(BABYLON.Vector3.Zero());
   camera.attachControl(canvas, false);
 
-  // const dummyCamera = new BABYLON.FollowCamera("followCam", new BABYLON.Vector3(0, 15, -45), scene);
-  // dummyCamera.lockedTarget = ground;
-  // scene.activeCamera = dummyCamera;
-  // dummyCamera.radius = 10; // how far from the object to follow
-  // dummyCamera.heightOffset = 7; // how high above the object to place the camera
-  // dummyCamera.rotationOffset = 180; // the viewing angle / 180
-  // dummyCamera.cameraAcceleration = 0.05 // how fast to move
-  // dummyCamera.maxCameraSpeed = 10; // speed limit / 0.05
-  // dummyCamera.attachControl(canvas, true);
   // ---- MATERIAL ----
 
   var groundMaterial = new BABYLON.StandardMaterial('material', scene);
