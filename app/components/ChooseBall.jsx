@@ -3,16 +3,14 @@ import ReactDOM, { render } from 'react-dom';
 import { Link } from 'react-router-dom'
 
 const balls = [
-  { name: 'First Ball', description: 'First ball description' },
-  { name: 'Second Ball', description: 'Second ball description' },
-  { name: 'Third Ball', description: 'Third ball description' },
-  { name: 'Fourth Ball', description: 'Fourth ball description' },
-  { name: 'Fifth Ball', description: 'Fifth ball description' }]
+  { name: 'Heavy Duty', description: 'Ball fashioned by the vikings themselves. This is the ball of choice for those serious about strength.', img: './assets/textures/grayball-choose.png' },
+  { name: 'Sleuth', description: "You're efficient. You like things that move with the grace of a cheetah. Choose this ball if this describes you.", img: './assets/textures/netball-choose.png' },
+]
 
 class ChooseBall extends React.Component {
   constructor(props) {
     super(props)
-    this.ballChoice = this.ballChoice.bind(this)
+    this.gameSetup = this.gameSetup.bind(this)
   }
   
   componentDidMount() {
@@ -21,13 +19,14 @@ class ChooseBall extends React.Component {
     this.props.setUser(user)
   }
 
-  ballChoice(evt) {
-    console.log(evt)
+  gameSetup () {
+
   }
 
   render() {
 
     const playerName = this.props.user.username ? this.props.user.username : 'Anonymous'
+
 
     return (
       <div className="content has-text-centered">
@@ -40,7 +39,7 @@ class ChooseBall extends React.Component {
                 <div key={ball.id} className="inner-product">
                   <br />
                   <figure className="image">
-                    <img src="http://bulma.io/images/placeholders/1280x960.png" alt="Image" />
+                    <img src={ball.img} alt="Image" />
                   </figure>
                   <p className="subtitle">{ball.name}</p>
                   <p className="subtitle">{ball.description}</p>
@@ -65,7 +64,7 @@ class ChooseBall extends React.Component {
 
 // /* -----------------    CONTAINER     ------------------ */
 
-import { chooseBall, setUser } from '../reducers/auth'
+import { setUser } from '../reducers/auth'
 import { connect } from 'react-redux'
 import store from '../store';
 
@@ -73,6 +72,6 @@ const mapStateToProps = (state) => ({
   user: state.auth.user 
 })
 
-const mapDispatch = ({ chooseBall, setUser })
+const mapDispatch = ({ setUser })
 
 export default connect(mapStateToProps, mapDispatch)(ChooseBall)

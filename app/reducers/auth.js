@@ -21,6 +21,9 @@ const reducer = (state = initialState, action) => {
     case LOGIN: 
       newState.user = action.user; 
       break      
+    case SET_BALL: 
+      newState.user.ball = action.ball;
+      break
     default:
       return state
   }
@@ -38,6 +41,9 @@ const signOutUser = () => ({ type: SIGN_OUT_USER })
 
 const LOGIN = 'LOGIN'
 const loginUser = (user) => ({ type: LOGIN, user })
+
+const SET_BALL = 'SET_BALL'
+const setBall = (ball) => ({ type: SET_BALL, ball })
 
 /* --------- THUNK CREATORS --------- */  
 
@@ -73,6 +79,22 @@ export const login = (user) => {
 export const setUser = (user) => {
     return loginUser(user);
 }
+
+export const chooseBall = (ball) => {
+    return setBall(ball)
+}
+
+// export const setBall = ball =>
+//   dispatch =>
+//     axios.get(`/api/products/${productId}`)
+//       .then(res => res.data)
+//       .then(product => {
+//         dispatch(getSingleProduct(product))
+//       })
+//       .catch(err => {
+//         console.error(`Error loading product with id: ${productId}`, err)
+//       })
+      
 
 export function logOut() {
     firebase.auth().signOut()

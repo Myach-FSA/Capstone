@@ -36,7 +36,7 @@ const createScene1 = (canvas, engine) => {
 
   // ---- BACKGROUND ----
 
-  var background = new BABYLON.Layer("back", "./assets/textures/graysurface.jpg", scene);
+  var background = new BABYLON.Layer("back", "./assets/textures/3dcubes.jpg", scene);
 	background.isBackground = true;
 	background.texture.level = 0;
 	background.texture.wAng = .2;
@@ -204,7 +204,7 @@ const createScene1 = (canvas, engine) => {
   sphere2.material = tubeMaterial
   torus.material = tubeMaterial
   var groundMaterial = new BABYLON.StandardMaterial('material', scene)
-  var textureGrass = new BABYLON.Texture('./assets/textures/grass-large.png', scene)
+  var textureGrass = new BABYLON.Texture('./assets/textures/chuttersnap.jpg', scene)
   groundMaterial.diffuseTexture = textureGrass
   ground.material = groundMaterial
 
