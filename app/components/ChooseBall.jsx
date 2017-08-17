@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM, { render } from 'react-dom';
+import { Link } from 'react-router-dom'
 
 const balls = [
   { name: 'First Ball', description: 'First ball description' },
@@ -20,11 +21,11 @@ class ChooseBall extends React.Component {
 
   render() {
 
-    console.log('Hey this is cray', this.props)
-    const player = this.props.user.usern
+    const playerName = this.props.user.username ? this.props.user.username : 'Anonymous'
+
     return (
       <div className="content has-text-centered">
-        <h1>Hi <strong>{ this.props.user.username }</strong>! Choose Your Ball</h1>
+        <h1>Hi <strong>{ playerName }</strong>! Choose Your Ball</h1>
         <div className="horiz-marg">
           <div className="columns is-multiline">
             {balls && balls.map((ball, i) => (
@@ -47,6 +48,10 @@ class ChooseBall extends React.Component {
             )}
           </div>
         </div>
+        <br></br>
+        <button type="submit" className="button is-primary is-fullwidth fullButton">
+          <Link to={`/game`}>Play Now!</Link>
+        </button>
       </div>
     );
   }

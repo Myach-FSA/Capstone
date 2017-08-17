@@ -23,6 +23,13 @@ import Demos from 'APP/demos'
 const auth = firebase.auth()
 
 // auth.onAuthStateChanged(user => user || auth.signInAnonymously())
+firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    console.log(User, 'is signed in, per main page')
+  } else {
+    console.log('No user is signed in')
+  }
+});
 
 const App = ({ children }) =>
   <Router>
