@@ -1,4 +1,3 @@
-
 import axios from 'axios'
 // const auth = firebase.auth()
 import Firebase from 'firebase';
@@ -63,13 +62,16 @@ export const login = (user) => {
 
     const ref = firebase.database().ref('users/' + user.id)
     ref.once("value", (snapshot) => {
-        console.log('Snapshot', snapshot.val());
         Object.assign(loginObj, snapshot.val())
     }, function (errorObject) {
         console.log("The read failed: " + errorObject.code);
     });
     console.log('This is the logged in user', loginObj)
     return loginUser(loginObj);
+}
+
+export const setUser = (user) => {
+    return loginUser(user);
 }
 
 export function logOut() {
