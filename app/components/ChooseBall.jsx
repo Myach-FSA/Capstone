@@ -11,17 +11,20 @@ const balls = [
 class ChooseBall extends React.Component {
   constructor(props) {
     super(props)
+    this.ballChoice = this.ballChoice.bind(this)
+  }
+
+  ballChoice(evt) {
+    console.log(evt)
   }
 
   render() {
 
-    console.log('Hey props', this.props)
-    const player = this.props.user.username;
-    console.log('This is hte player', player)
-
+    console.log('Hey this is cray', this.props)
+    const player = this.props.user.usern
     return (
       <div className="content has-text-centered">
-        <h1>Hi! { this.props.user.username }! Choose Your Ball</h1>
+        <h1>Hi <strong>{ this.props.user.username }</strong>! Choose Your Ball</h1>
         <div className="horiz-marg">
           <div className="columns is-multiline">
             {balls && balls.map((ball, i) => (
@@ -34,7 +37,10 @@ class ChooseBall extends React.Component {
                   </figure>
                   <p className="subtitle">{ball.name}</p>
                   <p className="subtitle">{ball.description}</p>
-                  <a className="button is-success is-outlined playnow" href="/game">Choose Now!</a>
+                  <button onClick={(evt) => this.ballChoice(i)}
+                    className="button is-success is-outlined playnow">
+                    Choose Ball
+                  </button>
                 </div>
               </article>
             )
@@ -48,7 +54,7 @@ class ChooseBall extends React.Component {
 
 // /* -----------------    CONTAINER     ------------------ */
 
-import { fetchUser } from '../reducers/auth'
+import { chooseBall } from '../reducers/auth'
 import { connect } from 'react-redux'
 import store from '../store';
 
@@ -56,7 +62,6 @@ const mapStateToProps = (state) => ({
   user: state.auth.user 
 })
 
-
-const mapDispatch = ({ fetchUser })
+const mapDispatch = ({ chooseBall })
 
 export default connect(mapStateToProps, mapDispatch)(ChooseBall)
