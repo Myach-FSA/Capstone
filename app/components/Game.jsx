@@ -1,18 +1,25 @@
 /* global BABYLON */
 
-import React from 'react';
+import React, {Component} from 'react';
 import firebase from '../../fire';
+import createScene1 from './Scene1'
+import createScene2 from './Scene2'
+
 const database = firebase.database();
 var objects = [];
 var thisPlayer = '';
 var playersInGame = {};
 var executed = false;
-
-class Game extends React.Component {
+let sceneNum = 1
+const changeScene = () => {
+  sceneNum++
+}
+class Game extends Component {
   componentDidMount() {
-    let canvas = this.refs.renderCanvas;
-    let engine = new BABYLON.Engine(canvas, true);
-    const scene = createScene(engine, canvas);
+    const canvas = this.refs.renderCanvas
+    const engine = new BABYLON.Engine(canvas, true)
+    let num = sceneNum
+    let scene = null
 
     database.ref('players').on('value', (players) => {
       var playersObj = players.val();
@@ -41,14 +48,27 @@ class Game extends React.Component {
         }
       }
     });
-
     engine.runRenderLoop(() => {
-      scene.render();
-    });
+      if (!scene || (sceneNum !== num)) {
+        num = sceneNum
+        switch (num) {
+          case 2:
+            scene = createScene2(canvas, engine)
+            break
+          case 3:
+            scene = createScene3()
+            break
+          default: scene = createScene1(canvas, engine)
+        }
+        setTimeout(scene.render(), 500)
+      } else {
+        scene.render()
+      }
+    })
 
     window.addEventListener('resize', () => {
-      engine.resize();
-    });
+      engine.resize()
+    })
   }
 
   componentWillUnmount() {
@@ -87,6 +107,7 @@ class Game extends React.Component {
     return head;
   }
 
+
   render() {
     return (
       <canvas className='gameDisplay ' ref="renderCanvas"></canvas>
@@ -94,17 +115,6 @@ class Game extends React.Component {
     );
   }
 }
-
-export default Game;
-
-// function once(func) {
-//   if (!executed) {
-//     console.log('hit');
-//     executed = true;
-//     return func;
-//   }
-// }
-
 function createScene(engine, canvas) {
   const scene = new BABYLON.Scene(engine); // creates a basic Babylon scene object
   scene.enablePhysics();
@@ -201,6 +211,6 @@ function createScene(engine, canvas) {
   ground.material = groundMaterial;
 
   // ---- RETURN SCENE ----
+export default Game
 
-  return scene;
-};
+export { changeScene }
