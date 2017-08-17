@@ -2,6 +2,7 @@
 import axios from 'axios'
 // const auth = firebase.auth()
 import Firebase from 'firebase';
+import store from '.././store.js'
 
 
 const initialState = {
@@ -61,7 +62,7 @@ export const login = (user) => {
     let loginObj = {}
 
     const ref = firebase.database().ref('users/' + user.id)
-    ref.on("value", (snapshot) => {
+    ref.once("value", (snapshot) => {
         console.log('Snapshot', snapshot.val());
         Object.assign(loginObj, snapshot.val())
     }, function (errorObject) {
