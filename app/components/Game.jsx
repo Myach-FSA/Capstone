@@ -1,6 +1,8 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import createScene1 from './Scene1'
 import createScene2 from './Scene2'
+import InfoScreen from './InfoScreen'
+import ScoreTable from './ScoreTable'
 
 /* global BABYLON */
 let sceneNum = 1
@@ -9,6 +11,22 @@ const changeScene = () => {
 }
 class Game extends Component {
   componentDidMount() {
+    window.onkeydown = function(e) {
+      e.preventDefault();
+      if (e.keyCode === 9){
+        document.getElementById('ScoreTable').className = "scoreTable visible has-text-centered"
+        document.getElementById('InfoScreen').className = "infoScreen invisible has-text-centered"
+      }
+    }
+
+    window.onkeyup = function(e) {
+      e.preventDefault();
+      if (e.keyCode === 9){
+        document.getElementById('ScoreTable').className = "scoreTable invisible has-text-centered"
+        document.getElementById('InfoScreen').className = "infoScreen visible has-text-centered"
+      }
+    }
+
     const canvas = this.refs.renderCanvas
     const engine = new BABYLON.Engine(canvas, true)
     let num = sceneNum
@@ -21,9 +39,10 @@ class Game extends Component {
             scene = createScene2(canvas, engine)
             break
           case 3:
-            scene = createScene3()
+            scene = createScene3(canvas, engine)
             break
-          default: scene = createScene1(canvas, engine)
+          default:
+            scene = createScene1(canvas, engine)
         }
         setTimeout(scene.render(), 500)
       } else {
@@ -35,14 +54,18 @@ class Game extends Component {
       engine.resize()
     })
   }
-  
+
   render() {
     return (
-      <canvas className='gameDisplay ' ref="renderCanvas"></canvas>
+      <div>
+        <InfoScreen/>
+        <ScoreTable/>
+        <canvas className='gameDisplay ' ref="renderCanvas"></canvas>
+      </div>
     )
   }
 }
 
 export default Game
 
-export { changeScene }
+export {changeScene}
