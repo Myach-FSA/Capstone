@@ -21,8 +21,24 @@ import firebase from 'APP/fire'
 import Demos from 'APP/demos'
 
 const auth = firebase.auth()
+let loginObj = {};
 
-// auth.onAuthStateChanged(user => user || auth.signInAnonymously())
+auth.onAuthStateChanged((user) => {
+  if (!user) {
+    console.log('No user is signed in')
+    firebase.auth().signInAnonymously().catch(function(error) {
+      console.log('Error: ', error.code, error.message)
+    });
+  } else {
+    console.log(user, 'is signed in')    
+    const ref = firebase.database().ref('users/' + user.uid)
+    ref.once("value", (snapshot) => {
+    Object.assign(loginObj, snapshot.val())
+    })
+  }
+});
+
+console.log('LoginObj', loginObj)
 
 const App = ({ children }) =>
   <Router>
@@ -31,9 +47,9 @@ const App = ({ children }) =>
       <Switch>
         <Route exact path="/" component={Home}/>
         <Route exact path="/game" component={Game}/>
-        <Route exact path="/choose" component={ChooseBall}/>
+        <Route exact path="/choose" render={() => <ChooseBall auth={auth} loginObj={loginObj}/>}/>
         <Route exact path="/scores" component={Scores}/>
-        <Route exact path="/login" render={() => <WhoAmI auth={auth} />} />
+        <Route exact path="/login" render={() => <WhoAmI auth={auth} loginObj={loginObj}/>} />
         <Route exact path="/signup" render={() => <Register auth={auth} />} />
         <Route component={NotFound}/>
       </Switch>

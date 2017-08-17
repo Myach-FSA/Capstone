@@ -1,21 +1,36 @@
 import React from 'react';
 import ReactDOM, { render } from 'react-dom';
+import { Link } from 'react-router-dom'
 
 const balls = [
-  { name: 'First Ball', description: 'First ball description' },
-  { name: 'Second Ball', description: 'Second ball description' },
-  { name: 'Third Ball', description: 'Third ball description' },
-  { name: 'Fourth Ball', description: 'Fourth ball description' },
-  { name: 'Fifth Ball', description: 'Fifth ball description' }]
+  { name: 'Heavy Duty', description: 'Ball fashioned by the vikings themselves. This is the ball of choice for those serious about strength.', img: './assets/textures/grayball-choose.png' },
+  { name: 'Sleuth', description: "You're efficient. You like things that move with the grace of a cheetah. Choose this ball if this describes you.", img: './assets/textures/netball-choose.png' },
+]
 
 class ChooseBall extends React.Component {
+  constructor(props) {
+    super(props)
+    this.gameSetup = this.gameSetup.bind(this)
+  }
+  
+  componentDidMount() {
+    const user = this.props.loginObj
+    console.log('User', user)
+    this.props.setUser(user)
+  }
+
+  gameSetup () {
+
+  }
+
   render() {
-    const { user } = this.props
-    console.log('This is the user', user)
+
+    const playerName = this.props.user.username ? this.props.user.username : 'Anonymous'
+
 
     return (
       <div className="content has-text-centered">
-        <h1>Choose Your Ball</h1>
+        <h1>Hi <strong>{ playerName }</strong>! Choose Your Ball</h1>
         <div className="horiz-marg">
           <div className="columns is-multiline">
             {balls && balls.map((ball, i) => (
@@ -24,17 +39,24 @@ class ChooseBall extends React.Component {
                 <div key={ball.id} className="inner-product">
                   <br />
                   <figure className="image">
-                    <img src="http://bulma.io/images/placeholders/1280x960.png" alt="Image" />
+                    <img src={ball.img} alt="Image" />
                   </figure>
                   <p className="subtitle">{ball.name}</p>
                   <p className="subtitle">{ball.description}</p>
-                  <a className="button is-success is-outlined playnow" href="/game">Choose Now!</a>
+                  <button onClick={(evt) => this.ballChoice(i)}
+                    className="button is-success is-outlined playnow">
+                    Choose Ball
+                  </button>
                 </div>
               </article>
             )
             )}
           </div>
         </div>
+        <br></br>
+        <button type="submit" className="button is-primary is-fullwidth fullButton">
+          <Link to={`/game`}>Play Now!</Link>
+        </button>
       </div>
     );
   }
@@ -42,15 +64,14 @@ class ChooseBall extends React.Component {
 
 // /* -----------------    CONTAINER     ------------------ */
 
-import { fetchUser } from '../reducers/auth'
+import { setUser } from '../reducers/auth'
 import { connect } from 'react-redux'
 import store from '../store';
 
-const mapStateToProps = (state) => {
-  return { user: state.auth.user
-}}
+const mapStateToProps = (state) => ({
+  user: state.auth.user 
+})
 
-
-const mapDispatch = ({ fetchUser })
+const mapDispatch = ({ setUser })
 
 export default connect(mapStateToProps, mapDispatch)(ChooseBall)
