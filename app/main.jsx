@@ -22,8 +22,6 @@ import Demos from 'APP/demos'
 
 const auth = firebase.auth()
 
-// auth.onAuthStateChanged(user => user || auth.signInAnonymously())
-
 const App = ({ children }) =>
   <Router>
       <div>
