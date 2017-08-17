@@ -14,6 +14,12 @@ class ChooseBall extends React.Component {
     super(props)
     this.ballChoice = this.ballChoice.bind(this)
   }
+  
+  componentDidMount() {
+    const user = this.props.loginObj
+    console.log('User', user)
+    this.props.setUser(user)
+  }
 
   ballChoice(evt) {
     console.log(evt)
@@ -59,7 +65,7 @@ class ChooseBall extends React.Component {
 
 // /* -----------------    CONTAINER     ------------------ */
 
-import { chooseBall } from '../reducers/auth'
+import { chooseBall, setUser } from '../reducers/auth'
 import { connect } from 'react-redux'
 import store from '../store';
 
@@ -67,6 +73,6 @@ const mapStateToProps = (state) => ({
   user: state.auth.user 
 })
 
-const mapDispatch = ({ chooseBall })
+const mapDispatch = ({ chooseBall, setUser })
 
 export default connect(mapStateToProps, mapDispatch)(ChooseBall)
