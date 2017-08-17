@@ -16,11 +16,6 @@ const createScene2=(canvas, engine) => {
   sphere1.position.x= 4
   sphere1.checkCollisions = true
 
-  let sphere2 = BABYLON.Mesh.CreateSphere('sphere2', 32, 2, scene)
-  sphere2.position.y = 3
-  sphere2.position.x = -4
-  sphere2.checkCollisions = true
-
   const head = BABYLON.MeshBuilder.CreateBox('box', 1, scene)
   head.position.x = 0
   head.position.y = 0
@@ -40,7 +35,7 @@ const createScene2=(canvas, engine) => {
 
     // ---- GROUND ----
 
-  const ground = BABYLON.Mesh.CreateGround('ground1', 10, 10, 2, scene)
+  const ground = BABYLON.Mesh.CreateGround('ground1', 50, 50, 2, scene)
   ground.checkCollisions = true
 
     // ---- CURVE POINTS ----
@@ -66,11 +61,6 @@ const createScene2=(canvas, engine) => {
   ground.physicsImpostor = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, {
     mass: 0,
     restitution: 0.9
-  }, scene)
-  sphere2.physicsImpostor = new BABYLON.PhysicsImpostor(sphere2, BABYLON.PhysicsImpostor.SphereImpostor, {
-    mass: 0.01,
-    friction: 0.5,
-    restitution: 0.7
   }, scene)
 
     // ---- Keys ----
@@ -111,7 +101,7 @@ const createScene2=(canvas, engine) => {
     }
     if ((Math.round(sphere1.position.x) === torus.position.x) && (Math.round(sphere1.position.y - 1) === torus.position.y) && (Math.round(sphere1.position.z) === torus.position.z)) {
       if (window.confirm('You Won!\nNext Level?') === true) {
-        changeScene()
+        changeScene(1)
         return
       } else {
         sphere1.dispose()
@@ -127,16 +117,6 @@ const createScene2=(canvas, engine) => {
         xAxis = 0
         yAxis = 0
         sphere1.material = ballMaterial
-        sphere2.dispose()
-        sphere2 = BABYLON.Mesh.CreateSphere('sphere2', 32, 2, scene)
-        sphere2.position.y = 3
-        sphere2.position.x = -4
-        sphere2.physicsImpostor = new BABYLON.PhysicsImpostor(sphere2, BABYLON.PhysicsImpostor.SphereImpostor, {
-          mass: 0.01,
-          friction: 0.5,
-          restitution: 0.7
-        }, scene)
-        sphere2.material = tubeMaterial
       }
     }
     if (sphere1.position.y<-20) {
@@ -153,16 +133,6 @@ const createScene2=(canvas, engine) => {
         xAxis = 0
         yAxis = 0
         sphere1.material = ballMaterial
-        sphere2.dispose()
-        sphere2 = BABYLON.Mesh.CreateSphere('sphere2', 32, 2, scene)
-        sphere2.position.y = 3
-        sphere2.position.x = -4
-        sphere2.physicsImpostor = new BABYLON.PhysicsImpostor(sphere2, BABYLON.PhysicsImpostor.SphereImpostor, {
-          mass: 0.01,
-          friction: 0.5,
-          restitution: 0.7
-        }, scene)
-        sphere2.material = tubeMaterial
       } else {
         window.location.replace(window.location.origin)
         return
@@ -197,7 +167,6 @@ const createScene2=(canvas, engine) => {
   sphere1.material = ballMaterial
   tubeMaterial.diffuseTexture = textureTube
   tubeMaterial.diffuseTexture.hasAlpha = true
-  sphere2.material = tubeMaterial
   torus.material = tubeMaterial
   var groundMaterial = new BABYLON.StandardMaterial('material', scene)
   var textureGrass = new BABYLON.Texture('albedo.png', scene)
