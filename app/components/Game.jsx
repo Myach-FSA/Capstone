@@ -1,38 +1,39 @@
 /* global BABYLON */
 
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import firebase from '../../fire';
-import createScene1 from './Scene1'
-import createScene2 from './Scene2'
+import createScene1 from './Scene1';
+import createScene2 from './Scene2';
 
 const database = firebase.database();
 var objects = [];
 var thisPlayer = '';
 var playersInGame = {};
 var executed = false;
-let sceneNum = 1
-const changeScene = () => {
-  sceneNum++
-}
+let sceneNum = 1;
+const changeScene = (num) => {
+  sceneNum=num;
+};
+
 class Game extends Component {
   componentDidMount() {
-    const canvas = this.refs.renderCanvas
-    const engine = new BABYLON.Engine(canvas, true)
-    let num = sceneNum
-    let scene = null
-
+    const canvas = this.refs.renderCanvas;
+    const engine = new BABYLON.Engine(canvas, true);
+    let num = sceneNum;
+    let scene = createScene1(canvas, engine);
+    const user = this.makeId();
     database.ref('players').on('value', (players) => {
+      console.log('db change')
       var playersObj = players.val();
       for (let player in playersObj) {
-        if (!playersInGame[player]) {
-          thisPlayer = player;
+        if (!playersInGame[player] || playersInGame.scene) {
           var newPlayer = this.createPlayerOnConnect(scene, player, null);
-          const followCamera = new BABYLON.FollowCamera("followCam", new BABYLON.Vector3(0, 15, -45), scene);
+          const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene);
           if (!executed) {
             const playerDummy = this.createCameraObj(scene, newPlayer);
             executed = true;
-            followCamera.lockedTarget = playerDummy;
-            scene.activeCamera = followCamera;
+            // followCamera.lockedTarget = playerDummy;
+            // scene.activeCamera = followCamera;
             followCamera.radius = 15; // how far from the object to follow
             followCamera.heightOffset = 7; // how high above the object to place the camera
             followCamera.rotationOffset = 180; // the viewing angle / 180
@@ -48,27 +49,29 @@ class Game extends Component {
         }
       }
     });
+    database.ref('players/' + user).set({ id: user });
+
     engine.runRenderLoop(() => {
       if (!scene || (sceneNum !== num)) {
-        num = sceneNum
+        num = sceneNum;
         switch (num) {
-          case 2:
-            scene = createScene2(canvas, engine)
-            break
-          case 3:
-            scene = createScene3()
-            break
-          default: scene = createScene1(canvas, engine)
+        case 2:
+          scene = createScene2(canvas, engine);
+          break;
+        default: scene = createScene1(canvas, engine);
         }
-        setTimeout(scene.render(), 500)
+        setTimeout(scene.render(), 500);
+        playersInGame.scene = true;
+        database.ref('players/' + user).push({ id: 'test' });
+        playersInGame.scene = false;
       } else {
-        scene.render()
+        scene.render();
       }
-    })
+    });
 
     window.addEventListener('resize', () => {
-      engine.resize()
-    })
+      engine.resize();
+    });
   }
 
   componentWillUnmount() {
@@ -76,9 +79,9 @@ class Game extends Component {
   }
 
   createPlayerOnConnect(sce, id, color) {
-    const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); //Params: name, subdivs, size, scene
+    const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); // Params: name, subdivs, size, scene
     function randomPosition(min) {
-      return Math.floor(Math.random() * min - min/2);
+      return Math.floor(Math.random() * min - min / 2);
     }
     player.position.y = 1;
     player.position.x = randomPosition(50);
@@ -96,9 +99,9 @@ class Game extends Component {
   }
 
   createCameraObj(scene, par) {
-    const head = BABYLON.MeshBuilder.CreateSphere("camera", 16, scene);
-    var headMaterial = new BABYLON.StandardMaterial("material", scene);
-    var headTexture = new BABYLON.Texture("./assets/textures/net.png", scene);
+    const head = BABYLON.MeshBuilder.CreateSphere('camera', 16, scene);
+    var headMaterial = new BABYLON.StandardMaterial('material', scene);
+    var headTexture = new BABYLON.Texture('./assets/textures/net.png', scene);
     headMaterial.diffuseTexture = headTexture;
     headMaterial.diffuseColor = new BABYLON.Color3(2.0, 1, 0.7);
     headMaterial.diffuseTexture.hasAlpha = true;
@@ -107,14 +110,24 @@ class Game extends Component {
     return head;
   }
 
+  makeId() {
+    var text = '';
+    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+    for (var i = 0; i < 8; i++) {
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+  }
 
   render() {
     return (
       <canvas className='gameDisplay ' ref="renderCanvas"></canvas>
-      //ref= // takes in callback (canvas)
+      // ref= // takes in callback (canvas)
     );
   }
 }
+
 function createScene(engine, canvas) {
   const scene = new BABYLON.Scene(engine); // creates a basic Babylon scene object
   scene.enablePhysics();
@@ -149,7 +162,7 @@ function createScene(engine, canvas) {
 
   let zAxis = 0;
   let xAxis = 0;
-  let yAxis = 0;
+  const yAxis = 0;
 
   var user = makeId();
 
@@ -157,13 +170,13 @@ function createScene(engine, canvas) {
 
   const keyState = {};
 
-  window.addEventListener('keydown', function (e) {
+  window.addEventListener('keydown', function(e) {
     keyState[e.keyCode || e.which] = true;
     if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
       e.preventDefault();
     }
   }, true);
-  window.addEventListener('keyup', function (e) {
+  window.addEventListener('keyup', function(e) {
     keyState[e.keyCode || e.which] = false;
   }, true);
 
@@ -211,6 +224,8 @@ function createScene(engine, canvas) {
   ground.material = groundMaterial;
 
   // ---- RETURN SCENE ----
-export default Game
+  return scene;
+}
+export default Game;
 
-export { changeScene }
+export { changeScene };
