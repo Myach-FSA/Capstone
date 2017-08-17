@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactDOM, { render } from 'react-dom';
 
-class Scores extends React.Component {
+class ScoreTable extends React.Component {
   render() {
     const { user } = this.props
 
     return (
-      <div className="content has-text-centered">
+      <div id="ScoreTable" className="scoreTable invisible has-text-centered">
         <h1>Scores</h1>
       <table className="table">
       <thead>
@@ -56,4 +56,4 @@ const mapStateToProps = (state) => ({
 
 const mapDispatch = ({ fetchUser })
 
-export default connect(mapStateToProps, mapDispatch)(Scores)
+export default connect(mapStateToProps, mapDispatch)(ScoreTable)
