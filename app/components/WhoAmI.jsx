@@ -21,7 +21,7 @@ class LoginUser extends React.Component {
       this.props.login({ id: response.uid })    
     })
     .then(() => {
-      this.props.history.push('/choose')    
+      this.props.history.push('/')    
     })
     .catch(error => console.log(error))
   }

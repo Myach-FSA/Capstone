@@ -26,6 +26,13 @@ const createScene2=(canvas, engine) => {
   torus.position.z = -5
   torus.position.x = -5
 
+   // ---- BACKGROUND ----
+
+   var background = new BABYLON.Layer("back", "./assets/textures/bluefog.jpg", scene);
+   background.isBackground = true;
+   background.texture.level = 0;
+   background.texture.wAng = .2;
+
     // ---- GROUND ----
 
   const ground = BABYLON.Mesh.CreateGround('ground1', 50, 50, 2, scene)
