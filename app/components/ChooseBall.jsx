@@ -27,13 +27,11 @@ class ChooseBall extends React.Component {
       gameId: 0,
     }
     const user = this.props.loginObj.email ? this.props.loginObj : anonymousUser
-    console.log('This is the actual user', user)
     this.props.setUser(user)
   }
 
   shouldComponentUpdate(nextProps){
     const differentGameRoomId = this.props.user.gameId !== nextProps.gameId;
-    console.log('diff', differentGameRoomId)
     return differentGameRoomId
   }
 
