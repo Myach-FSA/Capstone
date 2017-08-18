@@ -18,7 +18,6 @@ const changeScene = (num) => {
 class Game extends Component {
   constructor(props) {
     super(props)
-    console.log('props in game room', props)
   }
 
   componentDidMount() {
@@ -116,8 +115,6 @@ class Game extends Component {
   }
 
   setPosition(sphere, x, y, z) {
-    console.log(sphere.position);
-    console.log(x, y, z)
     sphere.position.x = x;
     sphere.position.y = y;
     sphere.position.z = z;
