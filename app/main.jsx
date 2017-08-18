@@ -34,7 +34,7 @@ auth.onAuthStateChanged((user) => {
     console.log(user, 'is signed in')    
     const ref = firebase.database().ref('users/' + user.uid)
     ref.once("value", (snapshot) => {
-    Object.assign(loginObj, snapshot.val())
+    Object.assign(loginObj, user)
     })
   }
 });
