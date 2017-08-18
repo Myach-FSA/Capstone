@@ -37,10 +37,11 @@ class Game extends Component {
             this.playerPosition(newPlayer);
             database.ref('playerPosition/' + newPlayer.id).set(newPlayer.position);
           } else {
-            database.ref('playerPosition/' + playerId).once('value', (coordinates) => {
-              const x = coordinates.val().x;
-              const z = coordinates.val().z;
-              this.setPosition(newPlayer, x, z);
+            database.ref('playerPosition/' + playerId).on('value', (coordinates) => {
+              let x = coordinates.val().x;
+              let y = 4;
+              let z = coordinates.val().z;
+              this.setPosition(newPlayer, x, y, z);
             });
           }
           const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene);
@@ -100,6 +101,7 @@ class Game extends Component {
     const ballMaterial = new BABYLON.StandardMaterial('material', sce);
     ballMaterial.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random());
     player.material = ballMaterial;
+    // player.position.y = 4;
     player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.SphereImpostor, {
       mass: 0.01,
       friction: 0.5,
@@ -108,11 +110,11 @@ class Game extends Component {
     return player;
   }
 
-  setPosition(sphere, x, z) {
+  setPosition(sphere, x, y, z) {
     console.log(sphere.position);
-    console.log(x, z)
+    console.log(x, y, z)
     sphere.position.x = x;
-    sphere.position.y = 1;
+    sphere.position.y = y;
     sphere.position.z = z;
   }
 
