@@ -37,11 +37,10 @@ class Game extends Component {
             this.playerPosition(newPlayer);
             database.ref('playerPosition/' + newPlayer.id).set(newPlayer.position);
           } else {
-            database.ref('playerPosition/' + playerId).once('value').then((coordinates) => {
+            database.ref('playerPosition/' + playerId).once('value', (coordinates) => {
               const x = coordinates.val().x;
-              const y = coordinates.val().y;
               const z = coordinates.val().z;
-              this.setPosition(newPlayer, x, y, z);
+              this.setPosition(newPlayer, x, z);
             });
           }
           const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene);
@@ -104,14 +103,16 @@ class Game extends Component {
     player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.SphereImpostor, {
       mass: 0.01,
       friction: 0.5,
-      // restitution: 0.1
+      // restitution: 1.0
     }, sce);
     return player;
   }
 
-  setPosition(sphere, x, y, z) {
+  setPosition(sphere, x, z) {
+    console.log(sphere.position);
+    console.log(x, z)
     sphere.position.x = x;
-    sphere.position.y = y;
+    sphere.position.y = 1;
     sphere.position.z = z;
   }
 
@@ -119,7 +120,7 @@ class Game extends Component {
     function randomPosition(min) {
       return Math.floor(Math.random() * min - min / 2);
     }
-    player.position.y = 1;
+    player.position.y = 4;
     player.position.x = randomPosition(50);
     player.position.z = randomPosition(50);
   }
