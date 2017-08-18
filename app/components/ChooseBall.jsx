@@ -74,7 +74,7 @@ class ChooseBall extends React.Component {
                     <div key={ball.id} className="inner-product">
                       <br />
                       <figure className="image">
-                        <img src={ball.img} alt="Image" />
+                        <img src={ball.img} id={i} alt="Image" onClick={(evt) => this.ballChoice(evt)}/>
                       </figure>
                       <p className="subtitle">{ball.name}</p>
                       <p className="subtitle">{ball.description}</p>
@@ -95,6 +95,7 @@ class ChooseBall extends React.Component {
         <div className="content has-text-centered">
           <div className="notification">
             <h3>Pick Your Game</h3>
+            <h5>Select "Start New Game" below to initiate a game and send the code to your friends. Or you can join an already initiated game by entering a game ID below.</h5>
             <br></br>
             <div className="columns">
               <div className="column is-half">
