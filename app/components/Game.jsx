@@ -12,17 +12,14 @@ const objects = [];
 const thisPlayer = '';
 const playersInGame = {};
 let sceneNum = 1;
-<<<<<<< HEAD
 let zAxis = 0;
 let xAxis = 0;
 const yAxis = 0;
 let torus;
 let winPos;
-=======
 let zAcceleration = 0;
 let xAcceleration = 0;
 const yAcceleration = 0;
->>>>>>> 9762d442e35ecfdbdb3dbeac72342975930139cc
 const changeScene = (num) => {
   sceneNum = num;
 };
