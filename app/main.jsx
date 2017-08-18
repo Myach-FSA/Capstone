@@ -1,45 +1,45 @@
-'use strict'
-import React from 'react'
-import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom'
-import {render} from 'react-dom'
-import { Provider, connect } from 'react-redux'
+'use strict';
+import React from 'react';
+import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom';
+import {render} from 'react-dom';
+import { Provider, connect } from 'react-redux';
 
-import store from './store'
+import store from './store';
 
-import WhoAmI from './components/WhoAmI'
-import NotFound from './components/NotFound'
-import Game from './components/Game'
-import Home from './components/Home'
-import NavbarSection from './components/Navbar'
-import FooterSection from './components/Footer'
-import Scores from './components/Scores'
-import ChooseBall from './components/ChooseBall'
-import Register from './components/Register'
-import GameWaitRoom from './components/GameWaitRoom'
+import WhoAmI from './components/WhoAmI';
+import NotFound from './components/NotFound';
+import Game from './components/Game';
+import Home from './components/Home';
+import NavbarSection from './components/Navbar';
+import FooterSection from './components/Footer';
+import Scores from './components/Scores';
+import ChooseBall from './components/ChooseBall';
+import Register from './components/Register';
+import GameWaitRoom from './components/GameWaitRoom';
 
-import firebase from 'APP/fire'
+import firebase from 'APP/fire';
 
-import Demos from 'APP/demos'
+import Demos from 'APP/demos';
 
-const auth = firebase.auth()
-let loginObj = {};
+const auth = firebase.auth();
+const loginObj = {};
 
 auth.onAuthStateChanged((user) => {
   if (!user) {
-    console.log('No user is signed in')
+    console.log('No user is signed in');
     firebase.auth().signInAnonymously().catch(function(error) {
-      console.log('Error: ', error.code, error.message)
+      console.log('Error: ', error.code, error.message);
     });
   } else {
-    console.log(user, 'is signed in')    
-    const ref = firebase.database().ref('users/' + user.uid)
-    ref.once("value", (snapshot) => {
-    Object.assign(loginObj, snapshot.val())
-    })
+    console.log(user, 'is signed in');
+    const ref = firebase.database().ref('users/' + user.uid);
+    ref.once('value', (snapshot) => {
+      Object.assign(loginObj, snapshot.val());
+    });
   }
 });
 
-console.log('LoginObj', loginObj)
+console.log('LoginObj', loginObj);
 
 const App = ({ children }) =>
   <Router>
@@ -57,7 +57,7 @@ const App = ({ children }) =>
       </Switch>
       <FooterSection />
     </div>
-  </Router>
+  </Router>;
 
 render(
   <Provider store={store}>
@@ -66,4 +66,4 @@ render(
     </Router>
   </Provider>,
   document.getElementById('content')
-)
+);
