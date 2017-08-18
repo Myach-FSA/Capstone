@@ -1,6 +1,6 @@
 .headersec {
   background-color: black;
-  padding-bottom: 5%;
+  padding-bottom: 1%;
 }
 
 .navbarsec {
@@ -20,13 +20,13 @@
 #bodysec {
   background-color: black;
   color: white;
-  padding-top: 5%;
-  padding-bottom: 5%;
+  padding-top: 2%;
+  padding-bottom: 1%;
 }
 
 #photoobj {
   background-color: black;
-  padding-top: 5px;
+  padding-top: 2%;
   width: 100%;
   height: 75%;
 }
@@ -36,14 +36,14 @@
 }
 
 #blue {
-  background-color:#045A73;
+  background-color: #045A73;
 }
 
 .content {
-  padding-top: 100px;
+  padding-top: 2%;
   padding-left: 100px;
   padding-right: 100px;
-  padding-bottom: 100px;
+  padding-bottom: 10px;
 }
 
 body {
@@ -107,6 +107,7 @@ a.halflink:hover {
   width: 200px;
   height: 300px;
 }
+
 .image-container .after {
   position: absolute;
   top: 0;
@@ -116,13 +117,14 @@ a.halflink:hover {
   display: none;
   color: #FFF;
 }
+
 .image-container:hover .after {
   display: block;
   background: rgba(0, 0, 0, .6);
 }
 
 .columnspace {
-  padding-top: 5%;
+  padding-top: 3%;
 }
 
 .formspacing {
@@ -166,4 +168,8 @@ a.halflink:hover {
 }
 .fullbutton {
   color: white;
+}
+
+h3 {
+  padding-top: 2%;
 }
