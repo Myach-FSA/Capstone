@@ -36,7 +36,7 @@
 }
 
 #blue {
-  background-color:#045A73;
+  background-color: #045A73;
 }
 
 .content {
@@ -98,8 +98,8 @@ body {
   padding-bottom: 2%;
 }
 
-a.halflink:hover { 
-  cursor: pointer; 
+a.halflink:hover {
+  cursor: pointer;
 }
 
 .image-container {
@@ -107,6 +107,7 @@ a.halflink:hover {
   width: 200px;
   height: 300px;
 }
+
 .image-container .after {
   position: absolute;
   top: 0;
@@ -116,13 +117,14 @@ a.halflink:hover {
   display: none;
   color: #FFF;
 }
+
 .image-container:hover .after {
   display: block;
   background: rgba(0, 0, 0, .6);
 }
 
 .columnspace {
-  padding-top: 5%;
+  padding-top: 3%;
 }
 
 .formspacing {
