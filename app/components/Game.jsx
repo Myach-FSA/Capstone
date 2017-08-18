@@ -13,9 +13,9 @@ const thisPlayer = '';
 let myPlayer;
 const playersInGame = {};
 let sceneNum = 1;
-let zAxis = 0;
-let xAxis = 0;
-const yAxis = 0;
+let zAcceleration = 0;
+let xAcceleration = 0;
+const yAcceleration = 0;
 const changeScene = (num) => {
   sceneNum = num;
 };
@@ -26,7 +26,6 @@ class Game extends Component {
   }
 
   componentDidMount() {
-    console.log('These are the props in game room', this.props)
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
     let num = sceneNum;
@@ -73,8 +72,7 @@ class Game extends Component {
             followCamera.attachControl(canvas, true);
           }
           database.ref(newPlayer.id).on('value', (val) => {
-            console.log('hit',val.val().xAxis,val.val().zAxis)
-            newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(val.val().zAxis, 0, val.val().xAxis, 0));
+            newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(val.val().zAcceleration, 0, val.val().xAcceleration, 0));
           });
           objects.push(newPlayer);
           playersInGame[playerId] = true;
@@ -100,10 +98,10 @@ class Game extends Component {
         let me=objects.filter(player=>player.id===user)[0]
         if(me&&me.absolutePosition.y<-100){
           this.playerPosition(me)
-          database.ref(user).set({'xAxis':0,'zAxis':0});
+          database.ref(user).set({'xAcceleration':0,'zAcceleration':0});
           me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0,0,0));
-          xAxis=0;
-          zAxis=0;
+          xAcceleration=0;
+          zAcceleration=0;
         }
         scene.render();
       }
@@ -212,31 +210,31 @@ function control(user) {
     keyState[e.keyCode || e.which] = false;
   }, true);
 
-  database.ref(user.id).set({ xAxis: 0, zAxis: 0 });
+  database.ref(user.id).set({ xAcceleration: 0, zAcceleration: 0 });
 
   function gameLoop() {
     if (keyState[37] || keyState[65]) {
-      if (xAxis < 5) {
-        xAxis += 0.5;
-        database.ref(user.id).set({ xAxis, zAxis });
+      if (xAcceleration < 5) {
+        xAcceleration += 0.5;
+        database.ref(user.id).set({ xAcceleration, zAcceleration });
       }
     }
     if (keyState[39] || keyState[68]) {
-      if (xAxis > -5) {
-        xAxis -= 0.5;
-        database.ref(user.id).set({ xAxis, zAxis });
+      if (xAcceleration > -5) {
+        xAcceleration -= 0.5;
+        database.ref(user.id).set({ xAcceleration, zAcceleration });
       }
     }
     if (keyState[38] || keyState[87]) {
-      if (zAxis < 5) {
-        zAxis += 0.5;
-        database.ref(user.id).set({ xAxis, zAxis });
+      if (zAcceleration < 5) {
+        zAcceleration += 0.5;
+        database.ref(user.id).set({ xAcceleration, zAcceleration });
       }
     }
     if (keyState[40] || keyState[83]) {
-      if (zAxis > -5) {
-        zAxis -= 0.5;
-        database.ref(user.id).set({ xAxis, zAxis });
+      if (zAcceleration > -5) {
+        zAcceleration -= 0.5;
+        database.ref(user.id).set({ xAcceleration, zAcceleration });
       }
     }
     setTimeout(gameLoop, 50);
@@ -247,19 +245,3 @@ export default Game;
 
 export { changeScene };
 
-
-// if ((Math.round(sphere1.position.x) === torus.position.x) && (Math.round(sphere1.position.y - 1) === torus.position.y) && (Math.round(sphere1.position.z) === torus.position.z)) {
-//   if (window.alert('You Won!\nNext Level?') === true) {
-//     changeScene(2);
-//   }
-// }
-
-// if (sphere1.position.y < -20) {
-//   if (window.confirm('You Lose :(\nTry Again?') === true) {
-//     sphere1 = createPlayer(scene, user, null);
-//     // sphere1.material = ballMaterial;
-//   } else {
-//     window.location.replace(window.location.origin);
-//     return;
-//   }
-//}
