@@ -11,12 +11,20 @@ import ScoreTable from './ScoreTable';
 const database = firebase.database();
 const objects = [];
 const thisPlayer = '';
-let myPlayer;
 const playersInGame = {};
 let sceneNum = 1;
+let zAxis = 0;
+let xAxis = 0;
+const yAxis = 0;
+let torus;
+let winPos;
+let zAcceleration = 0;
+let xAcceleration = 0;
+const yAcceleration = 0;
 const changeScene = (num) => {
   sceneNum = num;
 };
+let info;
 
 class Game extends Component {
   constructor(props) {
@@ -24,19 +32,21 @@ class Game extends Component {
   }
 
   componentDidMount() {
-  
+    audio0.play();
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
     let num = sceneNum;
-    let winPos;
     database.ref('winPosition').set({ x: 10, z: 10 });
-    const winPosition = database.ref('winPosition').once('value', (position) => {
+    let scene = createScene1(canvas, engine);
+    database.ref('winPosition').on('value', (position) => {
       winPos = position.val();
+      // this.createWinPoint(scene,null)
     });
     let scene = createScene1(canvas, engine, winPos);
     const user = this.props.user.userId
     console.log('This is the user', user)
     // Need to fix to accomodate multiplayer (prevent being overwritten)
+    this.createWinPoint()
     database.ref('players').on('value', (players) => {
       const playersObj = players.val();
       for (const playerId in playersObj) {
@@ -45,12 +55,12 @@ class Game extends Component {
           if (newPlayer.id === user) {
             this.playerPosition(newPlayer);
             this.setColor(newPlayer, {b: Math.random(), g: Math.random(), r: Math.random()});
-            const Info = { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, color: newPlayer.material.diffuseColor };
-            database.ref('playerPosition/' + newPlayer.id).set(Info);
+            info = { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, color: newPlayer.material.diffuseColor };
+            database.ref('playerPosition/' + newPlayer.id).set(info);
           } else {
             database.ref('playerPosition/' + playerId).on('value', (playerInfo) => {
               const x = playerInfo.val().x;
-              const y = 4;
+              const y = playerInfo.val().y;
               const z = playerInfo.val().z;
               const color = playerInfo.val().color;
               this.setPosition(newPlayer, x, y, z);
@@ -59,7 +69,6 @@ class Game extends Component {
           }
           const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene);
           if (playerId === user) {
-            myPlayer = newPlayer;
             const playerDummy = this.createCameraObj(scene, newPlayer);
             control(newPlayer);
             followCamera.lockedTarget = playerDummy;
@@ -72,29 +81,58 @@ class Game extends Component {
             followCamera.attachControl(canvas, true);
           }
           database.ref(newPlayer.id).on('value', (val) => {
-            newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(val.val().zAxis, 0, val.val().xAxis, 0));
+            newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(val.val().zAcceleration, 0, val.val().xAcceleration, 0));
           });
           objects.push(newPlayer);
           playersInGame[playerId] = true;
         }
       }
     });
-    database.ref('players/' + user).set({ 'created': true });
+    database.ref('players/' + user).set({ 'created': true, 'totalScore': 0 });
 
     engine.runRenderLoop(() => {
       if (!scene || (sceneNum !== num)) {
         num = sceneNum;
         switch (num) {
           case 2:
-            scene = createScene2(canvas, engine, winPos);
+            scene = createScene2(canvas, engine);
             break;
-          default: scene = createScene1(canvas, engine, winPos);
+          default: scene = createScene1(canvas, engine);
         }
         setTimeout(scene.render(), 500);
         playersInGame.scene = true;
         database.ref('players/' + user).push({ id: 'test' });
         playersInGame.scene = false;
       } else {
+        let me=objects.filter(player=>player.id===user)[0]
+        if(me&&me.absolutePosition.y<-100){
+          this.playerPosition(me)
+          database.ref(user).set({'xAcceleration':0,'zAcceleration':0});
+          me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0,0,0));
+          xAxis=0;
+          zAxis=0;
+          console.log(user)
+          database.ref('players/'+ user+'/totalScore').transaction(function(score){
+            score -=1;
+            return score;
+          })
+        }
+        if(me&&(Math.floor(me.absolutePosition.x)===winPos.x)&&(Math.floor(me.absolutePosition.z)===winPos.z)){
+          console.log('win')
+          database.ref('players/'+ user+'/totalScore').transaction(function(score){
+            score +=1;
+            return score;
+          })
+          const x=Math.floor(Math.random()*50-25)
+          const z=Math.floor(Math.random()*50-25)
+          database.ref('winPosition').set({'x':x,'z':z})
+          torus.position.x=x;
+          torus.position.z=z;
+          winPos.x=x;
+          winPos.z=z;
+          xAcceleration=0;
+          zAcceleration=0;
+        }
         scene.render();
       }
     });
@@ -107,6 +145,10 @@ class Game extends Component {
       database.ref('playerPosition/'+user).remove();
       database.ref(user).remove();
     });
+  }
+
+  componentWillUnmount(){
+    audio0.pause();
   }
 
   createPlayerOnConnect(sce, id) {
@@ -136,8 +178,8 @@ class Game extends Component {
       return Math.floor(Math.random() * min - min / 2);
     }
     player.position.y = 4;
-    player.position.x = randomPosition(50);
-    player.position.z = randomPosition(50);
+    player.position.x = randomPosition(45);
+    player.position.z = randomPosition(45);
   }
 
   createCameraObj(scene, par) {
@@ -151,6 +193,25 @@ class Game extends Component {
     head.parent = par;
     return head;
   }
+<<<<<<< HEAD
+=======
+  createWinPoint(scene,old){
+    console.log("create win point")
+    if(old){console.log("torus be gone",torus);torus.dispose()}
+    torus = BABYLON.Mesh.CreateTorus('torus', 2, 0.5, 10, scene);
+    torus.position.x=winPos.x;
+    torus.position.z=winPos.z;
+  }
+  makeId() {
+    let text = '';
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+    for (let i = 0; i < 8; i++) {
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+  }
+>>>>>>> origin
 
   render() {
     return (
@@ -164,9 +225,6 @@ class Game extends Component {
 }
 
 function control(user) {
-  let zAxis = 0;
-  let xAxis = 0;
-  const yAxis = 0;
 
   const keyState = {};
 
@@ -195,31 +253,32 @@ function control(user) {
     keyState[e.keyCode || e.which] = false;
   }, true);
 
-  database.ref(user.id).set({ xAxis: 0, zAxis: 0 });
+  database.ref(user.id).set({ xAcceleration: 0, zAcceleration: 0 });
 
   function gameLoop() {
+    database.ref('playerPosition/' + user.id).set({ color: info.color, x: user.position.x, y: user.position.y, z: user.position.z });
     if (keyState[37] || keyState[65]) {
-      if (xAxis < 5) {
-        xAxis += 0.5;
-        database.ref(user.id).set({ xAxis, zAxis });
+      if (xAcceleration < 5) {
+        xAcceleration += 0.5;
+        database.ref(user.id).set({ xAcceleration, zAcceleration });
       }
     }
     if (keyState[39] || keyState[68]) {
-      if (xAxis > -5) {
-        xAxis -= 0.5;
-        database.ref(user.id).set({ xAxis, zAxis });
+      if (xAcceleration > -5) {
+        xAcceleration -= 0.5;
+        database.ref(user.id).set({ xAcceleration, zAcceleration });
       }
     }
     if (keyState[38] || keyState[87]) {
-      if (zAxis < 5) {
-        zAxis += 0.5;
-        database.ref(user.id).set({ xAxis, zAxis });
+      if (zAcceleration < 5) {
+        zAcceleration += 0.5;
+        database.ref(user.id).set({ xAcceleration, zAcceleration });
       }
     }
     if (keyState[40] || keyState[83]) {
-      if (zAxis > -5) {
-        zAxis -= 0.5;
-        database.ref(user.id).set({ xAxis, zAxis });
+      if (zAcceleration > -5) {
+        zAcceleration -= 0.5;
+        database.ref(user.id).set({ xAcceleration, zAcceleration });
       }
     }
     setTimeout(gameLoop, 50);
@@ -244,20 +303,3 @@ export default connect(mapStateToProps, null)(Game)
 
 
 export { changeScene };
-
-
-// if ((Math.round(sphere1.position.x) === torus.position.x) && (Math.round(sphere1.position.y - 1) === torus.position.y) && (Math.round(sphere1.position.z) === torus.position.z)) {
-//   if (window.alert('You Won!\nNext Level?') === true) {
-//     changeScene(2);
-//   }
-// }
-
-// if (sphere1.position.y < -20) {
-//   if (window.confirm('You Lose :(\nTry Again?') === true) {
-//     sphere1 = createPlayer(scene, user, null);
-//     // sphere1.material = ballMaterial;
-//   } else {
-//     window.location.replace(window.location.origin);
-//     return;
-//   }
-//}
