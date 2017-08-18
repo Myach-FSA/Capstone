@@ -5,6 +5,7 @@ import firebase from '../../fire';
 import createScene1 from './Scene1';
 import createScene2 from './Scene2';
 import InfoScreen from './InfoScreen';
+const auth = firebase.auth();
 import ScoreTable from './ScoreTable';
 
 const database = firebase.database();
@@ -23,7 +24,7 @@ class Game extends Component {
   }
 
   componentDidMount() {
-    console.log('These are the props in game room', this.props)
+  
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
     let num = sceneNum;
@@ -33,7 +34,8 @@ class Game extends Component {
       winPos = position.val();
     });
     let scene = createScene1(canvas, engine, winPos);
-    const user = this.makeId();
+    const user = this.props.user.userId
+    console.log('This is the user', user)
     // Need to fix to accomodate multiplayer (prevent being overwritten)
     database.ref('players').on('value', (players) => {
       const playersObj = players.val();
@@ -150,16 +152,6 @@ class Game extends Component {
     return head;
   }
 
-  makeId() {
-    let text = '';
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-    for (let i = 0; i < 8; i++) {
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
-  }
-
   render() {
     return (
       <div>
@@ -234,7 +226,22 @@ function control(user) {
   }
   gameLoop();
 }
-export default Game;
+
+// export default Game;
+
+// /* -----------------    CONTAINER     ------------------ */
+
+import { connect } from 'react-redux'
+import store from '../store';
+
+const mapStateToProps = (state) => ({
+  user: state.auth.user
+})
+
+export default connect(mapStateToProps, null)(Game)
+
+// /* -----------------    CONTAINER     ------------------ */
+
 
 export { changeScene };
 

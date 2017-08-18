@@ -27,7 +27,7 @@ class ChooseBall extends React.Component {
       gameId: 0,
     }
     const user = this.props.loginObj.email ? this.props.loginObj : anonymousUser
-    this.props.setUser(user)
+    this.props.setUser(user)      
   }
 
   shouldComponentUpdate(nextProps){
@@ -46,19 +46,11 @@ class ChooseBall extends React.Component {
     document.getElementById('gameID').value = num;
   }
 
-  makeId() {
-    let text = '';
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < 8; i++) {
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
-  }
-
   sendDataToFB() {
     const user = this.props.user;
     const ref = firebase.database().ref("users/"+user.userId)
     ref.set(user)
+    this.props.setUser(user)    
   }
 
   render() {
@@ -134,6 +126,7 @@ class ChooseBall extends React.Component {
             </div>
           </div>
           <Link to={`/game/${gameID}`} onClick={(evt) => this.sendDataToFB(evt)}><button className="button is-success">Go to Game</button></Link>
+          {/* <Link to={`/game/${gameID}`} onClick={(evt) => this.sendDataToFB(evt)}><button className="button is-success">Go to Game</button></Link> */}
         <br></br>
         </div>
       </div>
