@@ -89,6 +89,10 @@ class Game extends Component {
     window.addEventListener('resize', () => {
       engine.resize();
     });
+    window.addEventListener('beforeunload',(evt)=>{
+      event.returnValue = "\o/";
+      database.ref('players/'+user).remove();
+    })
   }
 
   // componentWillUnmount() {
@@ -224,4 +228,4 @@ export { changeScene };
 //     window.location.replace(window.location.origin);
 //     return;
 //   }
-// }
+//}
