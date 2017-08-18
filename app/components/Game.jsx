@@ -23,6 +23,7 @@ class Game extends Component {
   }
 
   componentDidMount() {
+    console.log('These are the props in game room', this.props)
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
     let num = sceneNum;
