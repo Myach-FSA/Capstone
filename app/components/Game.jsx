@@ -16,6 +16,11 @@ const changeScene = (num) => {
 };
 
 class Game extends Component {
+  constructor(props) {
+    super(props)
+    console.log('props in game room', props)
+  }
+
   componentDidMount() {
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
