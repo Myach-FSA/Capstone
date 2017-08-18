@@ -31,15 +31,13 @@ auth.onAuthStateChanged((user) => {
       console.log('Error: ', error.code, error.message);
     });
   } else {
-    console.log(user, 'is signed in');
-    const ref = firebase.database().ref('users/' + user.uid);
-    ref.once('value', (snapshot) => {
-      Object.assign(loginObj, snapshot.val());
-    });
+    console.log(user, 'is signed in')    
+    const ref = firebase.database().ref('users/' + user.uid)
+    ref.once("value", (snapshot) => {
+    Object.assign(loginObj, user)
+    })
   }
 });
-
-console.log('LoginObj', loginObj);
 
 const App = ({ children }) =>
   <Router>
@@ -47,7 +45,7 @@ const App = ({ children }) =>
       <NavbarSection />
       <Switch>
         <Route exact path="/" component={Home}/>
-        <Route exact path="/game" component={Game}/>
+        <Route exact path="/game" component={Game} auth={auth} loginObj={loginObj}/>
         <Route exact path="/choose" render={() => <ChooseBall auth={auth} loginObj={loginObj}/>}/>
         <Route exact path="/scores" component={Scores}/>
         <Route exact path="/login" render={() => <WhoAmI auth={auth} loginObj={loginObj}/>} />

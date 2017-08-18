@@ -22,7 +22,7 @@ const reducer = (state = initialState, action) => {
       newState.user = action.user; 
       break      
     case SET_BALL: 
-        newState.user = { ...state.user, ball: action.ball };
+      newState.user = { ...state.user, ball: action.ball };
     break
     case SET_GAME: 
       newState.user = { ...state.user, gameId: action.gameId };

@@ -16,6 +16,10 @@ const changeScene = (num) => {
 };
 
 class Game extends Component {
+  constructor(props) {
+    super(props)
+  }
+
   componentDidMount() {
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
@@ -95,28 +99,20 @@ class Game extends Component {
     })
   }
 
-  // componentWillUnmount() {
-  //   database.ref('players/' + thisPlayer).set(null);
-  // }
-
   createPlayerOnConnect(sce, id, color) {
     const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); // Params: name, subdivs, size, scene
     player.checkCollisions = true;
     const ballMaterial = new BABYLON.StandardMaterial('material', sce);
     ballMaterial.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random());
     player.material = ballMaterial;
-    // player.position.y = 4;
     player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.SphereImpostor, {
       mass: 0.01,
       friction: 0.5,
-      // restitution: 1.0
     }, sce);
     return player;
   }
 
   setPosition(sphere, x, y, z) {
-    console.log(sphere.position);
-    console.log(x, y, z)
     sphere.position.x = x;
     sphere.position.y = y;
     sphere.position.z = z;
