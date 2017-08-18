@@ -22,12 +22,14 @@ const reducer = (state = initialState, action) => {
       newState.user = action.user; 
       break      
     case SET_BALL: 
-      newState.user.ball = action.ball;
+        newState.user = { ...state.user, ball: action.ball };
+    break
+    case SET_GAME: 
+      newState.user = { ...state.user, gameId: action.gameId };
       break
     default:
       return state
   }
-
   return newState
 }
 
@@ -45,6 +47,9 @@ const loginUser = (user) => ({ type: LOGIN, user })
 const SET_BALL = 'SET_BALL'
 const setBall = (ball) => ({ type: SET_BALL, ball })
 
+const SET_GAME = 'SET_GAME'
+const setGame = (gameId) => ({ type: SET_GAME, gameId })
+
 /* --------- THUNK CREATORS --------- */  
 
 export const signUp = (user) => {
@@ -55,7 +60,8 @@ export const signUp = (user) => {
         wins: 0,
         totalScore: 0,
         losses: 0,
-        ball: ''
+        ball: 0,
+        gameId: 0,
     }
     const ref = firebase.database().ref("users/"+user.userId)
     ref.set(userObj)
@@ -82,6 +88,10 @@ export const setUser = (user) => {
 
 export const chooseBall = (ball) => {
     return setBall(ball)
+}
+
+export const chooseGame = (id) => {
+    return setGame(id)
 }
 
 // export const setBall = ball =>
