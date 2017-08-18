@@ -44,12 +44,16 @@ const createScene1 = (canvas, engine) => {
   tubeMaterial.diffuseTexture = textureTube
   tubeMaterial.diffuseTexture.hasAlpha = true
   var groundMaterial = new BABYLON.StandardMaterial('material', scene)
-  var textureGrass = new BABYLON.Texture('./assets/textures/chuttersnap.jpg', scene)
-  groundMaterial.diffuseTexture = textureGrass
-  ground.material = groundMaterial
+  // var textureGrass = new BABYLON.Texture('./assets/textures/chuttersnap.jpg', scene)
+  // groundMaterial.diffuseTexture = textureGrass
+  const groundColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random());
+  groundColor.hasAlpha = true;
+  groundMaterial.alpha = 0.8;
+  groundMaterial.diffuseColor = groundColor;
+  ground.material = groundMaterial;
 
   // ---- RETURN SCENE ----
 
-  return scene
-}
-export default createScene1
+  return scene;
+};
+export default createScene1;

@@ -139,15 +139,14 @@ function control(user) {
   const keyState = {};
 
   window.onkeydown = function(e) {
-    e.preventDefault();
     if (e.keyCode === 9) {
+      e.preventDefault();
       document.getElementById('ScoreTable').className = 'scoreTable visible has-text-centered';
       document.getElementById('InfoScreen').className = 'infoScreen invisible has-text-centered';
     }
   };
 
   window.onkeyup = function(e) {
-    e.preventDefault();
     if (e.keyCode === 9) {
       document.getElementById('ScoreTable').className = 'scoreTable invisible has-text-centered';
       document.getElementById('InfoScreen').className = 'infoScreen visible has-text-centered';
