@@ -6,13 +6,13 @@ import createScene1 from './Scene1';
 import createScene2 from './Scene2';
 
 const database = firebase.database();
-var objects = [];
-var thisPlayer = '';
-var playersInGame = {};
-var executed = false;
+const objects = [];
+const thisPlayer = '';
+let myPlayer;
+const playersInGame = {};
 let sceneNum = 1;
 const changeScene = (num) => {
-  sceneNum=num;
+  sceneNum = num;
 };
 
 class Game extends Component {
@@ -20,20 +20,37 @@ class Game extends Component {
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
     let num = sceneNum;
-    let scene = createScene1(canvas, engine);
+    let winPos;
+    database.ref('winPosition').set({ x: 10, z: 10 });
+    const winPosition = database.ref('winPosition').once('value', (position) => {
+      winPos = position.val();
+    });
+    let scene = createScene1(canvas, engine, winPos);
     const user = this.makeId();
+    // Need to fix to accomodate multiplayer (prevent being overwritten)
     database.ref('players').on('value', (players) => {
-      console.log('db change')
-      var playersObj = players.val();
-      for (let player in playersObj) {
-        if (!playersInGame[player] || playersInGame.scene) {
-          var newPlayer = this.createPlayerOnConnect(scene, player, null);
+      const playersObj = players.val();
+      for (const playerId in playersObj) {
+        if (!playersInGame[playerId] || playersInGame.scene) {
+          const newPlayer = this.createPlayerOnConnect(scene, playerId, null);
+          if (newPlayer.id === user) {
+            this.playerPosition(newPlayer);
+            database.ref('playerPosition/' + newPlayer.id).set(newPlayer.position);
+          } else {
+            database.ref('playerPosition/' + playerId).on('value', (coordinates) => {
+              let x = coordinates.val().x;
+              let y = 4;
+              let z = coordinates.val().z;
+              this.setPosition(newPlayer, x, y, z);
+            });
+          }
           const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene);
-          if (!executed) {
+          if (playerId === user) {
+            myPlayer = newPlayer;
             const playerDummy = this.createCameraObj(scene, newPlayer);
-            executed = true;
-            // followCamera.lockedTarget = playerDummy;
-            // scene.activeCamera = followCamera;
+            control(newPlayer);
+            followCamera.lockedTarget = playerDummy;
+            scene.activeCamera = followCamera;
             followCamera.radius = 15; // how far from the object to follow
             followCamera.heightOffset = 7; // how high above the object to place the camera
             followCamera.rotationOffset = 180; // the viewing angle / 180
@@ -45,20 +62,20 @@ class Game extends Component {
             newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(val.val().zAxis, 0, val.val().xAxis, 0));
           });
           objects.push(newPlayer);
-          playersInGame[player] = true;
+          playersInGame[playerId] = true;
         }
       }
     });
-    database.ref('players/' + user).set({ id: user });
+    database.ref('players/' + user).set({ 'created': true });
 
     engine.runRenderLoop(() => {
       if (!scene || (sceneNum !== num)) {
         num = sceneNum;
         switch (num) {
-        case 2:
-          scene = createScene2(canvas, engine);
-          break;
-        default: scene = createScene1(canvas, engine);
+          case 2:
+            scene = createScene2(canvas, engine, winPos);
+            break;
+          default: scene = createScene1(canvas, engine, winPos);
         }
         setTimeout(scene.render(), 500);
         playersInGame.scene = true;
@@ -74,34 +91,46 @@ class Game extends Component {
     });
   }
 
-  componentWillUnmount() {
-    database.ref('players/' + thisPlayer).set(null);
-  }
+  // componentWillUnmount() {
+  //   database.ref('players/' + thisPlayer).set(null);
+  // }
 
   createPlayerOnConnect(sce, id, color) {
     const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); // Params: name, subdivs, size, scene
-    function randomPosition(min) {
-      return Math.floor(Math.random() * min - min / 2);
-    }
-    player.position.y = 1;
-    player.position.x = randomPosition(50);
-    player.position.z = randomPosition(50);
     player.checkCollisions = true;
-    var ballMaterial = new BABYLON.StandardMaterial('material', sce);
+    const ballMaterial = new BABYLON.StandardMaterial('material', sce);
     ballMaterial.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random());
     player.material = ballMaterial;
+    // player.position.y = 4;
     player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.SphereImpostor, {
       mass: 0.01,
       friction: 0.5,
-      // restitution: 0.1
+      // restitution: 1.0
     }, sce);
     return player;
   }
 
+  setPosition(sphere, x, y, z) {
+    console.log(sphere.position);
+    console.log(x, y, z)
+    sphere.position.x = x;
+    sphere.position.y = y;
+    sphere.position.z = z;
+  }
+
+  playerPosition(player) {
+    function randomPosition(min) {
+      return Math.floor(Math.random() * min - min / 2);
+    }
+    player.position.y = 4;
+    player.position.x = randomPosition(50);
+    player.position.z = randomPosition(50);
+  }
+
   createCameraObj(scene, par) {
     const head = BABYLON.MeshBuilder.CreateSphere('camera', 16, scene);
-    var headMaterial = new BABYLON.StandardMaterial('material', scene);
-    var headTexture = new BABYLON.Texture('./assets/textures/net.png', scene);
+    const headMaterial = new BABYLON.StandardMaterial('material', scene);
+    const headTexture = new BABYLON.Texture('./assets/textures/net.png', scene);
     headMaterial.diffuseTexture = headTexture;
     headMaterial.diffuseColor = new BABYLON.Color3(2.0, 1, 0.7);
     headMaterial.diffuseTexture.hasAlpha = true;
@@ -111,10 +140,10 @@ class Game extends Component {
   }
 
   makeId() {
-    var text = '';
-    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let text = '';
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-    for (var i = 0; i < 8; i++) {
+    for (let i = 0; i < 8; i++) {
       text += possible.charAt(Math.floor(Math.random() * possible.length));
     }
     return text;
@@ -128,104 +157,71 @@ class Game extends Component {
   }
 }
 
-function createScene(engine, canvas) {
-  const scene = new BABYLON.Scene(engine); // creates a basic Babylon scene object
-  scene.enablePhysics();
-  scene.collisionsEnabled = true;
-  const light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), scene);
-  light.intensity = 0.7; // default is 1, so this is slightly dimmed
-
-  // ---- GROUND ----
-
-  const ground = BABYLON.Mesh.CreateGround('ground1', 50, 50, 2, scene);
-  ground.checkCollisions = true;
-
-  // ---- PHYSICS ----
-  ground.physicsImpostor = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, {
-    mass: 0,
-    restitution: 0.9
-  }, scene);
-
-  // ---- Players ---- //
-
-  function makeId() {
-    var text = '';
-    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-    for (var i = 0; i < 8; i++) {
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
-  }
-
-  // ---- Keys ----
-
+function control(user) {
   let zAxis = 0;
   let xAxis = 0;
   const yAxis = 0;
 
-  var user = makeId();
-
-  database.ref('players/' + user).set({ id: user });
-
   const keyState = {};
 
-  window.addEventListener('keydown', function(e) {
+  window.addEventListener('keydown', function (e) {
     keyState[e.keyCode || e.which] = true;
     if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
       e.preventDefault();
     }
   }, true);
-  window.addEventListener('keyup', function(e) {
+  window.addEventListener('keyup', function (e) {
     keyState[e.keyCode || e.which] = false;
   }, true);
 
-  database.ref(user).set({ xAxis: 0, zAxis: 0 });
+  database.ref(user.id).set({ xAxis: 0, zAxis: 0 });
 
   function gameLoop() {
     if (keyState[37] || keyState[65]) {
       if (xAxis < 5) {
         xAxis += 0.5;
-        database.ref(user).set({ xAxis, zAxis });
+        database.ref(user.id).set({ xAxis, zAxis });
       }
     }
     if (keyState[39] || keyState[68]) {
       if (xAxis > -5) {
         xAxis -= 0.5;
-        database.ref(user).set({ xAxis, zAxis });
+        database.ref(user.id).set({ xAxis, zAxis });
       }
     }
     if (keyState[38] || keyState[87]) {
       if (zAxis < 5) {
         zAxis += 0.5;
-        database.ref(user).set({ xAxis, zAxis });
+        database.ref(user.id).set({ xAxis, zAxis });
       }
     }
     if (keyState[40] || keyState[83]) {
       if (zAxis > -5) {
         zAxis -= 0.5;
-        database.ref(user).set({ xAxis, zAxis });
+        database.ref(user.id).set({ xAxis, zAxis });
       }
     }
     setTimeout(gameLoop, 50);
   }
-
   gameLoop();
-
-  var camera = new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 5, -10), scene);
-  camera.setTarget(BABYLON.Vector3.Zero());
-  camera.attachControl(canvas, false);
-
-  // ---- MATERIAL ----
-
-  var groundMaterial = new BABYLON.StandardMaterial('material', scene);
-  var textureGrass = new BABYLON.Texture('./assets/textures/grass-large.png', scene);
-  groundMaterial.diffuseTexture = textureGrass;
-  ground.material = groundMaterial;
-
-  // ---- RETURN SCENE ----
-  return scene;
 }
 export default Game;
 
 export { changeScene };
+
+
+// if ((Math.round(sphere1.position.x) === torus.position.x) && (Math.round(sphere1.position.y - 1) === torus.position.y) && (Math.round(sphere1.position.z) === torus.position.z)) {
+//   if (window.alert('You Won!\nNext Level?') === true) {
+//     changeScene(2);
+//   }
+// }
+
+// if (sphere1.position.y < -20) {
+//   if (window.confirm('You Lose :(\nTry Again?') === true) {
+//     sphere1 = createPlayer(scene, user, null);
+//     // sphere1.material = ballMaterial;
+//   } else {
+//     window.location.replace(window.location.origin);
+//     return;
+//   }
+// }
