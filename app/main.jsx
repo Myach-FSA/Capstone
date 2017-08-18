@@ -47,7 +47,7 @@ const App = ({ children }) =>
       <NavbarSection />
       <Switch>
         <Route exact path="/" component={Home}/>
-        {/* <Route exact path="/game" component={Game}/> */}
+        <Route exact path="/game" component={Game}/>
         <Route exact path="/choose" render={() => <ChooseBall auth={auth} loginObj={loginObj}/>}/>
         <Route exact path="/scores" component={Scores}/>
         <Route exact path="/login" render={() => <WhoAmI auth={auth} loginObj={loginObj}/>} />

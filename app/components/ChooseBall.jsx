@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM, { render } from 'react-dom';
 import { Link, NavLink, Router } from 'react-router-dom'
+import Firebase from 'firebase';
 
 const balls = [
   { name: 'Heavy Duty', description: 'Ball fashioned by the vikings themselves. This is the ball of choice for those serious about strength.', img: './assets/textures/grayball-choose.png' },
@@ -17,7 +18,6 @@ class ChooseBall extends React.Component {
 
   componentDidMount() {
     const user = this.props.loginObj
-    console.log('This is the user', user)
     this.props.setUser(user)
   }
 
@@ -38,20 +38,25 @@ class ChooseBall extends React.Component {
     document.getElementById('gameID').value = num;
   }
 
+  sendDataToFB() {
+    const user = this.props.user;
+    const ref = firebase.database().ref("users/"+user.userId)
+    ref.set(user)
+  }
+
   render() {
-    console.log('is the user here? ', this.props.user.username)
-    const playerName = this.props.user.username ? this.props.user.username : 'Anonymous'
-    
+    const playerName = this.props.user.username  && this.props.user.username ? this.props.user.username : 'Anonymous'
+    const chosenBall = balls[this.props.user.ball]
+    const ballMessage = chosenBall ? `You have chosen ${chosenBall.name}` : 'You have not yet chosen a ball'
     const gameID = this.gameId && this.gameId
-    console.log('This is the gameID', gameID)
 
     return (
       <div className="container is-fluid">
         <div className="content has-text-centered">
-          <h1>Hi <strong>{playerName}</strong></h1>
+          <h1><strong>Set Up Game</strong></h1>
           <div className="notification">
             <h3>Choose Your Ball</h3>
-            <i className="fa fa-arrow-down fa-lg" aria-hidden="true"></i>
+            <h5><strong>{ballMessage}</strong></h5>
             <div className="horiz-marg">
               <div className="columns is-multiline">
                 {balls && balls.map((ball, i) => (
@@ -75,16 +80,16 @@ class ChooseBall extends React.Component {
               </div>
             </div>
           </div>
+          <i className="fa fa-arrow-down fa-lg" aria-hidden="true"></i>
           <br></br>
         </div>
         <div className="content has-text-centered">
           <div className="notification">
             <h3>Pick Your Game</h3>
-            <i className="fa fa-arrow-down fa-lg" aria-hidden="true"></i>
             <br></br>
             <div className="columns">
               <div className="column is-half">
-                <h5>Initiate a Game and send the code to your friends</h5>
+                <h5>Get a game ID</h5>
                 <div className="field has-addons">
                   <div className="control">
                     <a className="button is-info" onClick={(evt) => this.gameChoice(evt)}>
@@ -97,21 +102,21 @@ class ChooseBall extends React.Component {
                 </div>
               </div>
               <div className="column">
-                <h5>Enter a specific game room ID</h5>
+                <h5>Join an initiated game</h5>
                 <div className="field has-addons">
                   <div className="control">
                     <input className="input" type="text" placeholder="Enter ID" />
                   </div>
                   <div className="control">
                     <a className="button is-info">
-                      Enter Game
+                      Enter Game ID
                     </a>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <Link to={`/game/${gameID}`}><button className="button is-success">BACK TO STUDENTS</button></Link>
+          <Link to={`/game/${gameID}`} onClick={(evt) => this.sendDataToFB(evt)}><button className="button is-success">Go to Game</button></Link>
         <br></br>
         </div>
       </div>
