@@ -16,6 +16,10 @@ const changeScene = (num) => {
 };
 
 class Game extends Component {
+  constructor(props) {
+    super(props)
+  }
+
   componentDidMount() {
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
@@ -93,6 +97,10 @@ class Game extends Component {
     window.addEventListener('resize', () => {
       engine.resize();
     });
+    window.addEventListener('beforeunload',(evt)=>{
+      event.returnValue = "\o/";
+      database.ref('players/'+user).remove();
+    })
   }
 
   // componentWillUnmount() {
@@ -104,11 +112,9 @@ class Game extends Component {
     player.checkCollisions = true;
     const ballMaterial = new BABYLON.StandardMaterial('material', sce);
     player.material = ballMaterial;
-    // player.position.y = 4;
     player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.SphereImpostor, {
       mass: 0.01,
       friction: 0.5,
-      // restitution: 1.0
     }, sce);
     return player;
   }
@@ -229,4 +235,4 @@ export { changeScene };
 //     window.location.replace(window.location.origin);
 //     return;
 //   }
-// }
+//}

@@ -1,5 +1,5 @@
 import React from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, withRouter } from 'react-router-dom'
 
 class NavbarSection extends React.Component {
   constructor() {
@@ -8,7 +8,8 @@ class NavbarSection extends React.Component {
   }
 
   handleLogout() {
-    this.props.logOut()    
+    this.props.logOut()  
+    this.props.history.push('/')    
   };
   
   render() {
@@ -61,4 +62,4 @@ const mapState = (state, componentProps) => (
 
 const mapDispatch = ({logOut})
 
-export default connect(mapState, mapDispatch)(NavbarSection)
+export default withRouter(connect(mapState, mapDispatch)(NavbarSection))
