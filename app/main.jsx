@@ -15,6 +15,7 @@ import FooterSection from './components/Footer'
 import Scores from './components/Scores'
 import ChooseBall from './components/ChooseBall'
 import Register from './components/Register'
+import GameWaitRoom from './components/GameWaitRoom'
 
 import firebase from 'APP/fire'
 
@@ -51,6 +52,7 @@ const App = ({ children }) =>
         <Route exact path="/scores" component={Scores}/>
         <Route exact path="/login" render={() => <WhoAmI auth={auth} loginObj={loginObj}/>} />
         <Route exact path="/signup" render={() => <Register auth={auth} />} />
+        <Route exact path="/game/:id" component={GameWaitRoom}/>
         <Route component={NotFound}/>
       </Switch>
       <FooterSection />
