@@ -31,6 +31,7 @@ class Game extends Component {
   }
 
   componentDidMount() {
+    audio0.play();
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
     let num = sceneNum;
@@ -142,6 +143,10 @@ class Game extends Component {
     });
   }
 
+  componentWillUnmount(){
+    audio0.pause();
+  }
+
   createPlayerOnConnect(sce, id) {
     const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); // Params: name, subdivs, size, scene
     player.checkCollisions = true;
@@ -243,13 +248,8 @@ function control(user) {
 
   database.ref(user.id).set({ xAcceleration: 0, zAcceleration: 0 });
 
-  let positionTriggerCounter = 0;
-
   function gameLoop() {
-    // if (positionTriggerCounter === 5) {
-      database.ref('playerPosition/' + user.id).set({ color: info.color, x: user.position.x, y: user.position.y, z: user.position.z });
-    //   positionTriggerCounter = 0;
-    // }
+    database.ref('playerPosition/' + user.id).set({ color: info.color, x: user.position.x, y: user.position.y, z: user.position.z });
     if (keyState[37] || keyState[65]) {
       if (xAcceleration < 5) {
         xAcceleration += 0.5;
@@ -275,11 +275,9 @@ function control(user) {
       }
     }
     setTimeout(gameLoop, 50);
-    // positionTriggerCounter++;
   }
   gameLoop();
 }
 export default Game;
 
 export { changeScene };
-
