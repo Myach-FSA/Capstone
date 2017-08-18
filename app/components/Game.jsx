@@ -10,7 +10,6 @@ import ScoreTable from './ScoreTable';
 const database = firebase.database();
 const objects = [];
 const thisPlayer = '';
-let myPlayer;
 const playersInGame = {};
 let sceneNum = 1;
 let zAcceleration = 0;
@@ -36,7 +35,6 @@ class Game extends Component {
     });
     let scene = createScene1(canvas, engine, winPos);
     const user = this.makeId();
-    // Need to fix to accomodate multiplayer (prevent being overwritten)
     database.ref('players').on('value', (players) => {
       const playersObj = players.val();
       for (const playerId in playersObj) {
@@ -59,7 +57,6 @@ class Game extends Component {
           }
           const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene);
           if (playerId === user) {
-            myPlayer = newPlayer;
             const playerDummy = this.createCameraObj(scene, newPlayer);
             control(newPlayer);
             followCamera.lockedTarget = playerDummy;
