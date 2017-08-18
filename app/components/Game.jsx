@@ -18,6 +18,7 @@ const yAcceleration = 0;
 const changeScene = (num) => {
   sceneNum = num;
 };
+let info;
 
 class Game extends Component {
   constructor(props) {
@@ -43,12 +44,12 @@ class Game extends Component {
           if (newPlayer.id === user) {
             this.playerPosition(newPlayer);
             this.setColor(newPlayer, {b: Math.random(), g: Math.random(), r: Math.random()});
-            const Info = { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, color: newPlayer.material.diffuseColor };
-            database.ref('playerPosition/' + newPlayer.id).set(Info);
+            info = { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, color: newPlayer.material.diffuseColor };
+            database.ref('playerPosition/' + newPlayer.id).set(info);
           } else {
             database.ref('playerPosition/' + playerId).on('value', (playerInfo) => {
               const x = playerInfo.val().x;
-              const y = 4;
+              const y = playerInfo.val().y;
               const z = playerInfo.val().z;
               const color = playerInfo.val().color;
               this.setPosition(newPlayer, x, y, z);
@@ -209,7 +210,13 @@ function control(user) {
 
   database.ref(user.id).set({ xAcceleration: 0, zAcceleration: 0 });
 
+  let positionTriggerCounter = 0;
+
   function gameLoop() {
+    // if (positionTriggerCounter === 5) {
+      database.ref('playerPosition/' + user.id).set({ color: info.color, x: user.position.x, y: user.position.y, z: user.position.z });
+    //   positionTriggerCounter = 0;
+    // }
     if (keyState[37] || keyState[65]) {
       if (xAcceleration < 5) {
         xAcceleration += 0.5;
@@ -235,6 +242,7 @@ function control(user) {
       }
     }
     setTimeout(gameLoop, 50);
+    // positionTriggerCounter++;
   }
   gameLoop();
 }
