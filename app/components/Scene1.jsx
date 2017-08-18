@@ -17,6 +17,9 @@ const createScene1 = (canvas, engine) => {
   background.texture.level = 0;
   background.texture.wAng = 0.2;
 
+  // var torus = BABYLON.Mesh.CreateTorus('torus', 2, 0.5, 10, scene);
+  // torus.position.x=winPos.x;
+  // torus.position.z=winPos.z;
   // ---- GROUND ----
 
   const ground = BABYLON.Mesh.CreateGround('ground1', 50, 50, 2, scene);
