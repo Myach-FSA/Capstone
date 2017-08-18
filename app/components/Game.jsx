@@ -13,6 +13,9 @@ const thisPlayer = '';
 let myPlayer;
 const playersInGame = {};
 let sceneNum = 1;
+let zAxis = 0;
+let xAxis = 0;
+const yAxis = 0;
 const changeScene = (num) => {
   sceneNum = num;
 };
@@ -99,7 +102,8 @@ class Game extends Component {
           this.playerPosition(me)
           database.ref(user).set({'xAxis':0,'zAxis':0});
           me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0,0,0));
-          console.log("You Lose",me.physicsImpostor.getLinearVelocity(),me.physicsImpostor.getAngularVelocity())
+          xAxis=0;
+          zAxis=0;
         }
         scene.render();
       }
@@ -180,9 +184,6 @@ class Game extends Component {
 }
 
 function control(user) {
-  let zAxis = 0;
-  let xAxis = 0;
-  const yAxis = 0;
 
   const keyState = {};
 
