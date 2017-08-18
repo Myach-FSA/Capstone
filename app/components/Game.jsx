@@ -12,6 +12,11 @@ const objects = [];
 const thisPlayer = '';
 const playersInGame = {};
 let sceneNum = 1;
+let zAxis = 0;
+let xAxis = 0;
+const yAxis = 0;
+let torus;
+let winPos;
 let zAcceleration = 0;
 let xAcceleration = 0;
 const yAcceleration = 0;
@@ -29,12 +34,13 @@ class Game extends Component {
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
     let num = sceneNum;
-    let winPos;
     database.ref('winPosition').set({ x: 10, z: 10 });
-    const winPosition = database.ref('winPosition').once('value', (position) => {
+    let scene = createScene1(canvas, engine);
+    database.ref('winPosition').on('value', (position) => {
       winPos = position.val();
+      // this.createWinPoint(scene,null)
     });
-    let scene = createScene1(canvas, engine, winPos);
+    this.createWinPoint()
     const user = this.makeId();
     database.ref('players').on('value', (players) => {
       const playersObj = players.val();
@@ -77,16 +83,16 @@ class Game extends Component {
         }
       }
     });
-    database.ref('players/' + user).set({ 'created': true });
+    database.ref('players/' + user).set({ 'created': true, 'totalScore': 0 });
 
     engine.runRenderLoop(() => {
       if (!scene || (sceneNum !== num)) {
         num = sceneNum;
         switch (num) {
           case 2:
-            scene = createScene2(canvas, engine, winPos);
+            scene = createScene2(canvas, engine);
             break;
-          default: scene = createScene1(canvas, engine, winPos);
+          default: scene = createScene1(canvas, engine);
         }
         setTimeout(scene.render(), 500);
         playersInGame.scene = true;
@@ -98,6 +104,27 @@ class Game extends Component {
           this.playerPosition(me)
           database.ref(user).set({'xAcceleration':0,'zAcceleration':0});
           me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0,0,0));
+          xAxis=0;
+          zAxis=0;
+          console.log(user)
+          database.ref('players/'+ user+'/totalScore').transaction(function(score){
+            score -=1;
+            return score;
+          })
+        }
+        if(me&&(Math.floor(me.absolutePosition.x)===winPos.x)&&(Math.floor(me.absolutePosition.z)===winPos.z)){
+          console.log('win')
+          database.ref('players/'+ user+'/totalScore').transaction(function(score){
+            score +=1;
+            return score;
+          })
+          const x=Math.floor(Math.random()*50-25)
+          const z=Math.floor(Math.random()*50-25)
+          database.ref('winPosition').set({'x':x,'z':z})
+          torus.position.x=x;
+          torus.position.z=z;
+          winPos.x=x;
+          winPos.z=z;
           xAcceleration=0;
           zAcceleration=0;
         }
@@ -157,7 +184,13 @@ class Game extends Component {
     head.parent = par;
     return head;
   }
-
+  createWinPoint(scene,old){
+    console.log("create win point")
+    if(old){console.log("torus be gone",torus);torus.dispose()}
+    torus = BABYLON.Mesh.CreateTorus('torus', 2, 0.5, 10, scene);
+    torus.position.x=winPos.x;
+    torus.position.z=winPos.z;
+  }
   makeId() {
     let text = '';
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
