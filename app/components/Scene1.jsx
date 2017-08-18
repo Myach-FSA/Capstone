@@ -12,7 +12,7 @@ const createScene1 = (canvas, engine) => {
   const light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), scene);
   light.intensity = 0.7; // default is 1, so this is slightly dimmed
 
-  var background = new BABYLON.Layer('back', './assets/textures/3dcubes.jpg', scene);
+  var background = new BABYLON.Layer('back', './assets/textures/green_black_cubes.jpg', scene);
   background.isBackground = true;
   background.texture.level = 0;
   background.texture.wAng = 0.2;
@@ -44,8 +44,12 @@ const createScene1 = (canvas, engine) => {
   tubeMaterial.diffuseTexture = textureTube;
   tubeMaterial.diffuseTexture.hasAlpha = true;
   var groundMaterial = new BABYLON.StandardMaterial('material', scene);
-  var textureGrass = new BABYLON.Texture('./assets/textures/chuttersnap.jpg', scene);
-  groundMaterial.diffuseTexture = textureGrass;
+  // var textureGrass = new BABYLON.Texture('./assets/textures/chuttersnap.jpg', scene)
+  // groundMaterial.diffuseTexture = textureGrass
+  const groundColor = new BABYLON.Color3(0, 1, 0);
+  groundColor.hasAlpha = true;
+  groundMaterial.alpha = 0.6;
+  groundMaterial.diffuseColor = groundColor;
   ground.material = groundMaterial;
 
   // ---- RETURN SCENE ----
