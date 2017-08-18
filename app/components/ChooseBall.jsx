@@ -17,7 +17,17 @@ class ChooseBall extends React.Component {
   }
 
   componentDidMount() {
-    const user = this.props.loginObj
+    const anonymousUser = {
+      userId: this.props.loginObj.uid,
+      username: this.props.loginObj.uid,
+      wins: 0,
+      totalScore: 0,
+      losses: 0,
+      ball: 0,
+      gameId: 0,
+    }
+    const user = this.props.loginObj.email ? this.props.loginObj : anonymousUser
+    console.log('This is the actual user', user)
     this.props.setUser(user)
   }
 
@@ -36,6 +46,16 @@ class ChooseBall extends React.Component {
     this.gameId = num;
     this.props.chooseGame(num)
     document.getElementById('gameID').value = num;
+  }
+
+  makeId() {
+    let text = '';
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+    for (let i = 0; i < 8; i++) {
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
   }
 
   sendDataToFB() {
