@@ -8,10 +8,11 @@ import createScene2 from './Scene2';
 const database = firebase.database();
 const objects = [];
 const thisPlayer = '';
+let myPlayer;
 const playersInGame = {};
 let sceneNum = 1;
 const changeScene = (num) => {
-  sceneNum=num;
+  sceneNum = num;
 };
 
 class Game extends Component {
@@ -19,15 +20,33 @@ class Game extends Component {
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
     let num = sceneNum;
-    let scene = createScene1(canvas, engine);
+    let winPos;
+    database.ref('winPosition').set({ x: 10, z: 10 });
+    const winPosition = database.ref('winPosition').once('value', (position) => {
+      winPos = position.val();
+    });
+    let scene = createScene1(canvas, engine, winPos);
     const user = this.makeId();
+    // Need to fix to accomodate multiplayer (prevent being overwritten)
     database.ref('players').on('value', (players) => {
       const playersObj = players.val();
       for (const playerId in playersObj) {
         if (!playersInGame[playerId] || playersInGame.scene) {
           const newPlayer = this.createPlayerOnConnect(scene, playerId, null);
+          if (newPlayer.id === user) {
+            this.playerPosition(newPlayer);
+            database.ref('playerPosition/' + newPlayer.id).set(newPlayer.position);
+          } else {
+            database.ref('playerPosition/' + playerId).on('value', (coordinates) => {
+              let x = coordinates.val().x;
+              let y = 4;
+              let z = coordinates.val().z;
+              this.setPosition(newPlayer, x, y, z);
+            });
+          }
           const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene);
           if (playerId === user) {
+            myPlayer = newPlayer;
             const playerDummy = this.createCameraObj(scene, newPlayer);
             control(newPlayer);
             followCamera.lockedTarget = playerDummy;
@@ -47,16 +66,16 @@ class Game extends Component {
         }
       }
     });
-    database.ref('players/' + user).set({ id: user });
+    database.ref('players/' + user).set({ 'created': true });
 
     engine.runRenderLoop(() => {
       if (!scene || (sceneNum !== num)) {
         num = sceneNum;
         switch (num) {
-        case 2:
-          scene = createScene2(canvas, engine);
-          break;
-        default: scene = createScene1(canvas, engine);
+          case 2:
+            scene = createScene2(canvas, engine, winPos);
+            break;
+          default: scene = createScene1(canvas, engine, winPos);
         }
         setTimeout(scene.render(), 500);
         playersInGame.scene = true;
@@ -78,22 +97,34 @@ class Game extends Component {
 
   createPlayerOnConnect(sce, id, color) {
     const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); // Params: name, subdivs, size, scene
-    function randomPosition(min) {
-      return Math.floor(Math.random() * min - min / 2);
-    }
-    player.position.y = 1;
-    player.position.x = randomPosition(50);
-    player.position.z = randomPosition(50);
     player.checkCollisions = true;
     const ballMaterial = new BABYLON.StandardMaterial('material', sce);
     ballMaterial.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random());
     player.material = ballMaterial;
+    // player.position.y = 4;
     player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.SphereImpostor, {
       mass: 0.01,
       friction: 0.5,
-      // restitution: 0.1
+      // restitution: 1.0
     }, sce);
     return player;
+  }
+
+  setPosition(sphere, x, y, z) {
+    console.log(sphere.position);
+    console.log(x, y, z)
+    sphere.position.x = x;
+    sphere.position.y = y;
+    sphere.position.z = z;
+  }
+
+  playerPosition(player) {
+    function randomPosition(min) {
+      return Math.floor(Math.random() * min - min / 2);
+    }
+    player.position.y = 4;
+    player.position.x = randomPosition(50);
+    player.position.z = randomPosition(50);
   }
 
   createCameraObj(scene, par) {
@@ -133,13 +164,13 @@ function control(user) {
 
   const keyState = {};
 
-  window.addEventListener('keydown', function(e) {
+  window.addEventListener('keydown', function (e) {
     keyState[e.keyCode || e.which] = true;
     if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
       e.preventDefault();
     }
   }, true);
-  window.addEventListener('keyup', function(e) {
+  window.addEventListener('keyup', function (e) {
     keyState[e.keyCode || e.which] = false;
   }, true);
 
@@ -177,3 +208,20 @@ function control(user) {
 export default Game;
 
 export { changeScene };
+
+
+// if ((Math.round(sphere1.position.x) === torus.position.x) && (Math.round(sphere1.position.y - 1) === torus.position.y) && (Math.round(sphere1.position.z) === torus.position.z)) {
+//   if (window.alert('You Won!\nNext Level?') === true) {
+//     changeScene(2);
+//   }
+// }
+
+// if (sphere1.position.y < -20) {
+//   if (window.confirm('You Lose :(\nTry Again?') === true) {
+//     sphere1 = createPlayer(scene, user, null);
+//     // sphere1.material = ballMaterial;
+//   } else {
+//     window.location.replace(window.location.origin);
+//     return;
+//   }
+// }
