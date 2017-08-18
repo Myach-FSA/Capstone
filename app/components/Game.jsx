@@ -67,6 +67,7 @@ class Game extends Component {
             followCamera.attachControl(canvas, true);
           }
           database.ref(newPlayer.id).on('value', (val) => {
+            console.log('hit',val.val().xAxis,val.val().zAxis)
             newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(val.val().zAxis, 0, val.val().xAxis, 0));
           });
           objects.push(newPlayer);
@@ -90,6 +91,13 @@ class Game extends Component {
         database.ref('players/' + user).push({ id: 'test' });
         playersInGame.scene = false;
       } else {
+        let me=objects.filter(player=>player.id===user)[0]
+        if(me&&me.absolutePosition.y<-100){
+          this.playerPosition(me)
+          database.ref(user).set({'xAxis':0,'zAxis':0});
+          me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0,0,0));
+          console.log("You Lose",me.physicsImpostor.getLinearVelocity(),me.physicsImpostor.getAngularVelocity())
+        }
         scene.render();
       }
     });
@@ -134,8 +142,8 @@ class Game extends Component {
       return Math.floor(Math.random() * min - min / 2);
     }
     player.position.y = 4;
-    player.position.x = randomPosition(50);
-    player.position.z = randomPosition(50);
+    player.position.x = randomPosition(45);
+    player.position.z = randomPosition(45);
   }
 
   createCameraObj(scene, par) {
