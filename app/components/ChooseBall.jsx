@@ -111,9 +111,7 @@ class ChooseBall extends React.Component {
               </div>
             </div>
           </div>
-          <Link to={`/game/${gameID}`}>
-            <button className="button is-success">Click Here to Enter Game</button>
-        </Link>
+          <Link to={`/game/${gameID}`}><button className="button is-success">BACK TO STUDENTS</button></Link>
         <br></br>
         </div>
       </div>
