@@ -37,16 +37,20 @@ class Game extends Component {
       const playersObj = players.val();
       for (const playerId in playersObj) {
         if (!playersInGame[playerId] || playersInGame.scene) {
-          const newPlayer = this.createPlayerOnConnect(scene, playerId, null);
+          const newPlayer = this.createPlayerOnConnect(scene, playerId);
           if (newPlayer.id === user) {
             this.playerPosition(newPlayer);
-            database.ref('playerPosition/' + newPlayer.id).set(newPlayer.position);
+            this.setColor(newPlayer, {b: Math.random(), g: Math.random(), r: Math.random()});
+            const Info = { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, color: newPlayer.material.diffuseColor };
+            database.ref('playerPosition/' + newPlayer.id).set(Info);
           } else {
-            database.ref('playerPosition/' + playerId).on('value', (coordinates) => {
-              let x = coordinates.val().x;
-              let y = 4;
-              let z = coordinates.val().z;
+            database.ref('playerPosition/' + playerId).on('value', (playerInfo) => {
+              const x = playerInfo.val().x;
+              const y = 4;
+              const z = playerInfo.val().z;
+              const color = playerInfo.val().color;
               this.setPosition(newPlayer, x, y, z);
+              this.setColor(newPlayer, color);
             });
           }
           const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene);
@@ -100,11 +104,14 @@ class Game extends Component {
     })
   }
 
-  createPlayerOnConnect(sce, id, color) {
+  // componentWillUnmount() {
+  //   database.ref('players/' + thisPlayer).set(null);
+  // }
+
+  createPlayerOnConnect(sce, id) {
     const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); // Params: name, subdivs, size, scene
     player.checkCollisions = true;
     const ballMaterial = new BABYLON.StandardMaterial('material', sce);
-    ballMaterial.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random());
     player.material = ballMaterial;
     player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.SphereImpostor, {
       mass: 0.01,
@@ -117,6 +124,10 @@ class Game extends Component {
     sphere.position.x = x;
     sphere.position.y = y;
     sphere.position.z = z;
+  }
+
+  setColor(sphere, color) {
+    sphere.material.diffuseColor = new BABYLON.Color3(color.r, color.g, color.b);
   }
 
   playerPosition(player) {
