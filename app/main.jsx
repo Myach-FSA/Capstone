@@ -39,15 +39,13 @@ auth.onAuthStateChanged((user) => {
   }
 });
 
-console.log('LoginObj', loginObj)
-
 const App = ({ children }) =>
   <Router>
       <div>
       <NavbarSection />
       <Switch>
         <Route exact path="/" component={Home}/>
-        <Route exact path="/game" component={Game}/>
+        <Route exact path="/game" component={Game} auth={auth} loginObj={loginObj}/>
         <Route exact path="/choose" render={() => <ChooseBall auth={auth} loginObj={loginObj}/>}/>
         <Route exact path="/scores" component={Scores}/>
         <Route exact path="/login" render={() => <WhoAmI auth={auth} loginObj={loginObj}/>} />
