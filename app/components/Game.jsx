@@ -99,15 +99,12 @@ class Game extends Component {
     window.addEventListener('resize', () => {
       engine.resize();
     });
-    window.addEventListener('beforeunload',(evt)=>{
-      event.returnValue = "\o/";
+    window.addEventListener('beforeunload',()=>{
       database.ref('players/'+user).remove();
-    })
+      database.ref('playerPosition/'+user).remove();
+      database.ref(user).remove();
+    });
   }
-
-  // componentWillUnmount() {
-  //   database.ref('players/' + thisPlayer).set(null);
-  // }
 
   createPlayerOnConnect(sce, id) {
     const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); // Params: name, subdivs, size, scene
