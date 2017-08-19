@@ -28,7 +28,7 @@ let info;
 
 class Game extends Component {
   constructor(props) {
-    super(props)
+    super(props);
   }
 
   componentDidMount() {
@@ -42,7 +42,7 @@ class Game extends Component {
     });
     let scene = createScene1(canvas, engine, winPos);
     const user = this.props.user.userId;
-    this.createWinPoint()
+    this.createWinPoint();
     database.ref('players').on('value', (players) => {
       const playersObj = players.val();
       for (const playerId in playersObj) {
@@ -55,12 +55,14 @@ class Game extends Component {
             database.ref('playerPosition/' + newPlayer.id).set(info);
           } else {
             database.ref('playerPosition/' + playerId).on('value', (playerInfo) => {
-              const x = playerInfo.val().x;
-              const y = playerInfo.val().y;
-              const z = playerInfo.val().z;
-              const color = playerInfo.val().color;
-              this.setPosition(newPlayer, x, y, z);
-              this.setColor(newPlayer, color);
+              if (playerInfo.val()) {
+                const x = playerInfo.val().x;
+                const y = playerInfo.val().y;
+                const z = playerInfo.val().z;
+                const color = playerInfo.val().color;
+                this.setPosition(newPlayer, x, y, z);
+                this.setColor(newPlayer, color);
+              }
             });
           }
           const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene);
@@ -76,8 +78,10 @@ class Game extends Component {
             followCamera.maxCameraSpeed = 10; // speed limit / 0.05
             followCamera.attachControl(canvas, true);
           }
-          database.ref(newPlayer.id).on('value', (val) => {
-            newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(val.val().zAcceleration, 0, val.val().xAcceleration, 0));
+          database.ref(newPlayer.id).on('value', (otherPlayer) => {
+            if (otherPlayer.val()) {
+              newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(otherPlayer.val().zAcceleration, 0, otherPlayer.val().xAcceleration, 0));
+            }
           });
           objects.push(newPlayer);
           playersInGame[playerId] = true;
@@ -90,38 +94,38 @@ class Game extends Component {
       if (!scene || (sceneNum !== num)) {
         num = sceneNum;
         switch (num) {
-          case 2:
-            scene = createScene2(canvas, engine);
-            break;
-          default: scene = createScene1(canvas, engine);
+        case 2:
+          scene = createScene2(canvas, engine);
+          break;
+        default: scene = createScene1(canvas, engine);
         }
         setTimeout(scene.render(), 500);
         playersInGame.scene = true;
         database.ref('players/' + user).push({ id: 'test' });
         playersInGame.scene = false;
       } else {
-        let me=objects.filter(player=>player.id===user)[0]
-        if(me&&me.absolutePosition.y<-100){
-          this.playerPosition(me)
-          database.ref(user).set({'xAcceleration':0,'zAcceleration':0});
-          me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0,0,0));
+        const me=objects.filter(player => player.id===user)[0];
+        if (me&&me.absolutePosition.y<-100) {
+          this.playerPosition(me);
+          database.ref(user).set({'xAcceleration': 0, 'zAcceleration': 0});
+          me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
           xAxis=0;
           zAxis=0;
           database.ref('players/'+ user+'/totalScore').transaction((score) => {
-            this.props.changeScore(-1)
+            this.props.changeScore(-1);
             score -=1;
             return score;
-          })
+          });
         }
-        if(me&&(Math.floor(me.absolutePosition.x)===winPos.x)&&(Math.floor(me.absolutePosition.z)===winPos.z)){
+        if (me&&(Math.floor(me.absolutePosition.x)===winPos.x)&&(Math.floor(me.absolutePosition.z)===winPos.z)) {
           database.ref('players/'+ user+'/totalScore').transaction((score) => {
-            this.props.changeScore(1)
+            this.props.changeScore(1);
             score +=1;
             return score;
-          })
-          const x=Math.floor(Math.random()*50-25)
-          const z=Math.floor(Math.random()*50-25)
-          database.ref('winPosition').set({'x':x,'z':z})
+          });
+          const x=Math.floor(Math.random()*50-25);
+          const z=Math.floor(Math.random()*50-25);
+          database.ref('winPosition').set({'x': x, 'z': z});
           torus.position.x=x;
           torus.position.z=z;
           winPos.x=x;
@@ -136,14 +140,14 @@ class Game extends Component {
     window.addEventListener('resize', () => {
       engine.resize();
     });
-    window.addEventListener('beforeunload',()=>{
+    window.addEventListener('beforeunload', () => {
       database.ref('players/'+user).remove();
       database.ref('playerPosition/'+user).remove();
       database.ref(user).remove();
     });
   }
 
-  componentWillUnmount(){
+  componentWillUnmount() {
     audio0.pause();
   }
 
@@ -189,8 +193,8 @@ class Game extends Component {
     head.parent = par;
     return head;
   }
-  createWinPoint(scene,old){
-    if(old){console.log("torus be gone",torus);torus.dispose()}
+  createWinPoint(scene, old) {
+    if (old) { console.log('torus be gone', torus); torus.dispose() ;}
     torus = BABYLON.Mesh.CreateTorus('torus', 2, 0.5, 10, scene);
     torus.position.x=winPos.x;
     torus.position.z=winPos.z;
@@ -217,7 +221,6 @@ class Game extends Component {
 }
 
 function control(user) {
-
   const keyState = {};
 
   window.onkeydown = function(e) {
@@ -241,7 +244,7 @@ function control(user) {
       e.preventDefault();
     }
   }, true);
-  window.addEventListener('keyup', function (e) {
+  window.addEventListener('keyup', function(e) {
     keyState[e.keyCode || e.which] = false;
   }, true);
 
@@ -280,17 +283,17 @@ function control(user) {
 
 // /* -----------------    CONTAINER     ------------------ */
 
-import { changeScore } from '../reducers/auth'
-import { connect } from 'react-redux'
+import { changeScore } from '../reducers/auth';
+import { connect } from 'react-redux';
 import store from '../store';
 
 const mapStateToProps = (state, ownProps) => ({
   user: state.auth.user
-})
+});
 
-const mapDispatch = ({ changeScore })
+const mapDispatch = ({ changeScore });
 
-export default connect(mapStateToProps, mapDispatch)(Game)
+export default connect(mapStateToProps, mapDispatch)(Game);
 
 // /* -----------------    CONTAINER     ------------------ */
 
