@@ -3,6 +3,7 @@ import ReactDOM, { render } from 'react-dom';
 import { Link } from 'react-router-dom'
 
 class GameWaitRoom extends React.Component {
+
   render() {
     let numPlayer = 1;
     return (
@@ -10,7 +11,7 @@ class GameWaitRoom extends React.Component {
           <div className="notification">
             <h3>Waiting on Players</h3>
             <h5>Current number of connected players: {numPlayer}</h5>
-            <a className="button is-info" type="submit" title="playbutton" disabled>Play Now!</a>
+            <Link to={`/game`}><button className="button is-info" type="submit" title="playbutton">Play Now!</button></Link>
               {/* <Link to={`/game`}>Play Now!</Link> */}
           </div>
         </div>

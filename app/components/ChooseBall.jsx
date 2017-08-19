@@ -13,7 +13,8 @@ class ChooseBall extends React.Component {
     super(props)
       this.gameId = '';
     this.ballChoice = this.ballChoice.bind(this)
-    this.gameChoice = this.gameChoice.bind(this)
+    this.initiateGame = this.initiateGame.bind(this)
+    this.joinGameId = this.joinGameId.bind(this)
   }
 
   componentDidMount() {
@@ -27,7 +28,7 @@ class ChooseBall extends React.Component {
       gameId: 0,
     }
     const user = this.props.loginObj.email ? this.props.loginObj : anonymousUser
-    this.props.setUser(user)
+    this.props.setUser(user)      
   }
 
   shouldComponentUpdate(nextProps){
@@ -39,26 +40,24 @@ class ChooseBall extends React.Component {
     this.props.chooseBall(+evt.target.id)
   }
 
-  gameChoice() {
-    const num = (Math.floor(Math.random() * 90000) + 10000).toString();
+  initiateGame() {
+    let num = (Math.floor(Math.random() * 90000) + 10000).toString();
     this.gameId = num;
     this.props.chooseGame(num)
     document.getElementById('gameID').value = num;
   }
 
-  makeId() {
-    let text = '';
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < 8; i++) {
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
+  joinGameId() {
+    let num = document.getElementById('gameInput').value;
+    this.gameId = num;
+    this.props.chooseGame(num)
   }
 
   sendDataToFB() {
     const user = this.props.user;
     const ref = firebase.database().ref("users/"+user.userId)
     ref.set(user)
+    this.props.setUser(user)    
   }
 
   render() {
@@ -82,7 +81,7 @@ class ChooseBall extends React.Component {
                     <div key={ball.id} className="inner-product">
                       <br />
                       <figure className="image">
-                        <img src={ball.img} alt="Image" />
+                        <img src={ball.img} id={i} alt="Image" onClick={(evt) => this.ballChoice(evt)}/>
                       </figure>
                       <p className="subtitle">{ball.name}</p>
                       <p className="subtitle">{ball.description}</p>
@@ -103,13 +102,14 @@ class ChooseBall extends React.Component {
         <div className="content has-text-centered">
           <div className="notification">
             <h3>Pick Your Game</h3>
+            <h5>Select "Start New Game" below to initiate a game and send the code to your friends. Or you can join an already initiated game by entering a game ID below.</h5>
             <br></br>
             <div className="columns">
               <div className="column is-half">
                 <h5>Get a game ID</h5>
                 <div className="field has-addons">
                   <div className="control">
-                    <a className="button is-info" onClick={(evt) => this.gameChoice(evt)}>
+                    <a className="button is-info" onClick={(evt) => this.initiateGame(evt)}>
                       Start New Game
                   </a>
                   </div>
@@ -122,10 +122,10 @@ class ChooseBall extends React.Component {
                 <h5>Join an initiated game</h5>
                 <div className="field has-addons">
                   <div className="control">
-                    <input className="input" type="text" placeholder="Enter ID" />
+                    <input id="gameInput" className="input" type="text" placeholder="Enter ID" />
                   </div>
                   <div className="control">
-                    <a className="button is-info">
+                    <a className="button is-info" onClick={(evt) => this.joinGameId(evt)}>
                       Enter Game ID
                     </a>
                   </div>
@@ -134,6 +134,7 @@ class ChooseBall extends React.Component {
             </div>
           </div>
           <Link to={`/game/${gameID}`} onClick={(evt) => this.sendDataToFB(evt)}><button className="button is-success">Go to Game</button></Link>
+          {/* <Link to={`/game/${gameID}`} onClick={(evt) => this.sendDataToFB(evt)}><button className="button is-success">Go to Game</button></Link> */}
         <br></br>
         </div>
       </div>

@@ -9,9 +9,9 @@ const FooterSection = () => {
             <h4>
               <strong className="title">Myach</strong>
             </h4>
-            <p><a href="http://jgthms.com">By Dan, Denis, Yu, and Nancy</a></p>
+            <p>By Dan, Denis, Yu, and Nancy</p>
             <p>
-              <a className="icon" href="https://github.com/jgthms/bulma">
+              <a className="icon" href="https://github.com/Myach-FSA/Capstone">
                 <i className="fa fa-github"></i>
               </a>
             </p>
