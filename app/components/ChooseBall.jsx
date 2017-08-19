@@ -76,7 +76,7 @@ class ChooseBall extends React.Component {
           </div>
           <br></br>
           <div className="notification">
-          <Link to={`/game/${nextURL}`} onClick={(evt) => this.sendDataToFB(evt)}><button className="button is-success">Continue</button></Link>
+          <Link to={`/game`} onClick={(evt) => this.sendDataToFB(evt)}><button className="button is-success">Continue</button></Link>
           </div>
         </div>
       </div>
