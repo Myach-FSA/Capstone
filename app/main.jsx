@@ -17,6 +17,7 @@ import ChooseBall from './components/ChooseBall';
 import Register from './components/Register';
 import GameWaitRoom from './components/GameWaitRoom';
 import ChooseGame from './components/ChooseGame';
+import GameType from './components/GameType';
 
 import firebase from 'APP/fire';
 
@@ -48,8 +49,8 @@ const App = ({ children }) =>
       <Switch>
         <Route exact path="/" component={Home}/>
         <Route exact path="/game/:id/play" render={() =><Game auth={auth} loginObj={loginObj}/>}/>
-        <Route exact path="/game/:id/wait" component={GameWaitRoom}/>
-        <Route exact path="/choose" render={() => <ChooseGame auth={auth} loginObj={loginObj}/>}/>
+        <Route exact path="/game/:id/private" component={GameWaitRoom}/>
+        <Route exact path="/choose" render={() => <GameType auth={auth} loginObj={loginObj}/>}/>
         <Route exact path="/game/:id/ball" render={() => <ChooseBall auth={auth} loginObj={loginObj}/>}/>
         <Route exact path="/scores" component={Scores}/>
         <Route exact path="/login" render={() => <WhoAmI auth={auth} loginObj={loginObj}/>} />
