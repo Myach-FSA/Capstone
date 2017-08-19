@@ -27,6 +27,10 @@ const reducer = (state = initialState, action) => {
     case SET_GAME: 
       newState.user = { ...state.user, gameId: action.gameId };
       break
+    case SET_SCORE: 
+      let score = state.user.totalScore + Number(action.score);
+      newState.user = { ...state.user, totalScore: score }
+      break
     default:
       return state
   }
@@ -49,6 +53,9 @@ const setBall = (ball) => ({ type: SET_BALL, ball })
 
 const SET_GAME = 'SET_GAME'
 const setGame = (gameId) => ({ type: SET_GAME, gameId })
+
+const SET_SCORE = 'SET_SCORE'
+const setScore = (score) => ({ type: SET_SCORE, score })
 
 /* --------- THUNK CREATORS --------- */  
 
@@ -92,6 +99,10 @@ export const chooseBall = (ball) => {
 
 export const chooseGame = (id) => {
     return setGame(id)
+}
+
+export const changeScore = (score) => {
+    return setScore(score)
 }
 
 // export const setBall = ball =>

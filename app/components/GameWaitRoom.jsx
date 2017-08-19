@@ -5,14 +5,13 @@ import { Link } from 'react-router-dom'
 class GameWaitRoom extends React.Component {
 
   render() {
-    console.log('These are the props in game room', this.props)
     let numPlayer = 1;
     return (
         <div className="content has-text-centered">
           <div className="notification">
             <h3>Waiting on Players</h3>
             <h5>Current number of connected players: {numPlayer}</h5>
-            <Link to={`/game`}><a className="button is-info" type="submit" title="playbutton">Play Now!</a></Link>
+            <Link to={`/game`}><button className="button is-info" type="submit" title="playbutton">Play Now!</button></Link>
               {/* <Link to={`/game`}>Play Now!</Link> */}
           </div>
         </div>

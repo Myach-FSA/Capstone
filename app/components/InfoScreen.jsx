@@ -1,13 +1,24 @@
 import React from 'react';
 import ReactDOM, { render } from 'react-dom';
+import Firebase from 'firebase';
 
 class InfoScreen extends React.Component {
-  render() {
-    const { name, score } = this.props
+  constructor(props) {
+    super(props)
+  }
 
+  render() {
+    const userId = this.props.user.userId
+    let totalScore = this.props.user.totalScore || 0
+    
     return (
       <div id="InfoScreen" className="infoScreen has-text-centered">
-        Hello
+        <br></br>
+        <h4>Your Score: </h4>
+        <h4>{ totalScore }</h4>
+        <br></br>
+          <p>Points needed to win: </p>
+          <p>{ 10 - totalScore }</p>
       </div>
     );
   }
@@ -15,9 +26,12 @@ class InfoScreen extends React.Component {
 
 // /* -----------------    CONTAINER     ------------------ */
 
+import { setScore } from '../reducers/auth'
 import { connect } from 'react-redux'
 import store from '../store'
 
 const mapStateToProps = (state) => { return { user: state.auth.user } }
 
-export default connect(mapStateToProps)(InfoScreen)
+const mapDispatch = ({ setScore })
+
+export default connect(mapStateToProps, mapDispatch)(InfoScreen)
