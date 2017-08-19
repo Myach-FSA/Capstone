@@ -13,7 +13,8 @@ class ChooseBall extends React.Component {
     super(props)
       this.gameId = '';
     this.ballChoice = this.ballChoice.bind(this)
-    this.gameChoice = this.gameChoice.bind(this)
+    this.initiateGame = this.initiateGame.bind(this)
+    this.joinGameId = this.joinGameId.bind(this)
   }
 
   componentDidMount() {
@@ -39,11 +40,17 @@ class ChooseBall extends React.Component {
     this.props.chooseBall(+evt.target.id)
   }
 
-  gameChoice() {
-    const num = (Math.floor(Math.random() * 90000) + 10000).toString();
+  initiateGame() {
+    let num = (Math.floor(Math.random() * 90000) + 10000).toString();
     this.gameId = num;
     this.props.chooseGame(num)
     document.getElementById('gameID').value = num;
+  }
+
+  joinGameId() {
+    let num = document.getElementById('gameInput').value;
+    this.gameId = num;
+    this.props.chooseGame(num)
   }
 
   sendDataToFB() {
@@ -102,7 +109,7 @@ class ChooseBall extends React.Component {
                 <h5>Get a game ID</h5>
                 <div className="field has-addons">
                   <div className="control">
-                    <a className="button is-info" onClick={(evt) => this.gameChoice(evt)}>
+                    <a className="button is-info" onClick={(evt) => this.initiateGame(evt)}>
                       Start New Game
                   </a>
                   </div>
@@ -115,10 +122,10 @@ class ChooseBall extends React.Component {
                 <h5>Join an initiated game</h5>
                 <div className="field has-addons">
                   <div className="control">
-                    <input className="input" type="text" placeholder="Enter ID" />
+                    <input id="gameInput" className="input" type="text" placeholder="Enter ID" />
                   </div>
                   <div className="control">
-                    <a className="button is-info">
+                    <a className="button is-info" onClick={(evt) => this.joinGameId(evt)}>
                       Enter Game ID
                     </a>
                   </div>
