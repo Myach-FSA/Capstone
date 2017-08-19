@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM, { render } from 'react-dom';
-import { Route, Link, NavLink, Router, Switch } from 'react-router-dom'
+import { Route, Link, NavLink, Router, Switch, withRouter } from 'react-router-dom'
 import Firebase from 'firebase';
 import ChooseGame from './ChooseGame'
 
@@ -11,6 +11,8 @@ class GameType extends React.Component {
             renderJoinPage: false            
         }
     this.gameId = '';
+    this.initiateGame = this.initiateGame.bind(this)
+    this.sendDataToFB = this.sendDataToFB.bind(this)
   }
 
   componentDidMount() {
@@ -22,7 +24,9 @@ class GameType extends React.Component {
       losses: 0,
       ball: 0,
       gameId: 0,
-    }   
+    }
+    const user = this.props.loginObj.email ? this.props.loginObj : anonymousUser
+    this.props.setUser(user)   
   }
 
   showJoinPage() {
@@ -33,11 +37,20 @@ class GameType extends React.Component {
   initiateGame() {
     let num = (Math.floor(Math.random() * 90000) + 10000).toString();
     this.gameId = num;
-    this.props.chooseGame(num)
-    document.getElementById('gameID').value = num;
+    this.props.chooseGame(num)  
+    this.props.history.push(`/game/${num}/private`)
+    // document.getElementById('gameID').value = num;
+  }
+
+  sendDataToFB() {
+    const user = this.props.user;
+    const ref = firebase.database().ref("users/"+user.userId)
+    ref.set(user)
+    this.props.setUser(user)    
   }
 
   render() {
+      console.log('These are props on gametype', this.props)
 
     return (
       <div className="container is-fluid">
@@ -47,11 +60,9 @@ class GameType extends React.Component {
           <br></br>
           <div className="field is-grouped">
             <p className="control">
-                <Link to={`/game/123/private`}>
-                <button className="button is-primary">
+                <button className="button is-primary" onClick={() => this.initiateGame()}>
                     Create a Game
                 </button>
-                </Link>
             </p>
             <p className="control">
                 <button className="button is-primary" onClick={() => this.showJoinPage()}>
@@ -88,4 +99,4 @@ const mapStateToProps = (state) => ({
 
 const mapDispatch = ({ setUser, chooseGame })
 
-export default connect(mapStateToProps, mapDispatch)(GameType)
+export default withRouter(connect(mapStateToProps, mapDispatch)(GameType))

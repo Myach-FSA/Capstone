@@ -12,34 +12,33 @@ const games = [
 class ChooseGame extends React.Component {
   constructor(props) {
     super(props)
-    
     this.gameId = '';
     this.initiateGame = this.initiateGame.bind(this)
     this.joinGameId = this.joinGameId.bind(this)
   }
 
-  componentDidMount() {
-    const anonymousUser = {
-      userId: this.props.loginObj.uid,
-      username: this.props.loginObj.uid,
-      wins: 0,
-      totalScore: 0,
-      losses: 0,
-      ball: 0,
-      gameId: 0,
-    }
-    const user = this.props.loginObj.email ? this.props.loginObj : anonymousUser
-    this.gameChoice = this.gameChoice.bind(this)
-    this.initiateGame = this.initiateGame.bind(this)
-    this.joinGameId = this.joinGameId.bind(this)
-    this.sendDataToFB = this.sendDataToFB.bind(this)
-    this.props.setUser(user)      
-  }
+//   componentDidMount() {
+//     const anonymousUser = {
+//       userId: this.props.loginObj.uid,
+//       username: this.props.loginObj.uid,
+//       wins: 0,
+//       totalScore: 0,
+//       losses: 0,
+//       ball: 0,
+//       gameId: 0,
+//     }
+//     const user = this.props.loginObj.email ? this.props.loginObj : anonymousUser
+//     this.gameChoice = this.gameChoice.bind(this)
+//     this.initiateGame = this.initiateGame.bind(this)
+//     this.joinGameId = this.joinGameId.bind(this)
+//     this.sendDataToFB = this.sendDataToFB.bind(this)
+//     this.props.setUser(user)      
+//   }
 
-  shouldComponentUpdate(nextProps){
-    const differentGameRoomId = this.props.user.gameId !== nextProps.gameId;
-    return differentGameRoomId
-  }
+//   shouldComponentUpdate(nextProps){
+//     const differentGameRoomId = this.props.user.gameId !== nextProps.gameId;
+//     return differentGameRoomId
+//   }
 
   gameChoice(evt) {
     this.gameId = +evt.target.id
@@ -132,7 +131,7 @@ class ChooseGame extends React.Component {
             </div>
             <br></br>
           </div>
-          <Link to={`/game/${gameID}/ball`} onClick={(evt) => this.sendDataToFB(evt)}><button className="button is-success">Continue</button></Link>
+          <Link to={`/game`} onClick={(evt) => this.sendDataToFB(evt)}><button className="button is-success">Continue</button></Link>
         <br></br>
         </div>
       </div>
