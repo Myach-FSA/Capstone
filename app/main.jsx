@@ -22,7 +22,7 @@ import firebase from 'APP/fire';
 import Demos from 'APP/demos';
 
 const auth = firebase.auth();
-const loginObj = {};
+var loginObj = {}
 
 auth.onAuthStateChanged((user) => {
   if (!user) {
@@ -34,18 +34,19 @@ auth.onAuthStateChanged((user) => {
     console.log(user, 'is signed in')    
     const ref = firebase.database().ref('users/' + user.uid)
     ref.once("value", (snapshot) => {
-    Object.assign(loginObj, user)
+      Object.assign(loginObj, user)
     })
   }
 });
 
+console.log('This is the loginObj', loginObj)
 const App = ({ children }) =>
   <Router>
       <div>
       <NavbarSection />
       <Switch>
         <Route exact path="/" component={Home}/>
-        <Route exact path="/game" component={Game} auth={auth} loginObj={loginObj}/>
+        <Route exact path="/game" render={() =><Game auth={auth} loginObj={loginObj}/>}/>
         <Route exact path="/choose" render={() => <ChooseBall auth={auth} loginObj={loginObj}/>}/>
         <Route exact path="/scores" component={Scores}/>
         <Route exact path="/login" render={() => <WhoAmI auth={auth} loginObj={loginObj}/>} />

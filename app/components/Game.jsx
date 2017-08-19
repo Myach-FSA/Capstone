@@ -5,6 +5,7 @@ import firebase from '../../fire';
 import createScene1 from './Scene1';
 import createScene2 from './Scene2';
 import InfoScreen from './InfoScreen';
+const auth = firebase.auth();
 import ScoreTable from './ScoreTable';
 
 const database = firebase.database();
@@ -36,13 +37,12 @@ class Game extends Component {
     const engine = new BABYLON.Engine(canvas, true);
     let num = sceneNum;
     database.ref('winPosition').set({ x: 10, z: 10 });
-    let scene = createScene1(canvas, engine);
     database.ref('winPosition').on('value', (position) => {
       winPos = position.val();
-      // this.createWinPoint(scene,null)
     });
+    let scene = createScene1(canvas, engine, winPos);
+    const user = this.props.user.userId;
     this.createWinPoint()
-    const user = this.makeId();
     database.ref('players').on('value', (players) => {
       const playersObj = players.val();
       for (const playerId in playersObj) {
@@ -107,15 +107,15 @@ class Game extends Component {
           me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0,0,0));
           xAxis=0;
           zAxis=0;
-          console.log(user)
-          database.ref('players/'+ user+'/totalScore').transaction(function(score){
+          database.ref('players/'+ user+'/totalScore').transaction((score) => {
+            this.props.changeScore(-1)
             score -=1;
             return score;
           })
         }
         if(me&&(Math.floor(me.absolutePosition.x)===winPos.x)&&(Math.floor(me.absolutePosition.z)===winPos.z)){
-          console.log('win')
-          database.ref('players/'+ user+'/totalScore').transaction(function(score){
+          database.ref('players/'+ user+'/totalScore').transaction((score) => {
+            this.props.changeScore(1)
             score +=1;
             return score;
           })
@@ -190,7 +190,6 @@ class Game extends Component {
     return head;
   }
   createWinPoint(scene,old){
-    console.log("create win point")
     if(old){console.log("torus be gone",torus);torus.dispose()}
     torus = BABYLON.Mesh.CreateTorus('torus', 2, 0.5, 10, scene);
     torus.position.x=winPos.x;
@@ -278,6 +277,21 @@ function control(user) {
   }
   gameLoop();
 }
-export default Game;
+
+// /* -----------------    CONTAINER     ------------------ */
+
+import { changeScore } from '../reducers/auth'
+import { connect } from 'react-redux'
+import store from '../store';
+
+const mapStateToProps = (state, ownProps) => ({
+  user: state.auth.user
+})
+
+const mapDispatch = ({ changeScore })
+
+export default connect(mapStateToProps, mapDispatch)(Game)
+
+// /* -----------------    CONTAINER     ------------------ */
 
 export { changeScene };
