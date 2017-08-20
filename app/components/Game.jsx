@@ -54,12 +54,14 @@ class Game extends Component {
             database.ref('playerPosition/' + newPlayer.id).set(info);
           } else {
             database.ref('playerPosition/' + playerId).on('value', (playerInfo) => {
-              const x = playerInfo.val().x;
-              const y = playerInfo.val().y;
-              const z = playerInfo.val().z;
-              const color = playerInfo.val().color;
-              this.setPosition(newPlayer, x, y, z);
-              this.setColor(newPlayer, color);
+              if (playerInfo.val()) {
+                const x = playerInfo.val().x;
+                const y = playerInfo.val().y;
+                const z = playerInfo.val().z;
+                const color = playerInfo.val().color;
+                this.setPosition(newPlayer, x, y, z);
+                this.setColor(newPlayer, color);
+              }
             });
           }
           const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene);
@@ -75,8 +77,10 @@ class Game extends Component {
             followCamera.maxCameraSpeed = 10; // speed limit / 0.05
             followCamera.attachControl(canvas, true);
           }
-          database.ref(newPlayer.id).on('value', (val) => {
-            newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(val.val().zAcceleration, 0, val.val().xAcceleration, 0));
+          database.ref(newPlayer.id).on('value', (otherPlayer) => {
+            if (otherPlayer.val()) {
+              newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(otherPlayer.val().zAcceleration, 0, otherPlayer.val().xAcceleration, 0));
+            }
           });
           objects.push(newPlayer);
           playersInGame[playerId] = true;
@@ -140,9 +144,9 @@ class Game extends Component {
     });
   }
 
-  // componentWillUnmount() {
-  //   audio0.pause();
-  // }
+  componentWillUnmount() {
+    audio0.pause();
+  }
 
   createPlayerOnConnect(sce, id) {
     const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); // Params: name, subdivs, size, scene
@@ -186,8 +190,7 @@ class Game extends Component {
     head.parent = par;
     return head;
   }
-  createWinPoint(scene, old) {
-    if (old) { console.log('torus be gone', torus); torus.dispose(); }
+  createWinPoint(scene) {
     torus = BABYLON.Mesh.CreateTorus('torus', 2, 0.5, 10, scene);
     torus.position.x=10;
     torus.position.z=10;
@@ -280,10 +283,9 @@ import { changeScore } from '../reducers/auth';
 import { connect } from 'react-redux';
 import store from '../store';
 
-const mapStateToProps = (state, ownProps) => {
-  console.log(state);
-  return {user: state.auth.user};
-};
+const mapStateToProps = (state, ownProps) => ({
+  user: state.auth.user
+});
 
 const mapDispatch = ({ changeScore });
 
