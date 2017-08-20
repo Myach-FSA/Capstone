@@ -50,8 +50,6 @@ class GameType extends React.Component {
   }
 
   render() {
-      console.log('These are props on gametype', this.props)
-
     return (
       <div className="container is-fluid">
         <div className="content has-text-centered">
@@ -60,12 +58,12 @@ class GameType extends React.Component {
           <br></br>
           <div className="field is-grouped">
             <p className="control">
-                <button className="button is-primary" onClick={() => this.initiateGame()}>
+                <button className="button is-primary" id="neon" onClick={() => this.initiateGame()}>
                     Create a Game
                 </button>
             </p>
             <p className="control">
-                <button className="button is-primary" onClick={() => this.showJoinPage()}>
+                <button className="button is-primary" id="neon" onClick={() => this.showJoinPage()}>
                     <Link to={`/choose`}>
                     Join a Game
                     </Link>

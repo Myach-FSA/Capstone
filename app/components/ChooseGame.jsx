@@ -74,7 +74,6 @@ class ChooseGame extends React.Component {
     return (
       <div className="container is-fluid">
         <div className="content has-text-centered">
-        <div className="notification">
           <h1><strong>Choose Your Battleground</strong></h1>
             <h5>Pick a scene to join a random game or initiate/join a private game below.</h5>
             <h3>Join a Random Game</h3>
@@ -130,8 +129,7 @@ class ChooseGame extends React.Component {
               </div>
             </div>
             <br></br>
-          </div>
-          <Link to={`/game`} onClick={(evt) => this.sendDataToFB(evt)}><button className="button is-success">Continue</button></Link>
+          <Link to={`/game/${gameID}/ball`} onClick={(evt) => this.sendDataToFB(evt)}><button className="button is-success">Continue</button></Link>
         <br></br>
         </div>
       </div>

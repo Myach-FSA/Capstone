@@ -1,20 +1,29 @@
 import React from 'react';
 import ReactDOM, { render } from 'react-dom';
 import { Link } from 'react-router-dom'
+import SceneList from './SceneList'
+import ChooseBall from './ChooseBall'
 
 class GameWaitRoom extends React.Component {
 
   render() {
     let numPlayer = 1;
     return (
+      <div>
         <div className="content has-text-centered">
           <div className="notification">
-            <h3>Waiting on Players</h3>
-            <h5>Current number of connected players: {numPlayer}</h5>
-            <Link to={`/game`}><button className="button is-info" type="submit" title="playbutton">Play Now!</button></Link>
-              {/* <Link to={`/game`}>Play Now!</Link> */}
+            <h1><strong>Your Game ID: {this.props.user.gameId}</strong></h1>
+            <p>Send this code to your friends!</p>
           </div>
+            <SceneList />
+            <ChooseBall />
+          <h5 id="greenText">Current number of connected players: {numPlayer}</h5>
+          <Link to={`/game`}><button className="button is-success" type="submit" title="playbutton">Play Now!</button></Link>
         </div>
+        <div>
+          <h4></h4>
+        </div>
+      </div>
     );
   }
 }
