@@ -1,12 +1,23 @@
 import React from 'react';
 import ReactDOM, { render } from 'react-dom';
 import { Link, NavLink, Router } from 'react-router-dom';
-import Firebase from 'firebase';
+import firebase from 'firebase';
 import { connect } from 'react-redux';
 import { showGameList } from '../reducers/conditionals';
-import GameType from './GameType';
 
 class GameList extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      games: [],
+    };
+  }
+  componentDidMount() {
+    const database = firebase.database();
+    firebase.database().ref('games').once('value', (allGames) => {
+      this.setState({ games: allGames.val() });
+    });
+  }
   back = () => {
     this.props.showGameList(false);
   }
@@ -23,6 +34,21 @@ class GameList extends React.Component {
               <th><abbr title='Security'>Private / Public</abbr></th>
             </tr>
           </thead>
+          <tbody>
+            {
+              Object.keys(this.state.games).map((game) => {
+                return (
+                  <tr key={game}>
+                    <th>{game}</th>
+                    <th>RoomName placeholder</th>
+                    <th>map name placeholder</th>
+                    <th>[{this.state.games[game].playersInGame.length}/4]</th>
+                    <th>Public/Private</th>
+                  </tr>
+                );
+              })
+            }
+          </tbody>
         </table>
         <button className='button is-primary' id='neon' onClick={() => this.back()}>
           Back
