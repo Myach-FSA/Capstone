@@ -206,3 +206,12 @@ body {
 #greenText {
   color: #1BC98E;
 }
+
+#overlay {
+  position: absolute;
+  text-align: center;
+  border: solid 2px white;
+  z-index: 1;
+  transform: translateY(-1500%);
+  margin-left: 47%;
+}
