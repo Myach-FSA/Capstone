@@ -18,7 +18,7 @@ class GameWaitRoom extends React.Component {
             <SceneList />
             <ChooseBall />
           <h5 id="greenText">Current number of connected players: {numPlayer}</h5>
-          <Link to={`/game`}><button className="button is-success" type="submit" title="playbutton">Play Now!</button></Link>
+          <Link to={`/game`}><button className="button is-success" id="playnow" type="submit" title="playbutton">Play Now!</button></Link>
         </div>
         <div>
           <h4></h4>

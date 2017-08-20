@@ -1,10 +1,10 @@
 .headersec {
-  background-color: black;
+  background-color: #252830;
   padding-bottom: 1%;
 }
 
 .navbarsec {
-  background-color: black;
+  background-color: #252830;
   padding-top: 1%;
 }
 
@@ -13,7 +13,7 @@
 }
 
 .itemsec {
-  background-color: black;
+  background-color: #252830;
   color: white;
 }
 
@@ -48,7 +48,7 @@
 
 body {
   background: #252830;
-  color: #23d160;
+  color: #1BC98E;
   font-family: Roboto, Helvetica, Arial, sans-serif;
   margin: 0;
   padding: 0;
@@ -73,7 +73,7 @@ body {
 }
 
 #neon {
-  background-color: #23d160;
+  background-color: #1BC98E;
 }
 
 .notification strong {
@@ -104,11 +104,11 @@ body {
 }
 
 .icon .fa {
-  color: #23d160;
+  color: #1BC98E;
 }
 
 a {
-  color: #23d160;
+  color: #1BC98E;
 }
 
 #footersec {
@@ -117,7 +117,8 @@ a {
   padding: 40px 0px 40px 0px;
 }
 
-.playnow {
+#playnow {
+  background-color: #1CA8DD;
   padding-bottom: 2%;
 }
 
@@ -203,5 +204,5 @@ body {
 }
 
 #greenText {
-  color: #23d160;
+  color: #1BC98E;
 }
