@@ -54,7 +54,7 @@ class ChooseBall extends React.Component {
                       <p className="subtitle">{ball.name}</p>
                       <p className="subtitle">{ball.description}</p>
                       <button id={i} onClick={(evt) => this.ballChoice(evt)}
-                        className="button is-success is-outlined playnow">
+                        className="button is-success is-outlined">
                         Choose Ball
                       </button>
                     </div>
