@@ -54,9 +54,15 @@ class Game extends Component {
             return losses;
           });
         }
+        console.log('winner val', winner.val());
+        const myScore=this.props.user.totalScore;
+        database.ref('users/'+user+'/totalScore').transaction((score) => {
+          score+=myScore;
+          return score;
+        });
+        this.props.changeScore(-myScore);
         database.ref('players/' + user).update({ 'score': 0 });
-        database.ref('users/'+user).update({'totalScore': this.props.user.totalScore});
-        this.props.changeScore(-this.props.user.totalScore);
+        //
         database.ref('players/winner').remove();
       }
     });
@@ -144,10 +150,8 @@ class Game extends Component {
             this.props.changeScore(1);
             score +=1;
             if (score>=10) {
-              // database.ref('users/'+user).update({'totalScore': score, 'wins': 1});
               database.ref('/players').update({'winner': user});
-              // this.props.changeScore(-10);
-              // score=0;
+              score=0;
             }
             return score;
           });
