@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM, { render } from 'react-dom';
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
 
 class GameWaitRoom extends React.Component {
-
   render() {
-    let numPlayer = 1;
+    console.log('wait room');
+    const numPlayer = 1;
     return (
         <div className="content has-text-centered">
           <div className="notification">
@@ -21,11 +21,11 @@ class GameWaitRoom extends React.Component {
 
 // /* -----------------    CONTAINER     ------------------ */
 
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 import store from '../store';
 
 const mapStateToProps = (state) => ({
   user: state.auth.user
-})
+});
 
-export default connect(mapStateToProps)(GameWaitRoom)
+export default connect(mapStateToProps)(GameWaitRoom);
