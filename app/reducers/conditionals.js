@@ -11,4 +11,3 @@ export default function gameListReducer(state = initialState, action) {
       return state;
   }
 }
-
