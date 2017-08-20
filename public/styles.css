@@ -18,21 +18,21 @@
 }
 
 #bodysec {
-  background-color: black;
-  color: white;
+  background-color: #252830;
+  color: #252830;
   padding-top: 2%;
   padding-bottom: 1%;
 }
 
 #photoobj {
-  background-color: black;
+  background-color: #252830;
   padding-top: 2%;
   width: 100%;
   height: 75%;
 }
 
 .div {
-  background-color: white;
+  background-color: #252830;
 }
 
 #blue {
@@ -47,7 +47,7 @@
 }
 
 body {
-  background: black;
+  background: #252830;
   color: #23d160;
   font-family: Roboto, Helvetica, Arial, sans-serif;
   margin: 0;
@@ -58,18 +58,18 @@ body {
   body,
   #message {
     margin-top: 0;
-    background: white;
+    background: #252830;
     box-shadow: none;
   }
   body {
-    border-top: 16px solid #ffa100;
+    border-top: 16px solid #1BC98E;
   }
 }
 
 .notification {
-  background-color: black;
+  background-color: #252830;
   border-style: dashed;
-  border-color: #23d160;
+  border-color: #1BC98E;
 }
 
 #neon {
@@ -77,7 +77,7 @@ body {
 }
 
 .notification strong {
-  color: #23d160;
+  color: #1CA8DD;
 }
 
 html,
@@ -112,7 +112,7 @@ a {
 }
 
 #footersec {
-  background-color: black;
+  background-color: #252830;
   width: 100%;
   padding: 40px 0px 40px 0px;
 }
@@ -191,7 +191,7 @@ a.halflink:hover {
 }
 
 .fullbutton {
-  color: white;
+  color: #252830;
 }
 
 h3 {
@@ -199,7 +199,7 @@ h3 {
 }
 
 body {
-  background: black;
+  background: #252830;
 }
 
 #greenText {
