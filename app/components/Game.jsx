@@ -41,13 +41,32 @@ class Game extends Component {
     database.ref('winPosition').on('value', (position) => {
       winPos = position.val();
     });
+    database.ref('players/winner').on('value', (winner) => {
+      if (winner.val()) {
+        if (user===winner.val()) {
+          database.ref('users/'+user+'/wins').transaction((wins) => {
+            wins+=1;
+            return wins;
+          });
+        } else {
+          database.ref('users/'+user+'/losses').transaction((losses) => {
+            losses+=1;
+            return losses;
+          });
+        }
+        database.ref('players/' + user).update({ 'score': 0 });
+        database.ref('users/'+user).update({'totalScore': this.props.user.totalScore});
+        this.props.changeScore(-this.props.user.totalScore);
+        database.ref('players/winner').remove();
+      }
+    });
     database.ref('players').on('value', (players) => {
       const playersObj = players.val();
       for (const playerId in playersObj) {
         if (!playersInGame[playerId] || playersInGame.scene) {
           const newPlayer = this.createPlayerOnConnect(scene, playerId);
           if (newPlayer.id === user) {
-            console.log(user);
+            console.log(playersObj);
             this.playerPosition(newPlayer);
             this.setColor(newPlayer, {b: Math.random(), g: Math.random(), r: Math.random()});
             info = { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, color: newPlayer.material.diffuseColor };
@@ -87,7 +106,7 @@ class Game extends Component {
         }
       }
     });
-    database.ref('players/' + user).set({ 'created': true, 'totalScore': 0 });
+    database.ref('players/' + user).set({ 'created': true, 'score': 0 });
 
     engine.runRenderLoop(() => {
       if ((torus.position.x!==winPos.x)||(torus.position.z!==winPos.z)) {
@@ -114,16 +133,22 @@ class Game extends Component {
           me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
           xAcceleration=0;
           zAcceleration=0;
-          database.ref('players/'+ user+'/totalScore').transaction((score) => {
+          database.ref('players/'+ user+'/score').transaction((score) => {
             this.props.changeScore(-1);
             score -=1;
             return score;
           });
         }
         if (me&&(Math.floor(me.absolutePosition.x)===winPos.x)&&(Math.floor(me.absolutePosition.z)===winPos.z)) {
-          database.ref('players/'+ user+'/totalScore').transaction((score) => {
+          database.ref('players/'+ user+'/score').transaction((score) => {
             this.props.changeScore(1);
             score +=1;
+            if (score>=10) {
+              // database.ref('users/'+user).update({'totalScore': score, 'wins': 1});
+              database.ref('/players').update({'winner': user});
+              // this.props.changeScore(-10);
+              // score=0;
+            }
             return score;
           });
           const x=Math.floor(Math.random()*50-25);
