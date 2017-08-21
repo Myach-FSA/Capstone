@@ -12,12 +12,17 @@ class GameList extends React.Component {
       games: [],
     };
   }
-  componentDidMount() {
+  componentWillMount() {
     const database = firebase.database();
-    firebase.database().ref('games').once('value', (allGames) => {
+    firebase.database().ref('games').once('value').then(allGames => {
       this.setState({ games: allGames.val() });
     });
   }
+
+  componentWillUnmount() {
+    this.props.showGameList(false);
+  }
+
   back = () => {
     this.props.showGameList(false);
   }
