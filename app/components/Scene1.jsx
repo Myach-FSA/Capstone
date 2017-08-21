@@ -14,9 +14,9 @@ const createScene1 = (canvas, engine) => {
   var light0 = new BABYLON.PointLight("Omni0", new BABYLON.Vector3(0, 10, 0), scene);
   var light1 = new BABYLON.PointLight("Omni1", new BABYLON.Vector3(0, -10, 0), scene);
   var light2 = new BABYLON.PointLight("Omni2", new BABYLON.Vector3(10, 0, 0), scene);
-  var light3 = new BABYLON.PointLight("Omni2", new BABYLON.Vector3(0, 15, 0), scene);
-  var light4 = new BABYLON.PointLight("Omni2", new BABYLON.Vector3(0, -15, 0), scene);
-  var light5 = new BABYLON.PointLight("Omni2", new BABYLON.Vector3(15, 0, 0), scene);
+  var light3 = new BABYLON.PointLight("Omni3", new BABYLON.Vector3(0, 15, 0), scene);
+  var light4 = new BABYLON.PointLight("Omni4", new BABYLON.Vector3(0, -15, 0), scene);
+  var light5 = new BABYLON.PointLight("Omni5", new BABYLON.Vector3(15, 0, 0), scene);
   var lightSphere0 = BABYLON
     .Mesh
     .CreateSphere("Sphere0", 16, 0.5, scene);
@@ -97,9 +97,6 @@ const createScene1 = (canvas, engine) => {
   background.isBackground = true;
   background.texture.level = 0;
   background.texture.wAng = 0.2;
-
-  // var torus = BABYLON.Mesh.CreateTorus('torus', 2, 0.5, 10, scene);
-  // torus.position.x=winPos.x; torus.position.z=winPos.z; ---- GROUND ----
 
   const ground = BABYLON
     .Mesh
