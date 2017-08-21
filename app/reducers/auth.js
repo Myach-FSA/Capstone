@@ -1,5 +1,4 @@
 import axios from 'axios';
-// const auth = firebase.auth()
 import firebase from 'firebase';
 import store from '.././store.js';
 
@@ -95,17 +94,6 @@ export const chooseBall = (ball) => setBall(ball);
 export const chooseGame = (id) => setGame(id);
 
 export const changeScore = (score) => setScore(score);
-
-// export const setBall = ball =>
-//   dispatch =>
-//     axios.get(`/api/products/${productId}`)
-//       .then(res => res.data)
-//       .then(product => {
-//         dispatch(getSingleProduct(product))
-//       })
-//       .catch(err => {
-//         console.error(`Error loading product with id: ${productId}`, err)
-//       })
 
 export function logOut() {
   firebase.auth().signOut();
