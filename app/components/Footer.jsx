@@ -6,9 +6,6 @@ const FooterSection = () => {
       <footer id="footersec">
         <div className="container">
           <div className="has-text-centered">
-            <h4>
-              <strong className="title">Myach</strong>
-            </h4>
             <p>By Dan, Denis, Yu, and Nancy</p>
             <p>
               <a className="icon" href="https://github.com/Myach-FSA/Capstone">

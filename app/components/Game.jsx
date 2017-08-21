@@ -7,6 +7,7 @@ import createScene2 from './Scene2';
 import InfoScreen from './InfoScreen';
 const auth = firebase.auth();
 import ScoreTable from './ScoreTable';
+// import Chat from '../../demos/chat'
 
 const database = firebase.database();
 const objects = [];
