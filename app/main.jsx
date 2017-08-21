@@ -15,7 +15,7 @@ import FooterSection from './components/Footer';
 import Scores from './components/Scores';
 import ChooseBall from './components/ChooseBall';
 import Register from './components/Register';
-import PrivateGameRoom from './components/PrivateGameRoom';
+import GameWaitRoom from './components/GameWaitRoom';
 import ChooseGame from './components/ChooseGame';
 import GameType from './components/GameType';
 import GameList from './components/GameList';
@@ -50,7 +50,7 @@ const App = ({ children }) =>
       <Switch>
         <Route exact path="/" component={Home}/>
         <Route exact path="/game" render={() =><Game auth={auth} loginObj={loginObj}/>}/>
-        <Route exact path="/game/:id/private" component={PrivateGameRoom}/>
+        <Route exact path="/game/:id/private" component={GameWaitRoom}/>
         <Route exact path="/choose" render={() => <GameType auth={auth} loginObj={loginObj}/>}/>
         <Route exact path="/game/:id/ball" render={() => <ChooseBall auth={auth} loginObj={loginObj}/>}/>
         <Route exact path="/scores" component={Scores}/>
