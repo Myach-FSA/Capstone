@@ -10,6 +10,7 @@ class GameWaitRoom extends React.Component {
   constructor() {
     super();
     this.state = {
+      isAdmin: true,
       publicGame: false,
     };
   }
@@ -17,23 +18,16 @@ class GameWaitRoom extends React.Component {
     const user = this.props.user;
 
     var userRef = firebase.database().ref('games/' + user.gameId);
+
     userRef.once('value', (snapshot) => {
       var a = snapshot.exists();
       if(!a) {
-        console.log('Created?s')
-        firebase.database().ref('games').update({ [user.gameId]: { playersInGame: [this.props.user.userId] } }); 
+        firebase.database().ref('games').set({ [user.gameId]: { playersInGame: { 0: this.props.user.userId } } }); 
       } else {
-        console.log('In the else')
-        firebase.database().ref('games/' + user.gameId + '/playersInGame').push(this.props.user.userId); 
-      
-        // var ref = new Firebase(URL_TO_DATA);
-        // // this new, empty ref only exists locally
-        // var newChildRef = ref.push();
-        // // we can get its id using key()
-        // console.log('my new shiny id is '+newChildRef.key());
-        // // now it is appended at the end of data at the server
-        // newChildRef.set({foo: 'bar'});
-      
+        this.setState({ isAdmin: false })
+        let children = snapshot.val().playersInGame
+        children = children.concat(this.props.user.userId)
+        firebase.database().ref('games/' + user.gameId + '/playersInGame/').set(children); 
       }
     });
     this.getPlayers(user.gameId, true);
@@ -66,27 +60,37 @@ class GameWaitRoom extends React.Component {
 
   render() {
     const numPlayer = 1;
-    return (
+    return ( 
       <div>
         <div className="content has-text-centered">
-          <div className="notification">
-            <h1><strong>Your Game ID: {this.props.user.gameId}</strong></h1>
-            <p>Send this code to your friends!</p>
-          </div>
-          <SceneList />
+
+          { this.state.isAdmin && (
+            <div>
+              <div className="notification">
+                <h1><strong>Your Game ID: {this.props.user.gameId}</strong></h1>
+                <p>Send this code to your friends!</p>
+              </div>
+              <SceneList gameId={this.props.match.params.id}/>
+            </div>
+            )
+          }
           <ChooseBall />
           <h5 id="greenText">Current number of connected players: {this.state.numberOfPlayers}</h5>
-          <Link to={`/game`}>
-            <button
-              className="button is-success"
-              type="submit"
-              title="playbutton"
-              onClick={() => { this.sendInfo(); }}>
-              Play Now!
-            </button>
-          </Link>
-          <a
-            className="button is-success"
+          <div className="field is-grouped">
+            <p className="control">
+            <Link to={`/game/${this.props.user.gameId}`}>
+              <button
+                className="button is-success"
+                type="submit"
+                title="playbutton"
+                onClick={() => { this.sendInfo(); }}>
+                Play Now!
+              </button>
+            </Link>
+            </p>
+          <p>
+          <button
+            className="button"
             type="submit"
             title="publicPrivate"
             onClick={() => { this.security(); }}>
@@ -96,12 +100,14 @@ class GameWaitRoom extends React.Component {
             {!this.state.publicGame &&
             <i className="fa fa-lock"> Private</i>
             }
-          </a>
+          </button>
+          </p>
         </div>
         <div>
           <h4></h4>
         </div>
       </div>
+    </div>
     );
   }
 }
