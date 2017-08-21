@@ -15,7 +15,10 @@ import FooterSection from './components/Footer';
 import Scores from './components/Scores';
 import ChooseBall from './components/ChooseBall';
 import Register from './components/Register';
-import GameWaitRoom from './components/GameWaitRoom';
+import PrivateGameRoom from './components/PrivateGameRoom';
+import ChooseGame from './components/ChooseGame';
+import GameType from './components/GameType';
+import GameList from './components/GameList';
 
 import firebase from 'APP/fire';
 
@@ -31,7 +34,7 @@ auth.onAuthStateChanged((user) => {
       console.log('Error: ', error.code, error.message);
     });
   } else {
-    console.log(user, 'is signed in')    
+    console.log(user, 'is signed in')
     const ref = firebase.database().ref('users/' + user.uid)
     ref.once("value", (snapshot) => {
       Object.assign(loginObj, user)
@@ -47,11 +50,12 @@ const App = ({ children }) =>
       <Switch>
         <Route exact path="/" component={Home}/>
         <Route exact path="/game" render={() =><Game auth={auth} loginObj={loginObj}/>}/>
-        <Route exact path="/choose" render={() => <ChooseBall auth={auth} loginObj={loginObj}/>}/>
+        <Route exact path="/game/:id/private" component={PrivateGameRoom}/>
+        <Route exact path="/choose" render={() => <GameType auth={auth} loginObj={loginObj}/>}/>
+        <Route exact path="/game/:id/ball" render={() => <ChooseBall auth={auth} loginObj={loginObj}/>}/>
         <Route exact path="/scores" component={Scores}/>
         <Route exact path="/login" render={() => <WhoAmI auth={auth} loginObj={loginObj}/>} />
         <Route exact path="/signup" render={() => <Register auth={auth} />} />
-        <Route exact path="/game/:id" component={GameWaitRoom}/>
         <Route component={NotFound}/>
       </Switch>
       <FooterSection />
