@@ -54,7 +54,7 @@ class GameType extends React.Component {
     return (
       <div className="container is-fluid">
         <div className="content has-text-centered">
-          <div className="notification">
+          <div id="choose" className="notification">
             <br></br>
             <div>
               {!this.props.gameList &&

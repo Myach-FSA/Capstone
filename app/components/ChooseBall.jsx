@@ -36,9 +36,7 @@ class ChooseBall extends React.Component {
     const ballMessage = chosenBall ? `You have chosen ${chosenBall.name}` : 'You have not yet chosen a ball'
 
     return (
-      <div className="container is-fluid">
-        <div className="content has-text-centered">
-          <div className="notification">
+          <div id="choose" className="notification">
             <h1><strong>Choose Your Ball</strong></h1>
             <h5><strong>{ballMessage}</strong></h5>
             <div className="horiz-marg">
@@ -64,9 +62,6 @@ class ChooseBall extends React.Component {
               </div>
             </div>
           </div>
-          <br></br>
-        </div>
-      </div>
     );
   }
 }
