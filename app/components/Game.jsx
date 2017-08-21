@@ -190,8 +190,9 @@ class Game extends Component {
     const ballMaterial = new BABYLON.StandardMaterial('material', sce);
     player.material = ballMaterial;
     player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.SphereImpostor, {
-      mass: 0.01,
+      mass: 1,
       friction: 0.5,
+      restitution: 0.7
     }, sce);
     return player;
   }
@@ -307,6 +308,13 @@ function control(user) {
         zAcceleration -= 0.5;
         database.ref(user.id).set({ xAcceleration, zAcceleration });
       }
+    }
+    if (keyState[32]) {
+      var forceVector = new BABYLON.Vector3(0, 10, 0);
+      if (user.position.y < 1.1) {
+        user.applyImpulse(forceVector, user.position);
+      }
+      database.ref(user.id).set({ xAcceleration, zAcceleration });
     }
     setTimeout(gameLoop, 50);
   }
