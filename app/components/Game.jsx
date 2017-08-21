@@ -29,13 +29,12 @@ class Game extends Component {
   }
 
   componentDidMount() {
-    // audio0.play();
+    audio0.play();
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
     let num = sceneNum;
     let scene = createScene1(canvas, engine);
     const user = this.props.user.userId;
-    console.log('props', this.props);
     database.ref('winPosition').set({ x: 10, z: 10 });
     this.createWinPoint();
     database.ref('winPosition').on('value', (position) => {
@@ -54,7 +53,6 @@ class Game extends Component {
             return losses;
           });
         }
-        console.log('winner val', winner.val());
         const myScore=this.props.user.totalScore;
         database.ref('users/'+user+'/totalScore').transaction((score) => {
           score+=myScore;
@@ -72,7 +70,6 @@ class Game extends Component {
         if (!playersInGame[playerId] || playersInGame.scene) {
           const newPlayer = this.createPlayerOnConnect(scene, playerId);
           if (newPlayer.id === user) {
-            console.log(playersObj);
             this.playerPosition(newPlayer);
             this.setColor(newPlayer, {b: Math.random(), g: Math.random(), r: Math.random()});
             info = { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, color: newPlayer.material.diffuseColor };
