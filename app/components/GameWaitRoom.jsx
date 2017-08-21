@@ -7,8 +7,8 @@ import SceneList from './SceneList';
 import ChooseBall from './ChooseBall';
 
 class GameWaitRoom extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       numberOfPlayers: 0,
       publicGame: false,
@@ -46,28 +46,41 @@ class GameWaitRoom extends React.Component {
   }
 
   render() {
-    const numPlayer = 1;
-    return (
+    let numPlayers = 0;
+    const isAdmin = numPlayers === 0 ? true : false;
+    console.log('numPlayers', numPlayers, 'isAdmin', isAdmin)
+
+    return ( 
       <div>
         <div className="content has-text-centered">
-          <div className="notification">
-            <h1><strong>Your Game ID: {this.props.user.gameId}</strong></h1>
-            <p>Send this code to your friends!</p>
-          </div>
-          <SceneList />
+
+          { isAdmin && (
+            <div>
+              <div className="notification">
+                <h1><strong>Your Game ID: {this.props.user.gameId}</strong></h1>
+                <p>Send this code to your friends!</p>
+              </div>
+              <SceneList gameId={this.props.match.params.id}/>
+            </div>
+            )
+          }
           <ChooseBall />
           <h5 id="greenText">Current number of connected players: {this.state.numberOfPlayers}</h5>
-          <Link to={`/game`}>
-            <button
-              className="button is-success"
-              type="submit"
-              title="playbutton"
-              onClick={() => { this.sendInfo(); }}>
-              Play Now!
-            </button>
-          </Link>
-          <a
-            className="button is-success"
+          <div className="field is-grouped">
+            <p className="control">
+            <Link to={`/game/${this.props.user.gameId}`}>
+              <button
+                className="button is-success"
+                type="submit"
+                title="playbutton"
+                onClick={() => { this.sendInfo(); }}>
+                Play Now!
+              </button>
+            </Link>
+            </p>
+          <p>
+          <button
+            className="button"
             type="submit"
             title="publicPrivate"
             onClick={() => { this.security(); }}>
@@ -77,12 +90,14 @@ class GameWaitRoom extends React.Component {
             {!this.state.publicGame &&
             <i className="fa fa-lock"> Private</i>
             }
-          </a>
+          </button>
+          </p>
         </div>
         <div>
           <h4></h4>
         </div>
       </div>
+    </div>
     );
   }
 }
