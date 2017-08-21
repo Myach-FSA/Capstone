@@ -18,6 +18,7 @@ import Register from './components/Register';
 import PrivateGameRoom from './components/PrivateGameRoom';
 import ChooseGame from './components/ChooseGame';
 import GameType from './components/GameType';
+import GameList from './components/GameList';
 
 import firebase from 'APP/fire';
 
@@ -33,7 +34,7 @@ auth.onAuthStateChanged((user) => {
       console.log('Error: ', error.code, error.message);
     });
   } else {
-    console.log(user, 'is signed in')    
+    console.log(user, 'is signed in')
     const ref = firebase.database().ref('users/' + user.uid)
     ref.once("value", (snapshot) => {
       Object.assign(loginObj, user)

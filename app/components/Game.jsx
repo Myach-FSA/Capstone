@@ -7,6 +7,7 @@ import createScene2 from './Scene2';
 import InfoScreen from './InfoScreen';
 const auth = firebase.auth();
 import ScoreTable from './ScoreTable';
+// import Chat from '../../demos/chat'
 
 const database = firebase.database();
 const objects = [];
@@ -214,6 +215,7 @@ class Game extends Component {
       <div>
         <InfoScreen/>
         <ScoreTable/>
+        <Chat user={this.props.user}/>
         <canvas className='gameDisplay ' ref="renderCanvas"></canvas>
       </div>
     );
@@ -228,6 +230,7 @@ function control(user) {
       e.preventDefault();
       document.getElementById('ScoreTable').className = 'scoreTable visible has-text-centered';
       document.getElementById('InfoScreen').className = 'infoScreen invisible has-text-centered';
+      document.getElementById('Chat').className = 'chat invisible has-text-centered';      
     }
   };
 
