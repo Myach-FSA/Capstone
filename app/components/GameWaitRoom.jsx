@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 
 class GameWaitRoom extends React.Component {
   render() {
-    console.log('wait room');
     const numPlayer = 1;
     return (
         <div className="content has-text-centered">
