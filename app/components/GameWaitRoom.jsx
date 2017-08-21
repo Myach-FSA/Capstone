@@ -7,20 +7,35 @@ import SceneList from './SceneList';
 import ChooseBall from './ChooseBall';
 
 class GameWaitRoom extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
     this.state = {
-      numberOfPlayers: 0,
       publicGame: false,
     };
   }
   componentDidMount() {
     const user = this.props.user;
-    // if(!numberOfPlayers) {
-      firebase.database().ref('games').update({ [user.gameId]: { playersInGame: [user.userId] } });      
-    // } else {
-    //   firebase.database().ref('games').update({ [user.gameId]: { playersInGame: playersInGame.push(user.userId) } });    
-    // }
+
+    var userRef = firebase.database().ref('games/' + user.gameId);
+    userRef.once('value', (snapshot) => {
+      var a = snapshot.exists();
+      if(!a) {
+        console.log('Created?s')
+        firebase.database().ref('games').update({ [user.gameId]: { playersInGame: [this.props.user.userId] } }); 
+      } else {
+        console.log('In the else')
+        firebase.database().ref('games/' + user.gameId + '/playersInGame').push(this.props.user.userId); 
+      
+        // var ref = new Firebase(URL_TO_DATA);
+        // // this new, empty ref only exists locally
+        // var newChildRef = ref.push();
+        // // we can get its id using key()
+        // console.log('my new shiny id is '+newChildRef.key());
+        // // now it is appended at the end of data at the server
+        // newChildRef.set({foo: 'bar'});
+      
+      }
+    });
     this.getPlayers(user.gameId, true);
   }
 
@@ -46,45 +61,32 @@ class GameWaitRoom extends React.Component {
   sendInfo = (info) => {
     const database = firebase.database();
     const user = this.props.user;
-    // firebase.database().ref('games/' + user.gameId).update({ security: this.state.security });
+    firebase.database().ref('games/' + user.gameId).update({ security: this.state.security });
   }
 
   render() {
-    let numPlayers = 0;
-    const isAdmin = numPlayers === 0 ? true : false;
-    console.log('numPlayers', numPlayers, 'isAdmin', isAdmin)
-
-    return ( 
+    const numPlayer = 1;
+    return (
       <div>
         <div className="content has-text-centered">
-
-          { isAdmin && (
-            <div>
-              <div className="notification">
-                <h1><strong>Your Game ID: {this.props.user.gameId}</strong></h1>
-                <p>Send this code to your friends!</p>
-              </div>
-              <SceneList gameId={this.props.match.params.id}/>
-            </div>
-            )
-          }
+          <div className="notification">
+            <h1><strong>Your Game ID: {this.props.user.gameId}</strong></h1>
+            <p>Send this code to your friends!</p>
+          </div>
+          <SceneList />
           <ChooseBall />
           <h5 id="greenText">Current number of connected players: {this.state.numberOfPlayers}</h5>
-          <div className="field is-grouped">
-            <p className="control">
-            <Link to={`/game/${this.props.user.gameId}`}>
-              <button
-                className="button is-success"
-                type="submit"
-                title="playbutton"
-                onClick={() => { this.sendInfo(); }}>
-                Play Now!
-              </button>
-            </Link>
-            </p>
-          <p>
-          <button
-            className="button"
+          <Link to={`/game`}>
+            <button
+              className="button is-success"
+              type="submit"
+              title="playbutton"
+              onClick={() => { this.sendInfo(); }}>
+              Play Now!
+            </button>
+          </Link>
+          <a
+            className="button is-success"
             type="submit"
             title="publicPrivate"
             onClick={() => { this.security(); }}>
@@ -94,14 +96,12 @@ class GameWaitRoom extends React.Component {
             {!this.state.publicGame &&
             <i className="fa fa-lock"> Private</i>
             }
-          </button>
-          </p>
+          </a>
         </div>
         <div>
           <h4></h4>
         </div>
       </div>
-    </div>
     );
   }
 }
