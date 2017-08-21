@@ -49,7 +49,10 @@ const App = ({ children }) =>
       <NavbarSection />
       <Switch>
         <Route exact path="/" component={Home}/>
-        <Route exact path="/game" render={() => <Game auth={auth} loginObj={loginObj}/>}/>
+        <Route exact path="/game" render={() => (
+          loginObj.uid
+          ? <Game auth={auth} loginObj={loginObj}/>
+          : <Redirect to ='/' />)}/>
         <Route exact path="/game/:id/private" component={PrivateGameRoom}/>
         <Route exact path="/choose" render={() => <GameType auth={auth} loginObj={loginObj}/>}/>
         <Route exact path="/game/:id/ball" render={() => <ChooseBall auth={auth} loginObj={loginObj}/>}/>
