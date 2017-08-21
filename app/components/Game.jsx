@@ -31,11 +31,11 @@ class Game extends Component {
 
   componentDidMount() {
     audio0.play();
+    const user = this.props.user.userId;
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
     let num = sceneNum;
     let scene = createScene1(canvas, engine);
-    const user = this.props.user.userId;
     database.ref('winPosition').set({ x: 10, z: 10 });
     this.createWinPoint();
     database.ref('winPosition').on('value', (position) => {
