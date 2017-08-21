@@ -13,9 +13,6 @@ const objects = [];
 const thisPlayer = '';
 const playersInGame = {};
 let sceneNum = 1;
-let zAxis = 0;
-let xAxis = 0;
-const yAxis = 0;
 let torus;
 let winPos;
 let zAcceleration = 0;
@@ -36,13 +33,37 @@ class Game extends Component {
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
     let num = sceneNum;
+    let scene = createScene1(canvas, engine);
+    const user = this.props.user.userId;
     database.ref('winPosition').set({ x: 10, z: 10 });
+    this.createWinPoint();
     database.ref('winPosition').on('value', (position) => {
       winPos = position.val();
     });
-    let scene = createScene1(canvas, engine, winPos);
-    const user = this.props.user.userId;
-    this.createWinPoint();
+    database.ref('players/winner').on('value', (winner) => {
+      if (winner.val()) {
+        if (user===winner.val()) {
+          database.ref('users/'+user+'/wins').transaction((wins) => {
+            wins+=1;
+            return wins;
+          });
+        } else {
+          database.ref('users/'+user+'/losses').transaction((losses) => {
+            losses+=1;
+            return losses;
+          });
+        }
+        const myScore=this.props.user.totalScore;
+        database.ref('users/'+user+'/totalScore').transaction((score) => {
+          score+=myScore;
+          return score;
+        });
+        this.props.changeScore(-myScore);
+        database.ref('players/' + user).update({ 'score': 0 });
+        //
+        database.ref('players/winner').remove();
+      }
+    });
     database.ref('players').on('value', (players) => {
       const playersObj = players.val();
       for (const playerId in playersObj) {
@@ -88,9 +109,13 @@ class Game extends Component {
         }
       }
     });
-    database.ref('players/' + user).set({ 'created': true, 'totalScore': 0 });
+    database.ref('players/' + user).set({ 'created': true, 'score': 0 });
 
     engine.runRenderLoop(() => {
+      if ((torus.position.x!==winPos.x)||(torus.position.z!==winPos.z)) {
+        torus.position.x=winPos.x;
+        torus.position.z=winPos.z;
+      }
       if (!scene || (sceneNum !== num)) {
         num = sceneNum;
         switch (num) {
@@ -109,29 +134,27 @@ class Game extends Component {
           this.playerPosition(me);
           database.ref(user).set({'xAcceleration': 0, 'zAcceleration': 0});
           me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
-          xAxis=0;
-          zAxis=0;
-          database.ref('players/'+ user+'/totalScore').transaction((score) => {
+          xAcceleration=0;
+          zAcceleration=0;
+          database.ref('players/'+ user+'/score').transaction((score) => {
             this.props.changeScore(-1);
             score -=1;
             return score;
           });
         }
         if (me&&(Math.floor(me.absolutePosition.x)===winPos.x)&&(Math.floor(me.absolutePosition.z)===winPos.z)) {
-          database.ref('players/'+ user+'/totalScore').transaction((score) => {
+          database.ref('players/'+ user+'/score').transaction((score) => {
             this.props.changeScore(1);
             score +=1;
+            if (score>=10) {
+              database.ref('/players').update({'winner': user});
+              score=0;
+            }
             return score;
           });
           const x=Math.floor(Math.random()*50-25);
           const z=Math.floor(Math.random()*50-25);
           database.ref('winPosition').set({'x': x, 'z': z});
-          torus.position.x=x;
-          torus.position.z=z;
-          winPos.x=x;
-          winPos.z=z;
-          xAcceleration=0;
-          zAcceleration=0;
         }
         scene.render();
       }
@@ -193,11 +216,10 @@ class Game extends Component {
     head.parent = par;
     return head;
   }
-  createWinPoint(scene, old) {
-    if (old) { console.log('torus be gone', torus); torus.dispose() ;}
+  createWinPoint(scene) {
     torus = BABYLON.Mesh.CreateTorus('torus', 2, 0.5, 10, scene);
-    torus.position.x=winPos.x;
-    torus.position.z=winPos.z;
+    torus.position.x=10;
+    torus.position.z=10;
   }
   makeId() {
     let text = '';
