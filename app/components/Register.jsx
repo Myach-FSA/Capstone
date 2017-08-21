@@ -1,6 +1,6 @@
-import React from 'react'
-import firebase from 'APP/fire'
-const auth = firebase.auth()
+import React from 'react';
+import firebase from 'APP/fire';
+const auth = firebase.auth();
 import { Router, BrowserHistory, NavLink, withRouter } from 'react-router-dom';
 
 class Register extends React.Component {
@@ -10,26 +10,26 @@ class Register extends React.Component {
   }
 
   handleSignUp(evt) {
-    evt.preventDefault()    
+    evt.preventDefault();
 
-    let id = '';
-    
+    const id = '';
+
     const email = evt.target.email.value;
-    const password = evt.target.password.value
-    const username = evt.target.username.value
+    const password = evt.target.password.value;
+    const username = evt.target.username.value;
 
     auth.createUserWithEmailAndPassword(email, password)
     .then(user => {
-      this.props.signUp({ userId: user.uid, email, username})
+      this.props.signUp({ userId: user.uid, email, username});
     })
     .then(() => {
-      this.props.history.push('/')    
+      this.props.history.push('/');
     })
-    .catch(error => console.log(error))
+    .catch(error => console.error(error));
   }
 
   render() {
-    const { user } = this.state || {}
+    const { user } = this.state || {};
     return (
       <div className="columns">
         <div className="column is-one-third">
@@ -78,20 +78,20 @@ class Register extends React.Component {
           <div className="column is-one-third"></div>
         </div>
       </div>
-    )
+    );
   }
 }
 
 // /* -----------------    CONTAINER     ------------------ */
 
-import {signUp} from '../reducers/auth'
-import {connect} from 'react-redux'
+import {signUp} from '../reducers/auth';
+import {connect} from 'react-redux';
 import store from '../store';
 
 const mapState = (state, componentProps) => (
   {user: state.user }
-)
+);
 
-const mapDispatch = ({signUp})
+const mapDispatch = ({signUp});
 
-export default withRouter(connect(mapState, mapDispatch)(Register))
+export default withRouter(connect(mapState, mapDispatch)(Register));
