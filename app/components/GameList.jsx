@@ -9,7 +9,7 @@ class GameList extends React.Component {
   constructor() {
     super();
     this.state = {
-      games: [],
+      games: false,
     };
   }
   componentWillMount() {
@@ -40,7 +40,7 @@ class GameList extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {
+            {this.state.games &&
               Object.keys(this.state.games).map((game) => {
                 return (
                   <tr key={game}>
