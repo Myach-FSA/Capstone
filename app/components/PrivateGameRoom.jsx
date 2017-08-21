@@ -15,16 +15,23 @@ class GameWaitRoom extends React.Component {
     };
   }
   componentDidMount() {
-    const database = firebase.database();
     const user = this.props.user;
     firebase.database().ref('games').update({ [user.gameId]: { playersInGame: [user.userId] } });
-    this.getPlayers(user.gameId);
+    this.getPlayers(user.gameId, true);
   }
 
-  getPlayers = (gameId) => {
-    firebase.database().ref('games').on('value', players => {
-      this.setState({ numberOfPlayers: players.val()[gameId].playersInGame.length });
-    });
+  componentWillUnmount() {
+    this.getPlayers(this.props.user.gameId, false);
+  }
+
+  getPlayers = (gameId, bool) => {
+    if (bool) {
+      firebase.database().ref('games').on('value', players => {
+        this.setState({ numberOfPlayers: players.val()[gameId].playersInGame.length });
+      });
+    } else {
+      firebase.database().ref('games').off();
+    }
   }
 
   security = () => {
