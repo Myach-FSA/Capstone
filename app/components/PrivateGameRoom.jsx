@@ -15,7 +15,6 @@ class GameWaitRoom extends React.Component {
     };
   }
   componentDidMount() {
-    const database = firebase.database();
     const user = this.props.user;
     firebase.database().ref('games').update({ [user.gameId]: { playersInGame: [user.userId] } });
     this.getPlayers(user.gameId, true);
