@@ -31,11 +31,11 @@ class Game extends Component {
 
   componentDidMount() {
     audio0.play();
+    const user = this.props.user.userId;
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
     let num = sceneNum;
     let scene = createScene1(canvas, engine);
-    const user = this.props.user.userId;
     database.ref('winPosition').set({ x: 10, z: 10 });
     this.createWinPoint();
     database.ref('winPosition').on('value', (position) => {
@@ -43,25 +43,24 @@ class Game extends Component {
     });
     database.ref('players/winner').on('value', (winner) => {
       if (winner.val()) {
-        if (user===winner.val()) {
-          database.ref('users/'+user+'/wins').transaction((wins) => {
-            wins+=1;
+        if (user === winner.val()) {
+          database.ref('users/' + user + '/wins').transaction((wins) => {
+            wins += 1;
             return wins;
           });
         } else {
-          database.ref('users/'+user+'/losses').transaction((losses) => {
-            losses+=1;
+          database.ref('users/' + user + '/losses').transaction((losses) => {
+            losses += 1;
             return losses;
           });
         }
-        const myScore=this.props.user.totalScore;
-        database.ref('users/'+user+'/totalScore').transaction((score) => {
-          score+=myScore;
+        const myScore = this.props.user.totalScore;
+        database.ref('users/' + user + '/totalScore').transaction((score) => {
+          score += myScore;
           return score;
         });
         this.props.changeScore(-myScore);
         database.ref('players/' + user).update({ 'score': 0 });
-        //
         database.ref('players/winner').remove();
       }
     });
@@ -72,7 +71,7 @@ class Game extends Component {
           const newPlayer = this.createPlayerOnConnect(scene, playerId);
           if (newPlayer.id === user) {
             this.playerPosition(newPlayer);
-            this.setColor(newPlayer, {b: Math.random(), g: Math.random(), r: Math.random()});
+            this.setColor(newPlayer, { b: Math.random(), g: Math.random(), r: Math.random() });
             info = { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, color: newPlayer.material.diffuseColor };
             database.ref('playerPosition/' + newPlayer.id).set(info);
           } else {
@@ -109,53 +108,58 @@ class Game extends Component {
           playersInGame[playerId] = true;
         }
       }
+      for (let i = 0; i < objects.length; i++) {
+        if (playersObj[objects[i].id].remove) {
+          objects[i].dispose();
+        }
+      }
     });
-    database.ref('players/' + user).set({ 'created': true, 'score': 0 });
+    database.ref('players/' + user).set({ 'created': true, 'score': 0, 'remove': false });
 
     engine.runRenderLoop(() => {
-      if ((torus.position.x!==winPos.x)||(torus.position.z!==winPos.z)) {
-        torus.position.x=winPos.x;
-        torus.position.z=winPos.z;
+      if ((torus.position.x !== winPos.x) || (torus.position.z !== winPos.z)) {
+        torus.position.x = winPos.x;
+        torus.position.z = winPos.z;
       }
       if (!scene || (sceneNum !== num)) {
         num = sceneNum;
         switch (num) {
-        case 2:
-          scene = createScene2(canvas, engine);
-          break;
-        default: scene = createScene1(canvas, engine);
+          case 2:
+            scene = createScene2(canvas, engine);
+            break;
+          default: scene = createScene1(canvas, engine);
         }
         setTimeout(scene.render(), 500);
         playersInGame.scene = true;
         database.ref('players/' + user).push({ id: 'test' });
         playersInGame.scene = false;
       } else {
-        const me=objects.filter(player => player.id===user)[0];
-        if (me&&me.absolutePosition.y<-100) {
+        const me = objects.filter(player => player.id === user)[0];
+        if (me && me.absolutePosition.y < -100) {
           this.playerPosition(me);
-          database.ref(user).set({'xAcceleration': 0, 'zAcceleration': 0});
+          database.ref(user).set({ 'xAcceleration': 0, 'zAcceleration': 0 });
           me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
-          xAcceleration=0;
-          zAcceleration=0;
-          database.ref('players/'+ user+'/score').transaction((score) => {
+          xAcceleration = 0;
+          zAcceleration = 0;
+          database.ref('players/' + user + '/score').transaction((score) => {
             this.props.changeScore(-1);
-            score -=1;
+            score -= 1;
             return score;
           });
         }
-        if (me&&(Math.floor(me.absolutePosition.x)===winPos.x)&&(Math.floor(me.absolutePosition.z)===winPos.z)) {
-          database.ref('players/'+ user+'/score').transaction((score) => {
+        if (me && (Math.floor(me.absolutePosition.x) === winPos.x) && (Math.floor(me.absolutePosition.z) === winPos.z)) {
+          database.ref('players/' + user + '/score').transaction((score) => {
             this.props.changeScore(1);
-            score +=1;
-            if (score>=10) {
-              database.ref('/players').update({'winner': user});
-              score=0;
+            score += 1;
+            if (score >= 10) {
+              database.ref('/players').update({ 'winner': user });
+              score = 0;
             }
             return score;
           });
-          const x=Math.floor(Math.random()*50-25);
-          const z=Math.floor(Math.random()*50-25);
-          database.ref('winPosition').set({'x': x, 'z': z});
+          const x = Math.floor(Math.random() * 50 - 25);
+          const z = Math.floor(Math.random() * 50 - 25);
+          database.ref('winPosition').set({ 'x': x, 'z': z });
         }
         scene.render();
       }
@@ -165,13 +169,18 @@ class Game extends Component {
       engine.resize();
     });
     window.addEventListener('beforeunload', () => {
-      database.ref('players/'+user).remove();
-      database.ref('playerPosition/'+user).remove();
+      database.ref('players/' + user).update({ remove: true });
+      database.ref('players/' + user).remove();
+      database.ref('playerPosition/' + user).remove();
       database.ref(user).remove();
     });
   }
 
   componentWillUnmount() {
+    const user = this.props.user.userId;
+    database.ref('players/' + user).remove();
+    database.ref('playerPosition/' + user).remove();
+    database.ref(user).remove();
     audio0.pause();
   }
 
@@ -219,8 +228,8 @@ class Game extends Component {
   }
   createWinPoint(scene) {
     torus = BABYLON.Mesh.CreateTorus('torus', 2, 0.5, 10, scene);
-    torus.position.x=10;
-    torus.position.z=10;
+    torus.position.x = 10;
+    torus.position.z = 10;
   }
   makeId() {
     let text = '';
@@ -235,8 +244,8 @@ class Game extends Component {
   render() {
     return (
       <div>
-        <InfoScreen/>
-        <ScoreTable/>
+        <InfoScreen />
+        <ScoreTable />
         <canvas className='gameDisplay ' ref="renderCanvas"></canvas>
       </div>
     );
@@ -246,7 +255,7 @@ class Game extends Component {
 function control(user) {
   const keyState = {};
 
-  window.onkeydown = function(e) {
+  window.onkeydown = function (e) {
     if (e.keyCode === 9) {
       e.preventDefault();
       document.getElementById('ScoreTable').className = 'scoreTable visible has-text-centered';
@@ -254,20 +263,20 @@ function control(user) {
     }
   };
 
-  window.onkeyup = function(e) {
+  window.onkeyup = function (e) {
     if (e.keyCode === 9) {
       document.getElementById('ScoreTable').className = 'scoreTable invisible has-text-centered';
       document.getElementById('InfoScreen').className = 'infoScreen visible has-text-centered';
     }
   };
 
-  window.addEventListener('keydown', function(e) {
+  window.addEventListener('keydown', function (e) {
     keyState[e.keyCode || e.which] = true;
     if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
       e.preventDefault();
     }
   }, true);
-  window.addEventListener('keyup', function(e) {
+  window.addEventListener('keyup', function (e) {
     keyState[e.keyCode || e.which] = false;
   }, true);
 
