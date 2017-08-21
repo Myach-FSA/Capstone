@@ -1,18 +1,19 @@
 import React from 'react';
 import ReactDOM, { render } from 'react-dom';
-import { Route, Link, NavLink, Router, Switch, withRouter } from 'react-router-dom'
-import Firebase from 'firebase';
-import ChooseGame from './ChooseGame'
+import { Route, Link, NavLink, Router, Switch, withRouter } from 'react-router-dom';
+import firebase from 'firebase';
+import ChooseGame from './ChooseGame';
+import GameList from './GameList';
+import { setUser, chooseGame } from '../reducers/auth';
+import { showGameList } from '../reducers/conditionals';
+import { connect } from 'react-redux';
 
 class GameType extends React.Component {
   constructor(props) {
-    super(props)
-        this.state = {
-            renderJoinPage: false            
-        }
+    super(props);
     this.gameId = '';
-    this.initiateGame = this.initiateGame.bind(this)
-    this.sendDataToFB = this.sendDataToFB.bind(this)
+    this.initiateGame = this.initiateGame.bind(this);
+    this.sendDataToFB = this.sendDataToFB.bind(this);
   }
 
   componentDidMount() {
@@ -24,58 +25,61 @@ class GameType extends React.Component {
       losses: 0,
       ball: 0,
       gameId: 0,
-    }
-    const user = this.props.loginObj.email ? this.props.loginObj : anonymousUser
-    this.props.setUser(user)   
+    };
+    const user = this.props.loginObj.email ? this.props.loginObj : anonymousUser;
+    this.props.setUser(user);
+    this.props.showGameList(false);
   }
 
   showJoinPage() {
-    let bool = !this.state.renderJoinPage
-    this.setState({ renderJoinPage: bool })
+    this.props.showGameList(true);
   }
 
   initiateGame() {
-    let num = (Math.floor(Math.random() * 90000) + 10000).toString();
+    const num = (Math.floor(Math.random() * 90000) + 10000).toString();
     this.gameId = num;
-    this.props.chooseGame(num)  
-    this.props.history.push(`/game/${num}/private`)
+    this.props.chooseGame(num);
+    this.props.history.push(`/game/${num}/private`);
     // document.getElementById('gameID').value = num;
   }
 
   sendDataToFB() {
     const user = this.props.user;
-    const ref = firebase.database().ref("users/"+user.userId)
-    ref.set(user)
-    this.props.setUser(user)    
+    const ref = firebase.database().ref('users/' + user.userId);
+    ref.set(user);
+    this.props.setUser(user);
   }
 
   render() {
     return (
       <div className="container is-fluid">
         <div className="content has-text-centered">
-        <div className="notification">
-          <h1><strong>Create or Join a Game</strong></h1>
-          <br></br>
-          <div className="field is-grouped">
-            <p className="control">
-                <button className="button is-primary" id="neon" onClick={() => this.initiateGame()}>
-                    Create a Game
+          <div className="notification">
+            <br></br>
+            <div>
+              {!this.props.gameList &&
+                <div>
+                  <p className="control">
+                    <button className="button is-primary" id="neon" onClick={() => this.initiateGame()}>
+                      Create a Game
                 </button>
-            </p>
-            <p className="control">
-                <button className="button is-primary" id="neon" onClick={() => this.showJoinPage()}>
-                    <Link to={`/choose`}>
-                    Join a Game
+                  </p>
+                  <p className="control">
+                    <button className="button is-primary" id="neon" onClick={() => this.showJoinPage()}>
+                      <Link to={`/choose`}>
+                        Join a Game
                     </Link>
-                </button>
-            </p>
-            {this.state.renderJoinPage &&
-            <Switch>
-              <Route path={`/choose`} render={() => (
-                <ChooseGame />
-              )} />
-            </Switch>
-            }
+                    </button>
+                  </p>
+                </div>
+              }
+              {this.props.gameList &&
+                <Switch>
+                  <Route path={`/choose`} render={() => (
+                    <GameList />
+                  )} />
+                </Switch>
+              }
             </div>
             <br></br>
           </div>
@@ -85,16 +89,11 @@ class GameType extends React.Component {
   }
 }
 
-// /* -----------------    CONTAINER     ------------------ */
-
-import { setUser, chooseGame } from '../reducers/auth'
-import { connect } from 'react-redux'
-import store from '../store';
-
 const mapStateToProps = (state) => ({
-  user: state.auth.user
-})
+  user: state.auth.user,
+  gameList: state.conditionals.render
+});
 
-const mapDispatch = ({ setUser, chooseGame })
+const mapDispatch = ({ setUser, chooseGame, showGameList });
 
-export default withRouter(connect(mapStateToProps, mapDispatch)(GameType))
+export default withRouter(connect(mapStateToProps, mapDispatch)(GameType));
