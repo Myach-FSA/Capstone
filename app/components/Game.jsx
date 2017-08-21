@@ -286,7 +286,6 @@ function control(user) {
       database.ref(user.id).set({ xAcceleration, zAcceleration });
     }
 
-    // .applyImpulse(force_vector,bouncy_ball.position);
     setTimeout(gameLoop, 50);
   }
   gameLoop();
