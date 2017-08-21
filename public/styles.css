@@ -47,8 +47,8 @@
 }
 
 body {
-  background: #ECEFF1;
-  color: rgba(0, 0, 0, 0.87);
+  background: black;
+  color: #23d160;
   font-family: Roboto, Helvetica, Arial, sans-serif;
   margin: 0;
   padding: 0;
@@ -64,6 +64,20 @@ body {
   body {
     border-top: 16px solid #ffa100;
   }
+}
+
+.notification {
+  background-color: black;
+  border-style: dashed;
+  border-color: #23d160;
+}
+
+#neon {
+  background-color: #23d160;
+}
+
+.notification strong {
+  color: #23d160;
 }
 
 html,
@@ -88,10 +102,18 @@ body {
   touch-action: none;
 }
 
+.icon .fa {
+  color: #23d160;
+}
+
+a {
+  color: #23d160;
+}
+
 #footersec {
   background-color: black;
   width: 100%;
-  padding: 5px 0px 5px 0px;
+  padding: 40px 0px 40px 0px;
 }
 
 .playnow {
@@ -166,10 +188,19 @@ a.halflink:hover {
 .invisible {
    visibility: hidden !important;
 }
+
 .fullbutton {
   color: white;
 }
 
 h3 {
   padding-top: 2%;
+}
+
+body {
+  background: black;
+}
+
+#greenText {
+  color: #23d160;
 }
