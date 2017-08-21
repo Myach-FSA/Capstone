@@ -19,17 +19,17 @@ class GameWaitRoom extends React.Component {
     firebase.database().ref('games').update({[user.gameId]: {playersInGame: [user.userId]}});
     this.getPlayers(user.gameId);
   }
+
+  getPlayers = (gameId) => {
+    firebase.database().ref('games').on('value', players => {
+      this.setState({numberOfPlayers: players.val()[gameId].playersInGame.length});
+    });
+  }
   // Will use sendInfo later for scene selection / public or private games
   sendInfo = (info) => {
     const database = firebase.database();
     const user = this.props.user;
     firebase.database().ref('games').update({[user.gameId]: {playersInGame: [user.userId]}});
-  }
-
-  getPlayers = (gameId) => {
-    firebase.database().ref('games').on('value', (players) => {
-      this.setState({numberOfPlayers: players.val()[gameId].playersInGame.length});
-    });
   }
 
   render() {
