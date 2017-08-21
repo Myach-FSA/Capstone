@@ -1,6 +1,6 @@
-import React from 'react'
-import firebase from 'APP/fire'
-const auth = firebase.auth()
+import React from 'react';
+import firebase from 'APP/fire';
+const auth = firebase.auth();
 import { Router, BrowserHistory, NavLink, withRouter } from 'react-router-dom';
 
 class LoginUser extends React.Component {
@@ -8,26 +8,26 @@ class LoginUser extends React.Component {
     super(props);
     this.handleLogin = this.handleLogin.bind(this);
   }
-        
-  handleLogin(evt) {
-    evt.preventDefault()    
 
-    let id = '';
-    
+  handleLogin(evt) {
+    evt.preventDefault();
+
+    const id = '';
+
     const email = evt.target.email.value;
-    const password = evt.target.password.value
+    const password = evt.target.password.value;
     auth.signInWithEmailAndPassword(email, password)
     .then(response => {
-      this.props.login({ id: response.uid })    
+      this.props.login({ id: response.uid });
     })
     .then(() => {
-      this.props.history.push('/')    
+      this.props.history.push('/');
     })
-    .catch(error => console.log(error))
+    .catch(error => console.error(error));
   }
 
   render() {
-    const { user } = this.state || {}
+    const { user } = this.state || {};
     return (
       <div className="columns">
         <div className="column is-one-third">
@@ -66,19 +66,19 @@ class LoginUser extends React.Component {
           <div className="column is-one-third"></div>
         </div>
       </div>
-    )
+    );
   }
 }
 
 /* -----------------    CONTAINER     ------------------ */
 
-import { login } from '../reducers/auth'
-import {connect} from 'react-redux'
+import { login } from '../reducers/auth';
+import {connect} from 'react-redux';
 
 const mapState = (state) => (
   {user: state.user }
-)
+);
 
-const mapDispatch = ({login})
+const mapDispatch = ({login});
 
-export default withRouter(connect(mapState, mapDispatch)(LoginUser))
+export default withRouter(connect(mapState, mapDispatch)(LoginUser));

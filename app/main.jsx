@@ -29,12 +29,10 @@ var loginObj = {};
 
 auth.onAuthStateChanged((user) => {
   if (!user) {
-    console.log('No user is signed in');
     firebase.auth().signInAnonymously().catch(function(error) {
-      console.log('Error: ', error.code, error.message);
+      console.error('Error: ', error.code, error.message);
     });
   } else {
-    console.log(user, 'is signed in');
     const ref = firebase.database().ref('users/' + user.uid);
     ref.once('value', (snapshot) => {
       Object.assign(loginObj, user);
@@ -42,7 +40,6 @@ auth.onAuthStateChanged((user) => {
   }
 });
 
-console.log('This is the loginObj', loginObj);
 const App = ({ children }) =>
   <Router>
       <div>
