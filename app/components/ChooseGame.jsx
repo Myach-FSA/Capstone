@@ -72,7 +72,6 @@ class ChooseGame extends React.Component {
     const gameID = this.gameId && this.gameId
 
     return (
-      <div className="container is-fluid">
         <div className="content has-text-centered">
           <h1><strong>Choose Your Battleground</strong></h1>
             <h5>Pick a scene to join a random game or initiate/join a private game below.</h5>
@@ -132,7 +131,6 @@ class ChooseGame extends React.Component {
           <Link to={`/game/${gameID}/ball`} onClick={(evt) => this.sendDataToFB(evt)}><button className="button is-success">Continue</button></Link>
         <br></br>
         </div>
-      </div>
     );
   }
 }

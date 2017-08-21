@@ -8,7 +8,8 @@ import Chat from './Chat'
 // This component is a little piece of glue between React router
 // and our Scratchpad component. It takes in props.params.title, and
 // shows the Scratchpad along with that title.
-export default ({match: {params: {room}}}) =>
+// export default ({match: {params: {room}}}) =>
+export default firechat =>
   <div>
     <h1>{room}</h1>
     {/* Here, we're passing in a Firebase reference to
