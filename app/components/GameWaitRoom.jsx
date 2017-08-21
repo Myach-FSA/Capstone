@@ -42,7 +42,7 @@ class GameWaitRoom extends React.Component {
   sendInfo = (info) => {
     const database = firebase.database();
     const user = this.props.user;
-    firebase.database().ref('games/' + user.gameId).update({ security: this.state.security });
+    // firebase.database().ref('games/' + user.gameId).update({ security: this.state.security });
   }
 
   render() {
