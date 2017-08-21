@@ -7,16 +7,29 @@ import SceneList from './SceneList';
 import ChooseBall from './ChooseBall';
 
 class GameWaitRoom extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      numberOfPlayers: 0,
+    };
+  }
   componentDidMount() {
     const database = firebase.database();
     const user = this.props.user;
     firebase.database().ref('games').update({[user.gameId]: {playersInGame: [user.userId]}});
+    this.getPlayers(user.gameId);
   }
   // Will use sendInfo later for scene selection / public or private games
   sendInfo = (info) => {
     const database = firebase.database();
     const user = this.props.user;
     firebase.database().ref('games').update({[user.gameId]: {playersInGame: [user.userId]}});
+  }
+
+  getPlayers = (gameId) => {
+    firebase.database().ref('games').on('value', (players) => {
+      this.setState({numberOfPlayers: players.val()[gameId].playersInGame.length});
+    });
   }
 
   render() {
@@ -30,7 +43,7 @@ class GameWaitRoom extends React.Component {
           </div>
             <SceneList />
             <ChooseBall />
-          <h5 id="greenText">Current number of connected players: {numPlayer}</h5>
+          <h5 id="greenText">Current number of connected players: {this.state.numberOfPlayers}</h5>
           <Link to={`/game`}>
             <button
               className="button is-success"
