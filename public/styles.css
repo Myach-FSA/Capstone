@@ -230,10 +230,10 @@ body {
 
 .winScreen {
   position: absolute;
-  top: 10vh;
+  top: 30vh;
   left: 15vw;
-  height: 80vh;
-  width: 65vw;
+  height: 20vh;
+  width: 70vw;
 }
 .space {
   padding-top: 10%;

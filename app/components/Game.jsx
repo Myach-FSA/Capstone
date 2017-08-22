@@ -89,13 +89,13 @@ class Game extends Component {
       }
     });
 
-    database.ref('games/' + gameId).update({'winPosition': { x: 10, z: 10 }});
+    database.ref('games/' + gameId).update({ 'winPosition': { x: 10, z: 10 } });
     this.createWinPoint();
     database.ref('games/' + gameId + '/winPosition').on('value', (position) => {
       winPos = position.val();
     });
 
-    database.ref('games/'+gameId+ '/playersInGame/winner').on('value', (winner) => {
+    database.ref('games/' + gameId + '/playersInGame/winner').on('value', (winner) => {
       if (winner.val()) {
         if (user === winner.val()) {
           database.ref('users/' + user + '/wins').transaction((wins) => {
@@ -114,8 +114,8 @@ class Game extends Component {
           return score;
         });
         this.props.changeScore(-myScore);
-        database.ref('games/'+gameId+ '/playersInGame/' + user).update({ 'score': 0 });
-        database.ref('games/'+gameId+ '/playersInGame/winner').remove();
+        database.ref('games/' + gameId + '/playersInGame/' + user).update({ 'score': 0 });
+        database.ref('games/' + gameId + '/playersInGame/winner').remove();
       }
     });
 
@@ -127,10 +127,10 @@ class Game extends Component {
       if (!scene || (sceneNum !== num)) {
         num = sceneNum;
         switch (num) {
-        case 2:
-          scene = createScene2(canvas, engine);
-          break;
-        default: scene = createScene1(canvas, engine);
+          case 2:
+            scene = createScene2(canvas, engine);
+            break;
+          default: scene = createScene1(canvas, engine);
         }
         setTimeout(scene.render(), 500);
         playersInGame.scene = true;
@@ -143,18 +143,18 @@ class Game extends Component {
           me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
           xAcceleration = 0;
           zAcceleration = 0;
-          database.ref('games/'+gameId+ '/playersInGame/' + user + '/score').transaction((score) => {
+          database.ref('games/' + gameId + '/playersInGame/' + user + '/score').transaction((score) => {
             this.props.changeScore(-1);
             score -= 1;
             return score;
           });
         }
         if (me && (Math.floor(me.absolutePosition.x) === winPos.x) && (Math.floor(me.absolutePosition.z) === winPos.z)) {
-          database.ref('games/'+gameId+ '/playersInGame/' + user + '/score').transaction((score) => {
+          database.ref('games/' + gameId + '/playersInGame/' + user + '/score').transaction((score) => {
             this.props.changeScore(1);
             score += 1;
             if (score >= 10) {
-              database.ref('games/'+gameId+ '/playersInGame/').update({ 'winner': user });
+              database.ref('games/' + gameId + '/playersInGame/').update({ 'winner': user });
               score = 0;
             }
             return score;
@@ -172,7 +172,8 @@ class Game extends Component {
     });
     window.addEventListener('beforeunload', () => {
       database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true });
-      database.ref('games/' + gameId + '/playersInGame/' + user).remove();
+      //Need to find a way to call promises to remove one user and check for remainder before removing parent node
+      database.ref('games/' + gameId).remove();
       database.ref('playerPosition/' + user).remove();
       database.ref(user).remove();
     });
@@ -180,7 +181,16 @@ class Game extends Component {
 
   componentWillUnmount() {
     const user = this.props.user.userId;
-    database.ref('games/' + this.props.user.gameId + '/playersInGame' + user).remove();
+    const gameId = this.props.user.gameId;
+    database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true });
+    database.ref('games/' + gameId + '/playersInGame/' + user).remove().then(() => {
+      database.ref('games/' + gameId).once('value').then(allPlayers => {
+        allPlayers = allPlayers.val();
+        if (!allPlayers.playersInGame) {
+          database.ref('games/' + gameId).remove();
+        }
+      });
+    });
     database.ref('playerPosition/' + user).remove();
     database.ref(user).remove();
     audio0.pause();
@@ -243,11 +253,12 @@ class Game extends Component {
   }
 
   render() {
+    console.log(this.props.user);
     return (
       <div>
-        <WinScreen user={this.props.user}/>
+        {/* <WinScreen user={this.props.user}/> */}
         <InfoScreen />
-        <ScoreTable />
+        <ScoreTable gameId={this.props.user.gameId}/>
         <canvas className='gameDisplay ' ref="renderCanvas"></canvas>
       </div>
     );
@@ -257,7 +268,7 @@ class Game extends Component {
 function control(user) {
   const keyState = {};
 
-  window.onkeydown = function(e) {
+  window.onkeydown = function (e) {
     if (e.keyCode === 9) {
       e.preventDefault();
       document.getElementById('ScoreTable').className = 'scoreTable visible has-text-centered';
@@ -265,20 +276,20 @@ function control(user) {
     }
   };
 
-  window.onkeyup = function(e) {
+  window.onkeyup = function (e) {
     if (e.keyCode === 9) {
       document.getElementById('ScoreTable').className = 'scoreTable invisible has-text-centered';
       document.getElementById('InfoScreen').className = 'infoScreen visible has-text-centered';
     }
   };
 
-  window.addEventListener('keydown', function(e) {
+  window.addEventListener('keydown', function (e) {
     keyState[e.keyCode || e.which] = true;
     if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
       e.preventDefault();
     }
   }, true);
-  window.addEventListener('keyup', function(e) {
+  window.addEventListener('keyup', function (e) {
     keyState[e.keyCode || e.which] = false;
   }, true);
 
