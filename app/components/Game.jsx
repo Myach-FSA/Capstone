@@ -170,7 +170,7 @@ class Game extends Component {
     });
     window.addEventListener('beforeunload', () => {
       database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true });
-      database.ref('games/' + gameId + '/playersInGame').remove();
+      database.ref('games/' + gameId + '/playersInGame/' + user).remove();
       database.ref('playerPosition/' + user).remove();
       database.ref(user).remove();
     });
