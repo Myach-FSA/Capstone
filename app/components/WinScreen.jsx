@@ -8,7 +8,7 @@ class WinScreen extends React.Component {
   }
 
   render() {
-    if (this.props.user.totalScore > 9 && !this.winImgVisible) {
+    if (this.props.user.totalScore === 10 && !this.winImgVisible) {
       $('.winScreen').toggleClass('invisible');
       this.winImgVisible = true;
     }
