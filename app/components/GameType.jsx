@@ -55,16 +55,14 @@ class GameType extends React.Component {
       <div className="container is-fluid">
         <div className="content has-text-centered">
           <div id="choose" className="notification">
-          <br></br>
-          <h1><strong>Choose Game Preference</strong></h1>
             <br></br>
             <div>
               {!this.props.gameList &&
-                <div id="centerButtons" className="field is-grouped is-vcentered is-centered">
+                <div>
                   <p className="control">
                     <button className="button is-primary" id="neon" onClick={() => this.initiateGame()}>
                       Create a Game
-                    </button>
+                </button>
                   </p>
                   <p className="control">
                     <button className="button is-primary" id="neon" onClick={() => this.showJoinPage()}>
