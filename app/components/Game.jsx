@@ -181,7 +181,7 @@ class Game extends Component {
 
   componentWillUnmount() {
     const user = this.props.user.userId;
-    database.ref('games/' + this.props.user.gameId + '/playersInGame').remove();
+    database.ref('games/' + this.props.user.gameId + '/playersInGame' + user).remove();
     database.ref('playerPosition/' + user).remove();
     database.ref(user).remove();
     audio0.pause();
