@@ -13,6 +13,7 @@ const database = firebase.database();
 const objects = [];
 const thisPlayer = '';
 const playersInGame = {};
+// OB/JL: maybe wrap all this up into an object called babylonState
 let sceneNum = 1;
 let torus;
 let winPos;
@@ -29,9 +30,10 @@ class Game extends Component {
     super(props);
   }
 
+  // OB/JL: split it up! it's too big to not fail!
   componentDidMount() {
     audio0.play();
-    const user = this.props.user.userId;
+    const user = this.props.user.userId; // OB/JL: maybe name this userId
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
     let num = sceneNum;
@@ -39,8 +41,9 @@ class Game extends Component {
     database.ref('winPosition').set({ x: 10, z: 10 });
     this.createWinPoint();
     database.ref('winPosition').on('value', (position) => {
-      winPos = position.val();
+      winPos = position.val(); // OB/JL: couldn't this be a setState
     });
+    // OB/JL: name this as a function called "generateWinner" or something
     database.ref('players/winner').on('value', (winner) => {
       if (winner.val()) {
         if (user === winner.val()) {
@@ -64,6 +67,7 @@ class Game extends Component {
         database.ref('players/winner').remove();
       }
     });
+    // OB/JL: maybe only listen for child_added
     database.ref('players').on('value', (players) => {
       const playersObj = players.val();
       for (const playerId in playersObj) {
@@ -86,6 +90,7 @@ class Game extends Component {
               }
             });
           }
+          // OB/JL: camera stuff could be its own function
           const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene);
           if (playerId === user) {
             const playerDummy = this.createCameraObj(scene, newPlayer);
@@ -108,6 +113,7 @@ class Game extends Component {
           playersInGame[playerId] = true;
         }
       }
+      // OB/JL: put this into a child_removed (?) listener
       for (let i = 0; i < objects.length; i++) {
         if (playersObj[objects[i].id].remove) {
           objects[i].dispose();
@@ -115,7 +121,7 @@ class Game extends Component {
       }
     });
     database.ref('players/' + user).set({ 'created': true, 'score': 0, 'remove': false });
-
+    // OB/JL: consider putting bablyon stuff into its own module and here, you'd just do e.g. `babylonEngine.init(canvasElement)`
     engine.runRenderLoop(() => {
       if ((torus.position.x !== winPos.x) || (torus.position.z !== winPos.z)) {
         torus.position.x = winPos.x;
@@ -182,6 +188,8 @@ class Game extends Component {
     database.ref('playerPosition/' + user).remove();
     database.ref(user).remove();
     audio0.pause();
+    // OB/JL: don't forget to clean up all your listeners
+    // OB/JL: shouldn't this stop the engine?
   }
 
   createPlayerOnConnect(sce, id) {
@@ -197,6 +205,7 @@ class Game extends Component {
     return player;
   }
 
+  // OB/JL: nicecly wrapped up
   setPosition(sphere, x, y, z) {
     sphere.position.x = x;
     sphere.position.y = y;
@@ -232,6 +241,7 @@ class Game extends Component {
     torus.position.x = 10;
     torus.position.z = 10;
   }
+  // OB/JL: dead code
   makeId() {
     let text = '';
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
