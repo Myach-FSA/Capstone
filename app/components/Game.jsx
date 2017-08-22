@@ -200,6 +200,11 @@ class Game extends Component {
     const balls = ['/assets/textures/grayball-choose.png', '/assets/textures/netball-choose.png', '/assets/textures/students/alvin.png', '/assets/textures/students/andrew.png',
       '/assets/textures/students/denys.png', '/assets/textures/students/evan.png', '/assets/textures/students/snow.png', '/assets/textures/students/won_jun.png'];
     const ballId = this.props.user.ball;
+<<<<<<< HEAD
+=======
+    console.log('This is the ballid', ballId);
+    console.log('img', balls[ballId]);
+>>>>>>> 15bf45d29f13f3856fb9f4ac2c1d8c1655f8214d
     const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); // Params: name, subdivs, size, scene
     player.checkCollisions = true;
     const ballMaterial = new BABYLON.StandardMaterial('material', sce);
@@ -251,11 +256,16 @@ class Game extends Component {
   }
 
   render() {
+    console.log(this.props.user);
     return (
       <div>
+<<<<<<< HEAD
         <WinScreen user={this.props.user} />
+=======
+        {/* <WinScreen user={this.props.user}/> */}
+>>>>>>> 15bf45d29f13f3856fb9f4ac2c1d8c1655f8214d
         <InfoScreen />
-        <ScoreTable />
+        <ScoreTable gameId={this.props.user.gameId}/>
         <canvas className='gameDisplay ' ref="renderCanvas"></canvas>
       </div>
     );
