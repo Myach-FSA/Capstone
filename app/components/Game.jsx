@@ -37,34 +37,7 @@ class Game extends Component {
     const engine = new BABYLON.Engine(canvas, true);
     let num = sceneNum;
     let scene = createScene1(canvas, engine);
-    database.ref('winPosition').set({ x: 10, z: 10 });
-    this.createWinPoint();
-    database.ref('winPosition').on('value', (position) => {
-      winPos = position.val();
-    });
-    database.ref('players/winner').on('value', (winner) => {
-      if (winner.val()) {
-        if (user === winner.val()) {
-          database.ref('users/' + user + '/wins').transaction((wins) => {
-            wins += 1;
-            return wins;
-          });
-        } else {
-          database.ref('users/' + user + '/losses').transaction((losses) => {
-            losses += 1;
-            return losses;
-          });
-        }
-        const myScore = this.props.user.totalScore;
-        database.ref('users/' + user + '/totalScore').transaction((score) => {
-          score += myScore;
-          return score;
-        });
-        this.props.changeScore(-myScore);
-        database.ref('players/' + user).update({ 'score': 0 });
-        database.ref('players/winner').remove();
-      }
-    });
+
     database.ref('games/' + gameId + '/playersInGame').on('value', (players) => {
       const playersObj = players.val();
       for (const playerId in playersObj) {
@@ -116,6 +89,36 @@ class Game extends Component {
       }
     });
 
+    database.ref('games/' + gameId).update({'winPosition': { x: 10, z: 10 }});
+    this.createWinPoint();
+    database.ref('games/' + gameId + '/winPosition').on('value', (position) => {
+      winPos = position.val();
+    });
+
+    database.ref('games/'+gameId+ '/playersInGame/winner').on('value', (winner) => {
+      if (winner.val()) {
+        if (user === winner.val()) {
+          database.ref('users/' + user + '/wins').transaction((wins) => {
+            wins += 1;
+            return wins;
+          });
+        } else {
+          database.ref('users/' + user + '/losses').transaction((losses) => {
+            losses += 1;
+            return losses;
+          });
+        }
+        const myScore = this.props.user.totalScore;
+        database.ref('users/' + user + '/totalScore').transaction((score) => {
+          score += myScore;
+          return score;
+        });
+        this.props.changeScore(-myScore);
+        database.ref('games/'+gameId+ '/playersInGame/' + user).update({ 'score': 0 });
+        database.ref('games/'+gameId+ '/playersInGame/winner').remove();
+      }
+    });
+
     engine.runRenderLoop(() => {
       if ((torus.position.x !== winPos.x) || (torus.position.z !== winPos.z)) {
         torus.position.x = winPos.x;
@@ -131,7 +134,6 @@ class Game extends Component {
         }
         setTimeout(scene.render(), 500);
         playersInGame.scene = true;
-        database.ref('players/' + user).push({ id: 'test' });
         playersInGame.scene = false;
       } else {
         const me = objects.filter(player => player.id === user)[0];
@@ -141,25 +143,25 @@ class Game extends Component {
           me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
           xAcceleration = 0;
           zAcceleration = 0;
-          database.ref('players/' + user + '/score').transaction((score) => {
+          database.ref('games/'+gameId+ '/playersInGame/' + user + '/score').transaction((score) => {
             this.props.changeScore(-1);
             score -= 1;
             return score;
           });
         }
         if (me && (Math.floor(me.absolutePosition.x) === winPos.x) && (Math.floor(me.absolutePosition.z) === winPos.z)) {
-          database.ref('players/' + user + '/score').transaction((score) => {
+          database.ref('games/'+gameId+ '/playersInGame/' + user + '/score').transaction((score) => {
             this.props.changeScore(1);
             score += 1;
             if (score >= 10) {
-              database.ref('/players').update({ 'winner': user });
+              database.ref('games/'+gameId+ '/playersInGame/').update({ 'winner': user });
               score = 0;
             }
             return score;
           });
           const x = Math.floor(Math.random() * 50 - 25);
           const z = Math.floor(Math.random() * 50 - 25);
-          database.ref('winPosition').set({ 'x': x, 'z': z });
+          database.ref('games/' + gameId + '/winPosition').set({ 'x': x, 'z': z });
         }
         scene.render();
       }
@@ -170,7 +172,7 @@ class Game extends Component {
     });
     window.addEventListener('beforeunload', () => {
       database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true });
-      database.ref('games/' + gameId + '/playersInGame').remove();
+      database.ref('games/' + gameId + '/playersInGame/' + user).remove();
       database.ref('playerPosition/' + user).remove();
       database.ref(user).remove();
     });
@@ -178,7 +180,7 @@ class Game extends Component {
 
   componentWillUnmount() {
     const user = this.props.user.userId;
-    database.ref('games/' + this.props.user.gameId + '/playersInGame').remove();
+    database.ref('games/' + this.props.user.gameId + '/playersInGame' + user).remove();
     database.ref('playerPosition/' + user).remove();
     database.ref(user).remove();
     audio0.pause();
