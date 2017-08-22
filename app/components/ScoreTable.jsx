@@ -4,32 +4,31 @@ import firebase from '../../fire';
 const database = firebase.database();
 
 class ScoreTable extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+    console.log('props', props);
     this.state={
       children: []
     };
   }
   componentWillMount() {
     database.ref('users/').on('child_added', child => {
-      console.log(child.val());
       const children=this.state.children;
       children.push(child.val());
       this.setState({children: children});
       database.ref('users/'+child.val().userId).on('value', snapshot => {
-        console.log('snapshot val', snapshot.val().userId);
-        // this.state.children.findIndex(element => {
-        //   element.userId===snapshot.val().userId;
-        // });
-        // for (let i=0; i<this.state.children.length; i++) {
-
-        // }
+        const index=this.state.children.findIndex(element => element.userId===snapshot.val().userId);
+        children[index]=snapshot.val();
+        this.setState({children: children});
       });
     });
   }
   componentWillUnmount() {
     database.ref('users/').off();
   }
+  // shouldComponentUpdate(nextProps) {
+  //   const different = this.state.children;
+  // }
   render() {
     return (
       <div id="ScoreTable" className="scoreTable invisible has-text-centered">
@@ -45,14 +44,16 @@ class ScoreTable extends React.Component {
           </thead>
           <tbody>
             {this.state.children.map(child => {
-              console.log(child.username);
-              return (
-              <tr key={child.username}>
+              console.log('gameId', this.props.gameId);
+              if (child.gameId===this.props.gameId) {
+                return (
+              <tr key={child.userId}>
                 <th>{child.username}</th>
                 <th>{child.wins}</th>
                 <th>{child.losses}</th>
                 <th>{child.totalScore}</th>
               </tr>);
+              }
             }
             )}
           </tbody>

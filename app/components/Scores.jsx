@@ -12,10 +12,14 @@ class Scores extends React.Component {
   }
   componentWillMount() {
     database.ref('users/').on('child_added', child => {
-      console.log(child.val());
       const children=this.state.children;
       children.push(child.val());
       this.setState({children: children});
+      database.ref('users/'+child.val().userId).on('value', snapshot => {
+        const index=this.state.children.findIndex(element => element.userId===snapshot.val().userId);
+        children[index]=snapshot.val();
+        this.setState({children: children});
+      });
     });
   }
   componentWillUnmount() {
@@ -38,7 +42,7 @@ class Scores extends React.Component {
             {this.state.children.map(child => {
               console.log(child.username);
               return (
-              <tr key={child.username}>
+              <tr key={child.userId}>
                 <th>{child.username}</th>
                 <th>{child.wins}</th>
                 <th>{child.losses}</th>
