@@ -117,8 +117,7 @@ a {
 }
 
 #playnow {
-  background-color: #1CA8DD
-  padding-bottom: 2%;
+  background-color: #1CA8DD padding-bottom: 2%;
 }
 
 a.halflink:hover {
@@ -156,38 +155,38 @@ a.halflink:hover {
 
 .infoScreen {
   position: absolute;
-    top: 73%;
-    left: 4%;
-    width: 15vw;
-    height: 20vh;
-    background-color: rgba(0, 0, 0, 0.48);
-    border: 2px solid #00a9b2;
-    border-radius: 10px;
-    color: #00a9b2;
-    font-size: 2vh;
-    box-shadow: 0 0 100px 2px rgb(18, 156, 132);
+  top: 73%;
+  left: 4%;
+  width: 15vw;
+  height: 20vh;
+  background-color: rgba(0, 0, 0, 0.48);
+  border: 2px solid #00a9b2;
+  border-radius: 10px;
+  color: #00a9b2;
+  font-size: 2vh;
+  box-shadow: 0 0 100px 2px rgb(18, 156, 132);
 }
 
 .scoreTable {
   position: absolute;
-    top: 15vh;
-    left: 15vw;
-    width: 70vw;
-    height: 70vh;
-    background-color: rgba(0, 0, 0, 0.48);
-    border: 2px solid #00a9b2;
-    border-radius: 10px;
-    color: #00a9b2;
-    font-size: 2vh;
-    box-shadow: 0 0 100px 2px rgb(18, 156, 132);
+  top: 15vh;
+  left: 15vw;
+  width: 70vw;
+  height: 70vh;
+  background-color: rgba(0, 0, 0, 0.48);
+  border: 2px solid #00a9b2;
+  border-radius: 10px;
+  color: #00a9b2;
+  font-size: 2vh;
+  box-shadow: 0 0 100px 2px rgb(18, 156, 132);
 }
 
 .visible {
-   visibility: visible !important;
+  visibility: visible !important;
 }
 
 .invisible {
-   visibility: hidden !important;
+  visibility: hidden !important;
 }
 
 .fullbutton {
@@ -217,4 +216,12 @@ body {
 
 #choose {
   margin: 10% 10%;
+}
+
+.winScreen {
+  position: absolute;
+  top: 10vh;
+  left: 15vw;
+  height: 80vh;
+  width: 65vw;
 }
