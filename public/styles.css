@@ -41,8 +41,6 @@
 
 .content {
   padding-top: 2%;
-  padding-left: 5%;
-  padding-right: 5%;
 }
 
 body {
@@ -69,6 +67,8 @@ body {
   background-color: #191b21;
   border-style: dashed;
   border-color: #1BC98E;
+  margin-left: 5%;
+  margin-right: 5%;
 }
 
 #neon {
@@ -118,6 +118,8 @@ a {
 
 #playnow {
   background-color: #1CA8DD padding-bottom: 2%;
+  background-color: #1CA8DD;
+  padding-bottom: 2%;
 }
 
 a.halflink:hover {
@@ -224,4 +226,7 @@ body {
   left: 15vw;
   height: 80vh;
   width: 65vw;
+}
+.space {
+  padding-top: 10%;
 }
