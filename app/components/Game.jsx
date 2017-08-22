@@ -7,7 +7,7 @@ import createScene2 from './Scene2';
 import InfoScreen from './InfoScreen';
 const auth = firebase.auth();
 import ScoreTable from './ScoreTable';
-// import Chat from '../../demos/chat'
+import WinScreen from './WinScreen';
 
 const database = firebase.database();
 const objects = [];
@@ -236,6 +236,7 @@ class Game extends Component {
   render() {
     return (
       <div>
+        <WinScreen user={this.props.user}/>
         <InfoScreen />
         <ScoreTable />
         <canvas className='gameDisplay ' ref="renderCanvas"></canvas>

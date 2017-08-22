@@ -16,10 +16,14 @@ class ScoreTable extends React.Component {
       const children=this.state.children;
       children.push(child.val());
       this.setState({children: children});
-      database.ref('users/'+child.val().userId).on('child_changed', snapshot => {
-        for (let i=0; i<this.state.children; i++) {
+      database.ref('users/'+child.val().userId).on('value', snapshot => {
+        console.log('snapshot val', snapshot.val().userId);
+        // this.state.children.findIndex(element => {
+        //   element.userId===snapshot.val().userId;
+        // });
+        // for (let i=0; i<this.state.children.length; i++) {
 
-        }
+        // }
       });
     });
   }
