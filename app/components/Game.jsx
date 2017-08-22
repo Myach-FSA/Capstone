@@ -95,7 +95,7 @@ class Game extends Component {
       winPos = position.val();
     });
 
-    database.ref('players/winner').on('value', (winner) => {
+    database.ref('games/'+gameId+ '/playersInGame/winner').on('value', (winner) => {
       if (winner.val()) {
         if (user === winner.val()) {
           database.ref('users/' + user + '/wins').transaction((wins) => {
@@ -114,8 +114,8 @@ class Game extends Component {
           return score;
         });
         this.props.changeScore(-myScore);
-        database.ref('players/' + user).update({ 'score': 0 });
-        database.ref('players/winner').remove();
+        database.ref('games/'+gameId+ '/playersInGame/' + user).update({ 'score': 0 });
+        database.ref('games/'+gameId+ '/playersInGame/winner').remove();
       }
     });
 
@@ -134,7 +134,6 @@ class Game extends Component {
         }
         setTimeout(scene.render(), 500);
         playersInGame.scene = true;
-        database.ref('players/' + user).push({ id: 'test' });
         playersInGame.scene = false;
       } else {
         const me = objects.filter(player => player.id === user)[0];
@@ -144,18 +143,18 @@ class Game extends Component {
           me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
           xAcceleration = 0;
           zAcceleration = 0;
-          database.ref('players/' + user + '/score').transaction((score) => {
+          database.ref('games/'+gameId+ '/playersInGame/' + user + '/score').transaction((score) => {
             this.props.changeScore(-1);
             score -= 1;
             return score;
           });
         }
         if (me && (Math.floor(me.absolutePosition.x) === winPos.x) && (Math.floor(me.absolutePosition.z) === winPos.z)) {
-          database.ref('players/' + user + '/score').transaction((score) => {
+          database.ref('games/'+gameId+ '/playersInGame/' + user + '/score').transaction((score) => {
             this.props.changeScore(1);
             score += 1;
             if (score >= 10) {
-              database.ref('/players').update({ 'winner': user });
+              database.ref('games/'+gameId+ '/playersInGame/').update({ 'winner': user });
               score = 0;
             }
             return score;
