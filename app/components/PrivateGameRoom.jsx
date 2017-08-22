@@ -7,7 +7,6 @@ import SceneList from './SceneList';
 import ChooseBall from './ChooseBall';
 import { submitName } from '../reducers/auth';
 
-
 class GameWaitRoom extends React.Component {
   constructor() {
     super();
@@ -24,17 +23,11 @@ class GameWaitRoom extends React.Component {
     userRef.once('value', (snapshot) => {
       var a = snapshot.exists();
       if (!a) {
-        firebase.database().ref('games/' + user.gameId).set({ playersInGame: { [this.props.user.userId]: { 'created': true, 'score': 0, 'remove': false } } });
+        firebase.database().ref('games/' + user.gameId).set({ playersInGame: { [this.props.user.userId]: { 'score': 0, 'remove': false } } });
       } else {
-        firebase.database().ref('games/' + user.gameId + '/playersInGame/' + this.props.user.userId).set({ 'created': true, 'score': 0, 'remove': false });
-        
-        // this.setState({ isAdmin: false })
-        // this.setState({ numberOfPlayers: this.state.numberOfPlayers + 1 })
-        // let children = snapshot.val().playersInGame
-        // children = children.concat(this.props.user.userId)
-        // firebase.database().ref('games/' + user.gameId + '/playersInGame/').set(children);
+        firebase.database().ref('games/' + user.gameId + '/playersInGame/' + this.props.user.userId).set({ 'score': 0, 'remove': false });
       }
-    });    
+    });
     this.getPlayers(user.gameId, true);
   }
 
@@ -43,7 +36,7 @@ class GameWaitRoom extends React.Component {
   }
 
   submitUserName(evt) {
-    evt.preventDefault()
+    evt.preventDefault();
     const name = document.getElementById('nickname').value;
     this.props.submitName(name);
   }

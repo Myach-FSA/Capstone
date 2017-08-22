@@ -1,39 +1,39 @@
 import React from 'react';
 import ReactDOM, { render } from 'react-dom';
-import { Link, NavLink, Router } from 'react-router-dom'
+import { Link, NavLink, Router } from 'react-router-dom';
 import Firebase from 'firebase';
 
 const balls = [
   { name: 'Heavy Duty', description: 'Ball fashioned by the vikings themselves.', img: '/assets/textures/grayball-choose.png' },
-  { name: 'Sleuth', description: "You like things that move with the grace of a cheetah.", img: '/assets/textures/netball-choose.png' },  
-]
+  { name: 'Sleuth', description: "You like things that move with the grace of a cheetah.", img: '/assets/textures/netball-choose.png' }
+];
 
 class ChooseBall extends React.Component {
   constructor(props) {
-    super(props)
-    this.ballChoice = this.ballChoice.bind(this)
+    super(props);
+    this.ballChoice = this.ballChoice.bind(this);
   }
 
-  shouldComponentUpdate(nextProps){
+  shouldComponentUpdate(nextProps) {
     const differentBallId = this.props.user.ball !== nextProps.ball;
-    return differentBallId
+    return differentBallId;
   }
 
   ballChoice(evt) {
-    this.props.chooseBall(+evt.target.id)
-    this.sendDataToFB()
+    this.props.chooseBall(+evt.target.id);
+    this.sendDataToFB();
   }
 
   sendDataToFB() {
     const user = this.props.user;
-    const ref = firebase.database().ref("users/"+user.userId)
-    ref.set(user)
+    const ref = firebase.database().ref('users/'+user.userId);
+    ref.set(user);
   }
 
   render() {
-    const playerName = this.props.user.username && this.props.user.username ? this.props.user.username : 'Anonymous'
-    const chosenBall = balls[this.props.user.ball]
-    const ballMessage = chosenBall ? `You have chosen ${chosenBall.name}` : 'You have not yet chosen a ball'
+    const playerName = this.props.user.username && this.props.user.username ? this.props.user.username : 'Anonymous';
+    const chosenBall = balls[this.props.user.ball];
+    const ballMessage = chosenBall ? `You have chosen ${chosenBall.name}` : 'You have not yet chosen a ball';
 
     return (
           <div id="choose" className="notification has-text-centered">
@@ -68,14 +68,14 @@ class ChooseBall extends React.Component {
 
 // /* -----------------    CONTAINER     ------------------ */
 
-import { chooseBall } from '../reducers/auth'
-import { connect } from 'react-redux'
+import { chooseBall } from '../reducers/auth';
+import { connect } from 'react-redux';
 import store from '../store';
 
 const mapStateToProps = (state) => ({
   user: state.auth.user
-})
+});
 
-const mapDispatch = ({ chooseBall })
+const mapDispatch = ({ chooseBall });
 
-export default connect(mapStateToProps, mapDispatch)(ChooseBall)
+export default connect(mapStateToProps, mapDispatch)(ChooseBall);
