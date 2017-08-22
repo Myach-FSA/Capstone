@@ -172,14 +172,8 @@ class Game extends Component {
     });
     window.addEventListener('beforeunload', () => {
       database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true });
-      database.ref('games/' + gameId + '/playersInGame/' + user).remove().then(() => {
-        database.ref('games/' + gameId).once('value').then(allPlayers => {
-          allPlayers = allPlayers.val();
-          if (!allPlayers.playersInGame) {
-            database.ref('games/' + gameId).remove();
-          }
-        });
-      });
+      //Need to find a way to call promises to remove one user and check for remainder before removing parent node
+      database.ref('games/' + gameId).remove();
       database.ref('playerPosition/' + user).remove();
       database.ref(user).remove();
     });
