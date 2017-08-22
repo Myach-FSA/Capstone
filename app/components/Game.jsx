@@ -222,7 +222,7 @@ class Game extends Component {
   createCameraObj(scene, par) {
     const head = BABYLON.MeshBuilder.CreateSphere('camera', 16, scene);
     const headMaterial = new BABYLON.StandardMaterial('material', scene);
-    const headTexture = new BABYLON.Texture('./assets/textures/net.png', scene);
+    const headTexture = new BABYLON.Texture('/assets/textures/net.png', scene);
     headMaterial.diffuseTexture = headTexture;
     headMaterial.diffuseColor = new BABYLON.Color3(2.0, 1, 0.7);
     headMaterial.diffuseTexture.hasAlpha = true;
