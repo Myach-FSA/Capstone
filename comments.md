@@ -1,0 +1,7 @@
+- Use issues
+- Commit message: sync up on how you want to do it
+- Put deps in package.json and node_modules (e.g. babylon and cannon) and import them somewhere in main.jsx
+- Here's what you should do with dead code: 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+- Delete demos folder (dead code)
+- Maybe ditch redux if it's getting in the way
+- Tests?!

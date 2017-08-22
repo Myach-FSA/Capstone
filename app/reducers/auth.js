@@ -2,6 +2,7 @@ import axios from 'axios';
 import firebase from 'firebase';
 import store from '.././store.js';
 
+// OB/JL: consider flattening this to just an object, no `user` key
 const initialState = {
   user: {}
 };

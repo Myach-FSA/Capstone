@@ -3,6 +3,7 @@ import ReactDOM, { render } from 'react-dom';
 import { Link, NavLink, Router } from 'react-router-dom'
 import Firebase from 'firebase';
 
+// OB/JL: watch out for relative paths in client side!
 const balls = [
   { name: 'Heavy Duty', description: 'Ball fashioned by the vikings themselves.', img: './assets/textures/grayball-choose.png' },
   { name: 'Sleuth', description: "You like things that move with the grace of a cheetah.", img: './assets/textures/netball-choose.png' },  
@@ -11,6 +12,7 @@ const balls = [
 class ChooseBall extends React.Component {
   constructor(props) {
     super(props)
+    // OB/JL: consider arrow function class syntax
     this.ballChoice = this.ballChoice.bind(this)
   }
 
@@ -20,6 +22,7 @@ class ChooseBall extends React.Component {
   }
 
   ballChoice(evt) {
+    // OB/JL: consider putting the send-to-firebase logic into chooseBall
     this.props.chooseBall(+evt.target.id)
     this.sendDataToFB()
   }

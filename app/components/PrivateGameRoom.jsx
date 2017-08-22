@@ -30,10 +30,12 @@ class GameWaitRoom extends React.Component {
         this.setState({ numberOfPlayers: players.val()[gameId].playersInGame.length });
       });
     } else {
+      // OB/JL: maybe move this into its own function or just into the componentWillUnmount directly
       firebase.database().ref('games').off();
     }
   }
 
+  // OB/JL: consider renaming to `togglePublic`
   security = () => {
     this.setState({ publicGame: !this.state.publicGame });
   }
@@ -46,7 +48,7 @@ class GameWaitRoom extends React.Component {
   }
 
   render() {
-    const numPlayer = 1;
+    const numPlayer = 1; // OB/JL: dead code
     return (
       <div>
         <div className="content has-text-centered">
@@ -71,7 +73,7 @@ class GameWaitRoom extends React.Component {
             type="submit"
             title="publicPrivate"
             onClick={() => { this.security(); }}>
-            {this.state.publicGame &&
+            {this.state.publicGame && // OB/JL: consider ternary
             <i className="fa fa-unlock"> Public</i>
             }
             {!this.state.publicGame &&
