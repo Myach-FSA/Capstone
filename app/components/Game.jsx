@@ -124,10 +124,10 @@ class Game extends Component {
       if (!scene || (sceneNum !== num)) {
         num = sceneNum;
         switch (num) {
-          case 2:
-            scene = createScene2(canvas, engine);
-            break;
-          default: scene = createScene1(canvas, engine);
+        case 2:
+          scene = createScene2(canvas, engine);
+          break;
+        default: scene = createScene1(canvas, engine);
         }
         setTimeout(scene.render(), 500);
         playersInGame.scene = true;
@@ -256,7 +256,7 @@ class Game extends Component {
 function control(user) {
   const keyState = {};
 
-  window.onkeydown = function (e) {
+  window.onkeydown = function(e) {
     if (e.keyCode === 9) {
       e.preventDefault();
       document.getElementById('ScoreTable').className = 'scoreTable visible has-text-centered';
@@ -264,20 +264,20 @@ function control(user) {
     }
   };
 
-  window.onkeyup = function (e) {
+  window.onkeyup = function(e) {
     if (e.keyCode === 9) {
       document.getElementById('ScoreTable').className = 'scoreTable invisible has-text-centered';
       document.getElementById('InfoScreen').className = 'infoScreen visible has-text-centered';
     }
   };
 
-  window.addEventListener('keydown', function (e) {
+  window.addEventListener('keydown', function(e) {
     keyState[e.keyCode || e.which] = true;
     if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
       e.preventDefault();
     }
   }, true);
-  window.addEventListener('keyup', function (e) {
+  window.addEventListener('keyup', function(e) {
     keyState[e.keyCode || e.which] = false;
   }, true);
 

@@ -4,9 +4,29 @@ import firebase from '../../fire';
 const database = firebase.database();
 
 class ScoreTable extends React.Component {
+  constructor() {
+    super();
+    this.state={
+      children: []
+    };
+  }
+  componentWillMount() {
+    database.ref('users/').on('child_added', child => {
+      console.log(child.val());
+      const children=this.state.children;
+      children.push(child.val());
+      this.setState({children: children});
+      database.ref('users/'+child.val().userId).on('child_changed', snapshot => {
+        for (let i=0; i<this.state.children; i++) {
+
+        }
+      });
+    });
+  }
+  componentWillUnmount() {
+    database.ref('users/').off();
+  }
   render() {
-    const { user } = this.props;
-    console.log(this.props);
     return (
       <div id="ScoreTable" className="scoreTable invisible has-text-centered">
         <h1>Scores</h1>
@@ -20,44 +40,22 @@ class ScoreTable extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {database.ref('users/').on('value', users => {
-              for (const userId in users.val()) {
-                console.log('user id', userId);
-                database.ref('users/' + userId).on('value', user => {
-                  console.log('user', userId, user.val().wins, user.val().losses, user.val().totalScore);
-                  return (
-                  <tr>
-                    <th>{userId}</th>
-                    <td>{user.val().wins}</td>
-                    <td>{user.val().losses}</td>
-                    <td>{user.val().totalScore}</td>
-                  </tr>);
-                });
-              }
-            })
+            {this.state.children.map(child => {
+              console.log(child.username);
+              return (
+              <tr key={child.username}>
+                <th>{child.username}</th>
+                <th>{child.wins}</th>
+                <th>{child.losses}</th>
+                <th>{child.totalScore}</th>
+              </tr>);
             }
-            {/* <tr>
-              <th>1</th>
-              <td><a href="https://en.wikipedia.org/wiki/Leicester_City_F.C." title="Leicester City F.C.">Leicester City</a> <strong>(C)</strong>
-              </td>
-              <td>38</td>
-              <td>23</td>
-              <td>12</td>
-              <td>3</td>
-            </tr>
-            <tr>
-              <th>2</th>
-              <td><a href="https://en.wikipedia.org/wiki/Arsenal_F.C." title="Arsenal F.C.">Arsenal</a></td>
-              <td>38</td>
-              <td>20</td>
-              <td>11</td>
-              <td>7</td>
-            </tr> */}
+            )}
           </tbody>
         </table>
       </div>
     );
-  }
+  };
 };
 
 // /* -----------------    CONTAINER     ------------------ */
