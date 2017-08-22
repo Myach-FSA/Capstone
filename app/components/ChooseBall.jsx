@@ -5,7 +5,13 @@ import Firebase from 'firebase';
 
 const balls = [
   { name: 'Heavy Duty', description: 'Ball fashioned by the vikings themselves.', img: '/assets/textures/grayball-choose.png' },
-  { name: 'Sleuth', description: "You like things that move with the grace of a cheetah.", img: '/assets/textures/netball-choose.png' }
+  { name: 'Sleuth', description: "You like things that move with the grace of a cheetah.", img: '/assets/textures/netball-choose.png' },
+  { name: 'Alvin', description: "You like things that move with the grace of a cheetah.", img: '/assets/textures/students/alvin.png' },
+  { name: 'Andrew', description: "You like things that move with the grace of a cheetah.", img: '/assets/textures/students/andrew.png' },
+  { name: 'Denys', description: "You like things that move with the grace of a cheetah.", img: '/assets/textures/students/denys.png' },
+  { name: 'Evan', description: "You like things that move with the grace of a cheetah.", img: '/assets/textures/students/evan.png' }, 
+  { name: 'Snow', description: "You like things that move with the grace of a cheetah.", img: '/assets/textures/students/snow.png' }, 
+  { name: 'Won Jun', description: "You like things that move with the grace of a cheetah.", img: '/assets/textures/students/won_jun.png' }, 
 ];
 
 class ChooseBall extends React.Component {
@@ -36,8 +42,8 @@ class ChooseBall extends React.Component {
     const ballMessage = chosenBall ? `You have chosen ${chosenBall.name}` : 'You have not yet chosen a ball';
 
     return (
-          <div id="choose" className="notification has-text-centered">
-            <h1><strong>Choose Your Ball</strong></h1>
+        <div className="content has-text-centered notification">
+          <h1><strong>Choose Your Ball</strong></h1>
             <h5><strong>{ballMessage}</strong></h5>
             <div className="horiz-marg">
               <div className="columns is-multiline">
