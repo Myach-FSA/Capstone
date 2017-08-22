@@ -11,7 +11,6 @@ class GameWaitRoom extends React.Component {
             <h3>Waiting on Players</h3>
             <h5>Current number of connected players: {numPlayer}</h5>
             <Link to={`/game`}><button className="button is-info" type="submit" title="playbutton">Play Now!</button></Link>
-              {/* <Link to={`/game`}>Play Now!</Link> */}
           </div>
         </div>
     );
