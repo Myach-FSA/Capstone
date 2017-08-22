@@ -32,6 +32,7 @@ class Game extends Component {
   componentDidMount() {
     audio0.play();
     const user = this.props.user.userId;
+    const gameId = this.props.user.gameId;
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
     let num = sceneNum;
@@ -64,8 +65,11 @@ class Game extends Component {
         database.ref('players/winner').remove();
       }
     });
-    database.ref('players').on('value', (players) => {
+    //leave this line until create game component is fixed;
+    database.ref('games/' + gameId + '/playersInGame/' + user).set({ 'created': true, 'score': 0, 'remove': false });
+    database.ref('games/' + gameId + '/playersInGame').on('value', (players) => {
       const playersObj = players.val();
+      console.log(playersObj);
       for (const playerId in playersObj) {
         if (!playersInGame[playerId] || playersInGame.scene) {
           const newPlayer = this.createPlayerOnConnect(scene, playerId);
@@ -114,7 +118,6 @@ class Game extends Component {
         }
       }
     });
-    database.ref('players/' + user).set({ 'created': true, 'score': 0, 'remove': false });
 
     engine.runRenderLoop(() => {
       if ((torus.position.x !== winPos.x) || (torus.position.z !== winPos.z)) {
