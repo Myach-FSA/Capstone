@@ -4,8 +4,8 @@ import { Link, NavLink, Router } from 'react-router-dom'
 import Firebase from 'firebase';
 
 const balls = [
-  { name: 'Heavy Duty', description: 'Ball fashioned by the vikings themselves.', img: './assets/textures/grayball-choose.png' },
-  { name: 'Sleuth', description: "You like things that move with the grace of a cheetah.", img: './assets/textures/netball-choose.png' },  
+  { name: 'Heavy Duty', description: 'Ball fashioned by the vikings themselves.', img: '/assets/textures/grayball-choose.png' },
+  { name: 'Sleuth', description: "You like things that move with the grace of a cheetah.", img: '/assets/textures/netball-choose.png' },  
 ]
 
 class ChooseBall extends React.Component {
@@ -36,7 +36,7 @@ class ChooseBall extends React.Component {
     const ballMessage = chosenBall ? `You have chosen ${chosenBall.name}` : 'You have not yet chosen a ball'
 
     return (
-          <div id="choose" className="notification">
+          <div id="choose" className="notification has-text-centered">
             <h1><strong>Choose Your Ball</strong></h1>
             <h5><strong>{ballMessage}</strong></h5>
             <div className="horiz-marg">
