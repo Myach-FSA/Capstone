@@ -73,6 +73,13 @@ body {
 
 #neon {
   background-color: #1BC98E;
+  float: left;
+  position: relative;
+  left: 50%;   
+  width: 140px;
+  /* padding: 3px; */
+  /* margin: 4px; */
+  text-align: center;
 }
 
 .notification strong {
@@ -117,7 +124,8 @@ a {
 }
 
 #playnow {
-  background-color: #1CA8DD padding-bottom: 2%;
+  background-color: #1CA8DD;
+  padding-bottom: 2%;
   background-color: #1CA8DD;
   padding-bottom: 2%;
 }
@@ -229,4 +237,16 @@ body {
 }
 .space {
   padding-top: 10%;
+}
+
+#centerInput {
+  /* text-align: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center; */
+  justify-content: center;
+}
+
+#centerButtons {
+  justify-content: center;
 }
