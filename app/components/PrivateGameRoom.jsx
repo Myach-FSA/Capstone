@@ -19,7 +19,7 @@ class GameWaitRoom extends React.Component {
   componentDidMount() {
     const user = this.props.user;
 
-    var userRef = firebase.database().ref('games/' + user.gameId);
+    const userRef = firebase.database().ref('games/' + user.gameId);
     userRef.once('value', (snapshot) => {
       var a = snapshot.exists();
       if (!a) {
@@ -32,7 +32,7 @@ class GameWaitRoom extends React.Component {
   }
 
   componentWillUnmount() {
-    this.getPlayers(this.props.user.gameId, false);
+    firebase.database().ref('games').off();
   }
 
   submitUserName(evt) {
@@ -44,10 +44,10 @@ class GameWaitRoom extends React.Component {
   getPlayers = (gameId, bool) => {
     if (bool) {
       firebase.database().ref('games').on('value', players => {
-        this.setState({ numberOfPlayers: players.val()[gameId].playersInGame.length });
+        if (players.val()[gameId]) {
+          this.setState({ numberOfPlayers: Object.keys(players.val()[gameId].playersInGame).length });
+        }
       });
-    } else {
-      firebase.database().ref('games').off();
     }
   }
 
@@ -64,18 +64,18 @@ class GameWaitRoom extends React.Component {
 
   render() {
     return (
-        <div className='space'>
-          <div className="field has-addons">
-            <h1><strong>Enter Username</strong></h1>
-            <p className="control">
-              <input id='nickname' className="input" type="text" placeholder="Nickname" />
-            </p>
-            <p className="control">
-              <button className="button is-success" onClick={(evt) => this.submitUserName(evt)}>
-                Submit
+      <div className='space'>
+        <div className="field has-addons">
+          <h1><strong>Enter Username</strong></h1>
+          <p className="control">
+            <input id='nickname' className="input" type="text" placeholder="Nickname" />
+          </p>
+          <p className="control">
+            <button className="button is-success" onClick={(evt) => this.submitUserName(evt)}>
+              Submit
               </button>
-            </p>
-          </div>
+          </p>
+        </div>
         {this.state.isAdmin && (
           <div className="has-text-centered">
             <div className="notification">
@@ -127,6 +127,6 @@ const mapStateToProps = (state) => ({
   user: state.auth.user
 });
 
-const mapDispatch= ({ submitName });
+const mapDispatch = ({ submitName });
 
 export default connect(mapStateToProps, mapDispatch)(GameWaitRoom);
