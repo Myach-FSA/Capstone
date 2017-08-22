@@ -40,7 +40,6 @@ class GameType extends React.Component {
     this.gameId = num;
     this.props.chooseGame(num);
     this.props.history.push(`/game/${num}/private`);
-    // document.getElementById('gameID').value = num;
   }
 
   sendDataToFB() {

@@ -32,6 +32,7 @@ class Game extends Component {
   componentDidMount() {
     audio0.play();
     const user = this.props.user.userId;
+    const gameId = this.props.user.gameId;
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
     let num = sceneNum;
@@ -64,7 +65,7 @@ class Game extends Component {
         database.ref('players/winner').remove();
       }
     });
-    database.ref('players').on('value', (players) => {
+    database.ref('games/' + gameId + '/playersInGame').on('value', (players) => {
       const playersObj = players.val();
       for (const playerId in playersObj) {
         if (!playersInGame[playerId] || playersInGame.scene) {
@@ -114,7 +115,6 @@ class Game extends Component {
         }
       }
     });
-    database.ref('players/' + user).set({ 'created': true, 'score': 0, 'remove': false });
 
     engine.runRenderLoop(() => {
       if ((torus.position.x !== winPos.x) || (torus.position.z !== winPos.z)) {
@@ -169,8 +169,8 @@ class Game extends Component {
       engine.resize();
     });
     window.addEventListener('beforeunload', () => {
-      database.ref('players/' + user).update({ remove: true });
-      database.ref('players/' + user).remove();
+      database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true });
+      database.ref('games/' + gameId + '/playersInGame').remove();
       database.ref('playerPosition/' + user).remove();
       database.ref(user).remove();
     });
@@ -178,7 +178,7 @@ class Game extends Component {
 
   componentWillUnmount() {
     const user = this.props.user.userId;
-    database.ref('players/' + user).remove();
+    database.ref('games/' + this.props.user.gameId + '/playersInGame').remove();
     database.ref('playerPosition/' + user).remove();
     database.ref(user).remove();
     audio0.pause();
@@ -231,15 +231,6 @@ class Game extends Component {
     torus = BABYLON.Mesh.CreateTorus('torus', 2, 0.5, 10, scene);
     torus.position.x = 10;
     torus.position.z = 10;
-  }
-  makeId() {
-    let text = '';
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-    for (let i = 0; i < 8; i++) {
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
   }
 
   render() {
