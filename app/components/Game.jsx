@@ -65,11 +65,8 @@ class Game extends Component {
         database.ref('players/winner').remove();
       }
     });
-    //leave this line until create game component is fixed;
-    database.ref('games/' + gameId + '/playersInGame/' + user).set({ 'created': true, 'score': 0, 'remove': false });
     database.ref('games/' + gameId + '/playersInGame').on('value', (players) => {
       const playersObj = players.val();
-      console.log(playersObj);
       for (const playerId in playersObj) {
         if (!playersInGame[playerId] || playersInGame.scene) {
           const newPlayer = this.createPlayerOnConnect(scene, playerId);
@@ -172,8 +169,8 @@ class Game extends Component {
       engine.resize();
     });
     window.addEventListener('beforeunload', () => {
-      database.ref('players/' + user).update({ remove: true });
-      database.ref('players/' + user).remove();
+      database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true });
+      database.ref('games/' + gameId + '/playersInGame').remove();
       database.ref('playerPosition/' + user).remove();
       database.ref(user).remove();
     });
@@ -181,7 +178,7 @@ class Game extends Component {
 
   componentWillUnmount() {
     const user = this.props.user.userId;
-    database.ref('players/' + user).remove();
+    database.ref('games/' + this.props.user.gameId + '/playersInGame').remove();
     database.ref('playerPosition/' + user).remove();
     database.ref(user).remove();
     audio0.pause();
@@ -234,15 +231,6 @@ class Game extends Component {
     torus = BABYLON.Mesh.CreateTorus('torus', 2, 0.5, 10, scene);
     torus.position.x = 10;
     torus.position.z = 10;
-  }
-  makeId() {
-    let text = '';
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-    for (let i = 0; i < 8; i++) {
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
   }
 
   render() {
