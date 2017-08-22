@@ -189,8 +189,7 @@ class Game extends Component {
   createPlayerOnConnect(sce, id) {
     const balls = ['/assets/textures/grayball-choose.png', '/assets/textures/netball-choose.png', '/assets/textures/students/alvin.png', '/assets/textures/students/andrew.png', 
     '/assets/textures/students/denys.png', '/assets/textures/students/evan.png', '/assets/textures/students/snow.png', '/assets/textures/students/won_jun.png'];
-
-    const ballId = Number(this.props.user.ballId);
+    const ballId = this.props.user.ball;
     console.log('This is the ballid', ballId)
     console.log('img', balls[ballId])
     const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); // Params: name, subdivs, size, scene
