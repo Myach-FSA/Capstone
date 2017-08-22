@@ -1,4 +1,4 @@
-'use strict';
+'use strict'; // OB/JL: might not be necessary
 import React from 'react';
 import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom';
 import {render} from 'react-dom';
@@ -27,6 +27,8 @@ import Demos from 'APP/demos';
 const auth = firebase.auth();
 var loginObj = {};
 
+// OB/JL: this could be in a componentDidMount (or something)
+// OB/JL: consider making a `withAuth` higher-order react function
 auth.onAuthStateChanged((user) => {
   if (!user) {
     firebase.auth().signInAnonymously().catch(function(error) {
@@ -35,7 +37,7 @@ auth.onAuthStateChanged((user) => {
   } else {
     const ref = firebase.database().ref('users/' + user.uid);
     ref.once('value', (snapshot) => {
-      Object.assign(loginObj, user);
+      Object.assign(loginObj, user); // OB/JL: this could become a `setState` call
     });
   }
 });

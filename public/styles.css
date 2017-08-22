@@ -1,3 +1,4 @@
+/* OB/JL: inconsistent indentation here */
 .headersec {
   background-color: #191b21;
   padding-bottom: 1%;
@@ -71,6 +72,7 @@ body {
   border-color: #1BC98E;
 }
 
+/* OB/JL: ids are the least re-usable */
 #neon {
   background-color: #1BC98E;
 }

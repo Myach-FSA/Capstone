@@ -1,3 +1,4 @@
+// OB/JL: not secret, also dead code
 module.exports = {
   apiKey: "AIzaSyD5CuKXBrzpUH_m8ovpCdXCNbQ5uRKkPmI",
   authDomain: "myach-fsa.firebaseapp.com",

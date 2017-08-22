@@ -1,5 +1,6 @@
 const initialState = { render: false };
 
+// OB/JL: routing should be able to cover this (instead of redux)
 const SHOW_GAME_LIST = 'SHOW_GAME_LIST';
 export const showGameList = (render) => ({ type: SHOW_GAME_LIST, render });
 
