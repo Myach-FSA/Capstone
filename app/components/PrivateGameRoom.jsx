@@ -64,9 +64,10 @@ class GameWaitRoom extends React.Component {
 
   render() {
     return (
-        <div className='space'>
+      <div className='space'>
+        <div className="content has-text-centered notification">
+          <h1><strong>Enter Username</strong></h1>
           <div className="field has-addons">
-            <h1><strong>Enter Username</strong></h1>
             <p className="control">
               <input id='nickname' className="input" type="text" placeholder="Nickname" />
             </p>
@@ -76,44 +77,46 @@ class GameWaitRoom extends React.Component {
               </button>
             </p>
           </div>
+        </div>
         {this.state.isAdmin && (
-          <div className="has-text-centered">
-            <div className="notification">
+          <div>
+            <div className="content has-text-centered notification">
               <h1><strong>Your Game ID: {this.props.user.gameId}</strong></h1>
               <p>Send this code to your friends!</p>
             </div>
             <SceneList gameId={this.props.match.params.id} />
           </div>
-        )
-        }
+        )}
         <ChooseBall />
-        <h5 id="greenText">Current number of connected players: {this.state.numberOfPlayers}</h5>
-        <div className="field is-grouped">
-          <p className="control">
-            <Link to={`/game/${this.props.user.gameId}/play`}>
-              <button
-                className="button is-success"
-                type="submit"
-                title="playbutton"
-                onClick={() => { this.sendInfo(); }}>
-                Play Now!
+        <div className="content has-text-centered notification">
+          <h5 id="greenText">Current number of connected players: {this.state.numberOfPlayers}</h5>
+          <div className="field is-grouped">
+            <p className="control">
+              <Link to={`/game/${this.props.user.gameId}/play`}>
+                <button
+                  className="button is-success"
+                  type="submit"
+                  title="playbutton"
+                  onClick={() => { this.sendInfo(); }}>
+                  Play Now!
               </button>
-            </Link>
-          </p>
-          <p>
-            <button
-              className="button"
-              type="submit"
-              title="publicPrivate"
-              onClick={() => { this.security(); }}>
-              {this.state.publicGame &&
-                <i className="fa fa-unlock"> Public</i>
-              }
-              {!this.state.publicGame &&
-                <i className="fa fa-lock"> Private</i>
-              }
-            </button>
-          </p>
+              </Link>
+            </p>
+            <p>
+              <button
+                className="button"
+                type="submit"
+                title="publicPrivate"
+                onClick={() => { this.security(); }}>
+                {this.state.publicGame &&
+                  <i className="fa fa-unlock"> Public</i>
+                }
+                {!this.state.publicGame &&
+                  <i className="fa fa-lock"> Private</i>
+                }
+              </button>
+            </p>
+          </div>
         </div>
         <div>
           <h4></h4>
@@ -127,6 +130,6 @@ const mapStateToProps = (state) => ({
   user: state.auth.user
 });
 
-const mapDispatch= ({ submitName });
+const mapDispatch = ({ submitName });
 
 export default connect(mapStateToProps, mapDispatch)(GameWaitRoom);

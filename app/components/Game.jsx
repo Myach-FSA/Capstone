@@ -45,7 +45,7 @@ class Game extends Component {
           const newPlayer = this.createPlayerOnConnect(scene, playerId);
           if (newPlayer.id === user) {
             this.playerPosition(newPlayer);
-            this.setColor(newPlayer, { b: Math.random(), g: Math.random(), r: Math.random() });
+            // this.setColor(newPlayer, { b: Math.random(), g: Math.random(), r: Math.random() });
             info = { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, color: newPlayer.material.diffuseColor };
             database.ref('playerPosition/' + newPlayer.id).set(info);
           } else {
@@ -56,7 +56,7 @@ class Game extends Component {
                 const z = playerInfo.val().z;
                 const color = playerInfo.val().color;
                 this.setPosition(newPlayer, x, y, z);
-                this.setColor(newPlayer, color);
+                // this.setColor(newPlayer, color);
               }
             });
           }
@@ -187,9 +187,16 @@ class Game extends Component {
   }
 
   createPlayerOnConnect(sce, id) {
+    const balls = ['/assets/textures/grayball-choose.png', '/assets/textures/netball-choose.png', '/assets/textures/students/alvin.png', '/assets/textures/students/andrew.png', 
+    '/assets/textures/students/denys.png', '/assets/textures/students/evan.png', '/assets/textures/students/snow.png', '/assets/textures/students/won_jun.png'];
+    const ballId = this.props.user.ball;
+    console.log('This is the ballid', ballId)
+    console.log('img', balls[ballId])
     const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); // Params: name, subdivs, size, scene
     player.checkCollisions = true;
     const ballMaterial = new BABYLON.StandardMaterial('material', sce);
+    const ballTexture = new BABYLON.Texture(`${balls[ballId]}`, sce);
+    ballMaterial.diffuseTexture = ballTexture;
     player.material = ballMaterial;
     player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.SphereImpostor, {
       mass: 1,

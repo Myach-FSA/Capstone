@@ -6,7 +6,7 @@ import Firebase from 'firebase';
 const games = [
   { name: 'Mount Death', description: 'Mountains and stuff', img: '/assets/textures/grayball-choose.png' },
   { name: 'Elysium', description: "Travel to the future", img: '/assets/textures/green_black_cubes.jpg' },
-  { name: 'Adventure Island', description: "Sand and stuff", img: ' d/assets/textures/netball-choose.png' },  
+  { name: 'Adventure Island', description: "Sand and stuff", img: '/assets/textures/netball-choose.png' },  
 ]
 
 class ChooseGame extends React.Component {
@@ -42,7 +42,7 @@ class ChooseGame extends React.Component {
                     <div key={i} className="inner-product">
                       <br />
                       <figure className="image">
-                        <img src={games.img} id={i} alt="Image" onClick={(evt) => this.sceneChoice(evt)}/>
+                        <img src={game.img} id={i} alt="Image" onClick={(evt) => this.sceneChoice(evt)}/>
                       </figure>
                       <p className="subtitle">{game.name}</p>
                       <p className="subtitle">{game.description}</p>
