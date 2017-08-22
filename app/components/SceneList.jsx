@@ -10,18 +10,24 @@ const games = [
 ]
 
 class ChooseGame extends React.Component {
-  constructor(props) {
-    super(props)
+  constructor() {
+    super()
     this.state = {
-        sceneId: 0
+        sceneId: ''
     }
     this.sceneChoice = this.sceneChoice.bind(this)
   }
 
   sceneChoice(evt) {
-    firebase.database().ref('games/' + this.props.gameId).update({ scene: +evt.target.id });        
     this.setState({ sceneId: +evt.target.id });
   }
+
+//   sendDataToFB() {
+//     const user = this.props.user;
+//     const ref = firebase.database().ref("users/"+user.userId)
+//     ref.set(user)
+//     this.props.setUser(user)    
+//   }
 
   render() {
 
