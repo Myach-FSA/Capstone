@@ -5,23 +5,47 @@ import { connect } from 'react-redux';
 import firebase from 'firebase';
 import SceneList from './SceneList';
 import ChooseBall from './ChooseBall';
+import { submitName } from '../reducers/auth';
+
 
 class GameWaitRoom extends React.Component {
   constructor() {
     super();
     this.state = {
+      isAdmin: true,
       numberOfPlayers: 0,
       publicGame: false,
     };
   }
   componentDidMount() {
     const user = this.props.user;
-    firebase.database().ref('games').update({ [user.gameId]: { playersInGame: [user.userId] } });
+
+    var userRef = firebase.database().ref('games/' + user.gameId);
+    userRef.once('value', (snapshot) => {
+      var a = snapshot.exists();
+      if (!a) {
+        firebase.database().ref('games/' + user.gameId).set({ playersInGame: { [this.props.user.userId]: { 'created': true, 'score': 0, 'remove': false } } });
+      } else {
+        firebase.database().ref('games/' + user.gameId + '/playersInGame/' + this.props.user.userId).set({ 'created': true, 'score': 0, 'remove': false });
+        
+        // this.setState({ isAdmin: false })
+        // this.setState({ numberOfPlayers: this.state.numberOfPlayers + 1 })
+        // let children = snapshot.val().playersInGame
+        // children = children.concat(this.props.user.userId)
+        // firebase.database().ref('games/' + user.gameId + '/playersInGame/').set(children);
+      }
+    });    
     this.getPlayers(user.gameId, true);
   }
 
   componentWillUnmount() {
     this.getPlayers(this.props.user.gameId, false);
+  }
+
+  submitUserName(evt) {
+    evt.preventDefault()
+    const name = document.getElementById('nickname').value;
+    this.props.submitName(name);
   }
 
   getPlayers = (gameId, bool) => {
@@ -46,38 +70,57 @@ class GameWaitRoom extends React.Component {
   }
 
   render() {
-    const numPlayer = 1;
     return (
-      <div>
-        <div className="content has-text-centered">
-          <div className="notification">
-            <h1><strong>Your Game ID: {this.props.user.gameId}</strong></h1>
-            <p>Send this code to your friends!</p>
+        <div className='space'>
+          <div className="field has-addons">
+            <h1><strong>Enter Username</strong></h1>
+            <p className="control">
+              <input id='nickname' className="input" type="text" placeholder="Nickname" />
+            </p>
+            <p className="control">
+              <button className="button is-success" onClick={(evt) => this.submitUserName(evt)}>
+                Submit
+              </button>
+            </p>
           </div>
-          <SceneList />
-          <ChooseBall />
-          <h5 id="greenText">Current number of connected players: {this.state.numberOfPlayers}</h5>
-          <Link to={`/game`}>
+        {this.state.isAdmin && (
+          <div className="has-text-centered">
+            <div className="notification">
+              <h1><strong>Your Game ID: {this.props.user.gameId}</strong></h1>
+              <p>Send this code to your friends!</p>
+            </div>
+            <SceneList gameId={this.props.match.params.id} />
+          </div>
+        )
+        }
+        <ChooseBall />
+        <h5 id="greenText">Current number of connected players: {this.state.numberOfPlayers}</h5>
+        <div className="field is-grouped">
+          <p className="control">
+            <Link to={`/game/${this.props.user.gameId}/play`}>
+              <button
+                className="button is-success"
+                type="submit"
+                title="playbutton"
+                onClick={() => { this.sendInfo(); }}>
+                Play Now!
+              </button>
+            </Link>
+          </p>
+          <p>
             <button
-              className="button is-success"
+              className="button"
               type="submit"
-              title="playbutton"
-              onClick={() => { this.sendInfo(); }}>
-              Play Now!
+              title="publicPrivate"
+              onClick={() => { this.security(); }}>
+              {this.state.publicGame &&
+                <i className="fa fa-unlock"> Public</i>
+              }
+              {!this.state.publicGame &&
+                <i className="fa fa-lock"> Private</i>
+              }
             </button>
-          </Link>
-          <a
-            className="button is-success"
-            type="submit"
-            title="publicPrivate"
-            onClick={() => { this.security(); }}>
-            {this.state.publicGame &&
-            <i className="fa fa-unlock"> Public</i>
-            }
-            {!this.state.publicGame &&
-            <i className="fa fa-lock"> Private</i>
-            }
-          </a>
+          </p>
         </div>
         <div>
           <h4></h4>
@@ -91,4 +134,6 @@ const mapStateToProps = (state) => ({
   user: state.auth.user
 });
 
-export default connect(mapStateToProps)(GameWaitRoom);
+const mapDispatch= ({ submitName });
+
+export default connect(mapStateToProps, mapDispatch)(GameWaitRoom);

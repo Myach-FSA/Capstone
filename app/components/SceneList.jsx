@@ -4,9 +4,9 @@ import { Link, NavLink, Router } from 'react-router-dom'
 import Firebase from 'firebase';
 
 const games = [
-  { name: 'Mount Death', description: 'Mountains and stuff', img: './assets/textures/grayball-choose.png' },
-  { name: 'Elysium', description: "Travel to the future", img: './assets/textures/green_black_cubes.jpg' },
-  { name: 'Adventure Island', description: "Sand and stuff", img: './assets/textures/netball-choose.png' },  
+  { name: 'Mount Death', description: 'Mountains and stuff', img: '/assets/textures/grayball-choose.png' },
+  { name: 'Elysium', description: "Travel to the future", img: '/assets/textures/green_black_cubes.jpg' },
+  { name: 'Adventure Island', description: "Sand and stuff", img: ' d/assets/textures/netball-choose.png' },  
 ]
 
 class ChooseGame extends React.Component {

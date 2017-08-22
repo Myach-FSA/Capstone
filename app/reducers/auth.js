@@ -29,6 +29,9 @@ const reducer = (state = initialState, action) => {
     const score = state.user.totalScore + Number(action.score);
     newState.user = { ...state.user, totalScore: score };
     break;
+  case SET_USER_NAME:
+    newState.user = { ...state.user, username: action.name };
+    break;
   default:
     return state;
   }
@@ -54,6 +57,9 @@ const setGame = (gameId) => ({ type: SET_GAME, gameId });
 
 const SET_SCORE = 'SET_SCORE';
 const setScore = (score) => ({ type: SET_SCORE, score });
+
+const SET_USER_NAME = 'SET_USER_NAME';
+const setUserName = (name) => ({ type: SET_USER_NAME, name });
 
 /* --------- THUNK CREATORS --------- */
 
@@ -94,6 +100,8 @@ export const chooseBall = (ball) => setBall(ball);
 export const chooseGame = (id) => setGame(id);
 
 export const changeScore = (score) => setScore(score);
+
+export const submitName = (name) => setUserName(name);
 
 export function logOut() {
   firebase.auth().signOut();
