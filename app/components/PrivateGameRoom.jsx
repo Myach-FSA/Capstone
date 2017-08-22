@@ -19,7 +19,7 @@ class GameWaitRoom extends React.Component {
   componentDidMount() {
     const user = this.props.user;
 
-    var userRef = firebase.database().ref('games/' + user.gameId);
+    const userRef = firebase.database().ref('games/' + user.gameId);
     userRef.once('value', (snapshot) => {
       var a = snapshot.exists();
       if (!a) {
@@ -32,7 +32,7 @@ class GameWaitRoom extends React.Component {
   }
 
   componentWillUnmount() {
-    this.getPlayers(this.props.user.gameId, false);
+    firebase.database().ref('games').off();
   }
 
   submitUserName(evt) {
@@ -44,10 +44,10 @@ class GameWaitRoom extends React.Component {
   getPlayers = (gameId, bool) => {
     if (bool) {
       firebase.database().ref('games').on('value', players => {
-        this.setState({ numberOfPlayers: players.val()[gameId].playersInGame.length });
+        if (players.val()[gameId]) {
+          this.setState({ numberOfPlayers: Object.keys(players.val()[gameId].playersInGame).length });
+        }
       });
-    } else {
-      firebase.database().ref('games').off();
     }
   }
 
