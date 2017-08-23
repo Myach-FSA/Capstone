@@ -39,15 +39,15 @@ class Game extends Component {
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
     let num = sceneNum;
-    const allPlayersInGame = this.state.playersInGame;
     let scene = createScene1(canvas, engine);
 
     database.ref('games/' + gameId + '/playersInGame').on('value', (players) => {
       const playersObj = players.val();
       for (const playerId in playersObj) {
-        console.log(this.state.playersInGame, 'allPLayers');
-        console.log(playersObj, 'playersObj');
-        if (!this.state.playersInGame.includes(playerId) && playersObj[user].create) {
+        console.log('playersIngame', this.state.playersInGame)
+        console.log('playersObj', playersObj);
+        if (!this.state.playersInGame.includes(playerId) && playersObj[playerId].create) {
+          console.log('1', playersObj[user]);
           const newPlayer = this.createPlayerOnConnect(scene, playerId);
           if (newPlayer.id === user) {
             this.playerPosition(newPlayer);
@@ -72,6 +72,7 @@ class Game extends Component {
           newPlayersState.push(playerId);
           this.setState({ objects: newState });
           this.setState({ playersInGame: newPlayersState });
+          console.log('playersIngame after push', this.state.playersInGame);
           const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene);
           if (playerId === user) {
             const playerDummy = this.createCameraObj(scene, newPlayer);
@@ -85,25 +86,28 @@ class Game extends Component {
             followCamera.maxCameraSpeed = 10; // speed limit / 0.05
             followCamera.attachControl(canvas, true);
           }
+          console.log(newPlayer.id);
           database.ref(newPlayer.id).on('value', (otherPlayer) => {
             if (otherPlayer.val()) {
+              console.log(otherPlayer.val());
               newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(otherPlayer.val().zAcceleration, 0, otherPlayer.val().xAcceleration, 0));
             }
           });
         }
       }
       for (let i = 0; i < this.state.objects.length; i++) {
-        if (playersObj) {
-          if (playersObj[this.state.objects[i].id].remove) {
-            // database.ref('games/' + user.gameId + '/playersInGame/' + this.props.user.userId).update({ 'create': false });
+        if (playersObj[this.state.playersInGame[i]]) {
+          if (playersObj[this.state.playersInGame[i]].remove) {
+            console.log(playersObj[this.state.playersInGame[i]]);
             this.state.objects[i].dispose();
             this.state.objects[i].physicsImpostor.dispose();
             const newState = this.state.playersInGame.filter(player => { return player !== this.state.objects[i].id; });
             this.setState({playersInGame: newState});
             this.setState({ objects: this.state.objects.filter((_, j) => { return j !== this.state.objects.indexOf(this.state.objects[i]); }) });
-            database.ref('playerPosition/' + user).remove();
           }
         }
+        console.log(this.state.playersInGame);
+        console.log(this.state.objects);
       }
     });
 
@@ -202,6 +206,10 @@ class Game extends Component {
   componentWillUnmount() {
     const user = this.props.user.userId;
     const gameId = this.props.user.gameId;
+    for (let i = 0; i < this.state.playersInGame.length; i++) {
+      console.log(this.state.playersInGame[i]);
+      database.ref('playerPosition/' + this.state.playersInGame[i]).off();
+    }
     database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true }).then(() => {
       database.ref('playerPosition/' + user).remove();
     });
@@ -214,6 +222,7 @@ class Game extends Component {
       });
     });
     database.ref('games/' + gameId + '/playersInGame').off();
+    database.ref('playerPostion').off();
     database.ref('playerPosition/' + user).off();
     database.ref(user).off();
     database.ref('playerPosition/' + user).remove();
@@ -256,7 +265,7 @@ class Game extends Component {
     function randomPosition(min) {
       return Math.floor(Math.random() * min - min / 2);
     }
-    player.position.y = 4;
+    player.position.y = 2;
     player.position.x = randomPosition(45);
     player.position.z = randomPosition(45);
   }

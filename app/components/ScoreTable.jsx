@@ -23,7 +23,7 @@ class ScoreTable extends React.Component {
     });
   }
   componentWillUnmount() {
-    database.ref('users').off();
+    database.ref('users/').off();
   }
   render() {
     return (
