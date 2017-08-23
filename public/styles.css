@@ -90,6 +90,11 @@ body {
   color: #1CA8DD;
 }
 
+.ingametext {
+  color: #23d160;
+  padding-top: 5%;
+}
+
 html,
 body {
   overflow: auto;

@@ -59,7 +59,11 @@ class GameWaitRoom extends React.Component {
 
   // Will use sendInfo later for scene selection / public or private games
   sendInfo = (info) => {
-    const name = document.getElementById('nickname').value;
+    let name = document.getElementById('nickname').value;
+    if(name === '') {
+      name = 'Anonymous ID: ' + this.props.user.userId.substr(0, 4)
+    }
+
     this.props.submitName(name);
     
     firebase.database().ref('users/' + this.props.user.userId).update({ 'username': name });
