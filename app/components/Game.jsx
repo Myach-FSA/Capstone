@@ -10,8 +10,6 @@ import ScoreTable from './ScoreTable';
 import WinScreen from './WinScreen';
 
 const database = firebase.database();
-// const objects = [];
-// const playersInGame = {};
 let sceneNum = 1;
 let torus;
 let winPos;
@@ -102,7 +100,7 @@ class Game extends Component {
             this.state.objects[i].dispose();
             this.state.objects[i].physicsImpostor.dispose();
             const newState = this.state.playersInGame.filter(player => { return player !== this.state.objects[i].id; });
-            this.setState({playersInGame: newState});
+            this.setState({ playersInGame: newState });
             this.setState({ objects: this.state.objects.filter((_, j) => { return j !== this.state.objects.indexOf(this.state.objects[i]); }) });
           }
         }
@@ -159,6 +157,9 @@ class Game extends Component {
         setTimeout(scene.render(), 500);
       } else {
         const me = this.state.objects.filter(player => player.id === user)[0];
+        // if (me) {
+        //   database.ref('playerPosition/' + me.id).set({ color: 'black', x: me.position.x, y: me.position.y, z: me.position.z });
+        // }
         if (me && me.absolutePosition.y < -100) {
           this.playerPosition(me);
           database.ref(user).set({ 'xAcceleration': 0, 'zAcceleration': 0 });
@@ -222,7 +223,7 @@ class Game extends Component {
       });
     });
     database.ref('games/' + gameId + '/playersInGame').off();
-    database.ref('playerPostion').off();
+    database.ref('playerPosition').off();
     database.ref('playerPosition/' + user).off();
     database.ref(user).off();
     database.ref('playerPosition/' + user).remove();
