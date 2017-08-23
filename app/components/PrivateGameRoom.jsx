@@ -123,14 +123,18 @@ class GameWaitRoom extends React.Component {
         <div className="content has-text-centered notification">
           <h5 id="greenText">Current number of connected players: {this.state.numberOfPlayers}</h5>
           <div id='centerButtons' className="field is-grouped">
-            <p className="control">
-              <Link to={`/game/${this.props.user.gameId}/play`}>
-              </Link>
-            </p>
-            <p>
-              { this.state.canPlay ? yesPlay : noCannotPlay }
-            </p>
-          </div>
+          <p className="control">
+          <Link to={`/game/${this.props.user.gameId}/play`}>
+            <button
+              className="button is-success"
+              type="submit"
+              title="playbutton"
+              onClick={() => { this.sendInfo(); }}>
+              Play Now!
+          </button>
+          </Link>
+        </p>
+        </div>
         </div>
         <div>
           <h4></h4>
