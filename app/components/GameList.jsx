@@ -38,14 +38,14 @@ class GameList extends React.Component {
   render() {
     return (
       <div>
-        <table className='table'>
+        <table>
           <thead>
             <tr>
-              <th><abbr title='GameId'>GameId</abbr></th>
-              <th><abbr title='Map'>Map</abbr></th>
-              <th><abbr title='NumPlayers'>Player #</abbr></th>
-              <th><abbr title='Security'>Private / Public</abbr></th>
-              <th><abbr title='Select'>Select</abbr></th>
+              <th id='tableList'><abbr title='GameId'>GameId</abbr></th>
+              {/* <th><abbr title='Map'>Map</abbr></th> */}
+              <th id='tableList'><abbr title='NumPlayers'>Player #</abbr></th>
+              <th id='tableList'><abbr title='Security'>Private / Public</abbr></th>
+              <th id='tableList'><abbr title='Select'>Select</abbr></th>
             </tr>
           </thead>
           <tbody>
@@ -53,11 +53,11 @@ class GameList extends React.Component {
               Object.keys(this.state.games).map((game) => {
                 return (
                   <tr key={game} onClick={(evt) => this.selectGame(evt)}>
-                    <th>{game}</th>
-                    <th>map name placeholder</th>
-                    <th>[{Object.keys(this.state.games[game].playersInGame).length}/4]</th>
-                    <th>Public/Private</th>
-                    <th ><a name={game} onClick={(evt) => this.selectGame(evt)} className="button is-primary">JOIN</a></th>
+                    <th id='tableList'>{game}</th>
+                    {/* <th>map name placeholder</th> */}
+                    <th id='tableList'>[{Object.keys(this.state.games[game].playersInGame).length}/4]</th>
+                    <th id='tableList'>Public</th>
+                    <th id='tableList'><a name={game} onClick={(evt) => this.selectGame(evt)} className="button is-primary">JOIN</a></th>
                   </tr>
                 );
               })
