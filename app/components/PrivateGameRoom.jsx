@@ -133,7 +133,8 @@ class GameWaitRoom extends React.Component {
               className="button is-success"
               type="submit"
               title="playbutton"
-              onClick={() => { this.sendInfo(); }}>
+              onClick={() => { this.sendInfo(); }}
+              >
               Play Now!
           </button>
           </Link>
