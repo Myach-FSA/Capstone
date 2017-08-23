@@ -42,7 +42,6 @@ class Game extends Component {
 
     database.ref('games/' + gameId + '/playersInGame').on('value', (players) => {
       const playersObj = players.val();
-      console.log(playersObj);
       for (const playerId in playersObj) {
         if (!this.state.playersInGame.includes(playerId) && playersObj[playerId].create) {
           const newPlayer = this.createPlayerOnConnect(scene, playerId);
@@ -90,7 +89,6 @@ class Game extends Component {
         }
       }
       for (let i = 0; i < this.state.objects.length; i++) {
-        console.log('fix null', playersObj[this.state.playersInGame[i]]);
         if (playersObj[this.state.playersInGame[i]]) {
           if (playersObj[this.state.playersInGame[i]].remove) {
             database.ref('playerPosition/' + this.state.playersInGame[i]).off();
@@ -99,9 +97,6 @@ class Game extends Component {
             const newState = this.state.playersInGame.filter(player => { return player !== this.state.objects[i].id; });
             this.setState({ playersInGame: newState });
             this.setState({ objects: this.state.objects.filter((_, j) => { return j !== this.state.objects.indexOf(this.state.objects[i]); }) });
-            console.log('playersInGame', this.state.playersInGame);
-            console.log('objects', this.state.objects);
-            // engine.stopRenderLoop();
           }
         }
       }
@@ -206,7 +201,6 @@ class Game extends Component {
     const user = this.props.user.userId;
     const gameId = this.props.user.gameId;
     for (let i = 0; i < this.state.playersInGame.length; i++) {
-      console.log(this.state.playersInGame[i]);
       database.ref('playerPosition/' + this.state.playersInGame[i]).off();
     }
     database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true }).then(() => {
