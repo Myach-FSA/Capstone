@@ -10,9 +10,6 @@ import ScoreTable from './ScoreTable';
 import WinScreen from './WinScreen';
 
 const database = firebase.database();
-const objects = [];
-const thisPlayer = '';
-const playersInGame = {};
 let sceneNum = 1;
 let torus;
 let winPos;
@@ -27,6 +24,10 @@ let info;
 class Game extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      playersInGame: [],
+      objects: [],
+    };
   }
 
   componentDidMount() {
@@ -41,7 +42,10 @@ class Game extends Component {
     database.ref('games/' + gameId + '/playersInGame').on('value', (players) => {
       const playersObj = players.val();
       for (const playerId in playersObj) {
-        if (!playersInGame[playerId] || playersInGame.scene) {
+        console.log('playersIngame', this.state.playersInGame)
+        console.log('playersObj', playersObj);
+        if (!this.state.playersInGame.includes(playerId) && playersObj[playerId].create) {
+          console.log('1', playersObj[user]);
           const newPlayer = this.createPlayerOnConnect(scene, playerId);
           if (newPlayer.id === user) {
             this.playerPosition(newPlayer);
@@ -60,6 +64,13 @@ class Game extends Component {
               }
             });
           }
+          const newState = this.state.objects.slice();
+          const newPlayersState = this.state.playersInGame.slice();
+          newState.push(newPlayer);
+          newPlayersState.push(playerId);
+          this.setState({ objects: newState });
+          this.setState({ playersInGame: newPlayersState });
+          console.log('playersIngame after push', this.state.playersInGame);
           const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene);
           if (playerId === user) {
             const playerDummy = this.createCameraObj(scene, newPlayer);
@@ -73,19 +84,28 @@ class Game extends Component {
             followCamera.maxCameraSpeed = 10; // speed limit / 0.05
             followCamera.attachControl(canvas, true);
           }
+          console.log(newPlayer.id);
           database.ref(newPlayer.id).on('value', (otherPlayer) => {
             if (otherPlayer.val()) {
+              console.log(otherPlayer.val());
               newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(otherPlayer.val().zAcceleration, 0, otherPlayer.val().xAcceleration, 0));
             }
           });
-          objects.push(newPlayer);
-          playersInGame[playerId] = true;
         }
       }
-      for (let i = 0; i < objects.length; i++) {
-        if (playersObj[objects[i].id].remove) {
-          objects[i].dispose();
+      for (let i = 0; i < this.state.objects.length; i++) {
+        if (playersObj[this.state.playersInGame[i]]) {
+          if (playersObj[this.state.playersInGame[i]].remove) {
+            console.log(playersObj[this.state.playersInGame[i]]);
+            this.state.objects[i].dispose();
+            this.state.objects[i].physicsImpostor.dispose();
+            const newState = this.state.playersInGame.filter(player => { return player !== this.state.objects[i].id; });
+            this.setState({ playersInGame: newState });
+            this.setState({ objects: this.state.objects.filter((_, j) => { return j !== this.state.objects.indexOf(this.state.objects[i]); }) });
+          }
         }
+        console.log(this.state.playersInGame);
+        console.log(this.state.objects);
       }
     });
 
@@ -120,9 +140,11 @@ class Game extends Component {
     });
 
     engine.runRenderLoop(() => {
-      if ((torus.position.x !== winPos.x) || (torus.position.z !== winPos.z)) {
-        torus.position.x = winPos.x;
-        torus.position.z = winPos.z;
+      if (winPos) {
+        if ((torus.position.x !== winPos.x) || (torus.position.z !== winPos.z)) {
+          torus.position.x = winPos.x;
+          torus.position.z = winPos.z;
+        }
       }
       if (!scene || (sceneNum !== num)) {
         num = sceneNum;
@@ -133,10 +155,11 @@ class Game extends Component {
           default: scene = createScene1(canvas, engine);
         }
         setTimeout(scene.render(), 500);
-        playersInGame.scene = true;
-        playersInGame.scene = false;
       } else {
-        const me = objects.filter(player => player.id === user)[0];
+        const me = this.state.objects.filter(player => player.id === user)[0];
+        // if (me) {
+        //   database.ref('playerPosition/' + me.id).set({ color: 'black', x: me.position.x, y: me.position.y, z: me.position.z });
+        // }
         if (me && me.absolutePosition.y < -100) {
           this.playerPosition(me);
           database.ref(user).set({ 'xAcceleration': 0, 'zAcceleration': 0 });
@@ -149,19 +172,21 @@ class Game extends Component {
             return score;
           });
         }
-        if (me && (Math.floor(me.absolutePosition.x) === winPos.x) && (Math.floor(me.absolutePosition.z) === winPos.z)) {
-          database.ref('games/' + gameId + '/playersInGame/' + user + '/score').transaction((score) => {
-            this.props.changeScore(1);
-            score += 1;
-            if (score >= 10) {
-              database.ref('games/' + gameId + '/playersInGame/').update({ 'winner': user });
-              score = 0;
-            }
-            return score;
-          });
-          const x = Math.floor(Math.random() * 50 - 25);
-          const z = Math.floor(Math.random() * 50 - 25);
-          database.ref('games/' + gameId + '/winPosition').set({ 'x': x, 'z': z });
+        if (winPos) {
+          if (me && (Math.floor(me.absolutePosition.x) === winPos.x) && (Math.floor(me.absolutePosition.z) === winPos.z)) {
+            database.ref('games/' + gameId + '/playersInGame/' + user + '/score').transaction((score) => {
+              this.props.changeScore(1);
+              score += 1;
+              if (score >= 10) {
+                database.ref('games/' + gameId + '/playersInGame/').update({ 'winner': user });
+                score = 0;
+              }
+              return score;
+            });
+            const x = Math.floor(Math.random() * 50 - 25);
+            const z = Math.floor(Math.random() * 50 - 25);
+            database.ref('games/' + gameId + '/winPosition').set({ 'x': x, 'z': z });
+          }
         }
         scene.render();
       }
@@ -182,7 +207,13 @@ class Game extends Component {
   componentWillUnmount() {
     const user = this.props.user.userId;
     const gameId = this.props.user.gameId;
-    database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true });
+    for (let i = 0; i < this.state.playersInGame.length; i++) {
+      console.log(this.state.playersInGame[i]);
+      database.ref('playerPosition/' + this.state.playersInGame[i]).off();
+    }
+    database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true }).then(() => {
+      database.ref('playerPosition/' + user).remove();
+    });
     database.ref('games/' + gameId + '/playersInGame/' + user).remove().then(() => {
       database.ref('games/' + gameId).once('value').then(allPlayers => {
         allPlayers = allPlayers.val();
@@ -191,15 +222,20 @@ class Game extends Component {
         }
       });
     });
+    database.ref('games/' + gameId + '/playersInGame').off();
+    database.ref('playerPosition').off();
+    database.ref('playerPosition/' + user).off();
+    database.ref(user).off();
     database.ref('playerPosition/' + user).remove();
     database.ref(user).remove();
+    database.ref(this.props.user.userId).off();
     audio0.pause();
   }
 
   createPlayerOnConnect(sce, id) {
-    const balls = ['/assets/textures/students/stone.png', '/assets/textures/students/net.png', '/assets/textures/students/alvin.png', '/assets/textures/students/andrew.png', 
-    '/assets/textures/students/denys.png', '/assets/textures/students/evan.png', '/assets/textures/students/snow.png', '/assets/textures/students/won_jun.png',
-    '/assets/textures/students/grass-large.png'
+    const balls = ['/assets/textures/students/stone.png', '/assets/textures/students/net.png', '/assets/textures/students/alvin.png', '/assets/textures/students/andrew.png',
+      '/assets/textures/students/denys.png', '/assets/textures/students/evan.png', '/assets/textures/students/snow.png', '/assets/textures/students/won_jun.png',
+      '/assets/textures/students/grass-large.png'
     ];
     const ballId = this.props.user.ball;
     const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); // Params: name, subdivs, size, scene
@@ -230,7 +266,7 @@ class Game extends Component {
     function randomPosition(min) {
       return Math.floor(Math.random() * min - min / 2);
     }
-    player.position.y = 4;
+    player.position.y = 2;
     player.position.x = randomPosition(45);
     player.position.z = randomPosition(45);
   }
@@ -253,12 +289,11 @@ class Game extends Component {
   }
 
   render() {
-    console.log(this.props.user);
     return (
       <div>
         {/* <WinScreen user={this.props.user}/> */}
         <InfoScreen />
-        <ScoreTable gameId={this.props.user.gameId}/>
+        <ScoreTable gameId={this.props.user.gameId} />
         <canvas className='gameDisplay ' ref="renderCanvas"></canvas>
       </div>
     );
