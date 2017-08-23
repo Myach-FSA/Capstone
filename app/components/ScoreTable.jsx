@@ -25,9 +25,6 @@ class ScoreTable extends React.Component {
   componentWillUnmount() {
     database.ref('users/').off();
   }
-  // shouldComponentUpdate(nextProps) {
-  //   const different = this.state.children;
-  // }
   render() {
     return (
       <div id="ScoreTable" className="scoreTable invisible has-text-centered">
