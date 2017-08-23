@@ -7,7 +7,8 @@ class ScoreTable extends React.Component {
   constructor(props) {
     super(props);
     this.state={
-      children: []
+      children: [],
+      scores: []
     };
   }
   componentWillMount() {
@@ -15,6 +16,21 @@ class ScoreTable extends React.Component {
       const children=this.state.children;
       children.push(child.val());
       this.setState({children: children});
+      console.log(child.val());
+      database.ref('games/'+this.props.gameId+'/playersInGame').on('value', player => {
+        children.find(element => {
+
+        });
+        const players=this.state.scores;
+        players.push(player.val());
+        this.setState({scores: players});
+        console.log('game player', player.val(), 'scores', this.state.scores);
+        // database.ref('games/'+this.props.gameId+'/playersInGame'+child.val()).userId).on('value', snapshot => {
+        //   const index=this.state.children.findIndex(element => element.userId===snapshot.val().userId);
+        //   children[index]=snapshot.val();
+        //   this.setState({children: children});
+        // });
+      });
       database.ref('users/'+child.val().userId).on('value', snapshot => {
         const index=this.state.children.findIndex(element => element.userId===snapshot.val().userId);
         children[index]=snapshot.val();
@@ -35,7 +51,7 @@ class ScoreTable extends React.Component {
               <th><abbr title="Username">Username</abbr></th>
               <th><abbr title="Won">Wins</abbr></th>
               <th><abbr title="Lost">Losses</abbr></th>
-              <th><abbr title="Points">Total Points</abbr></th>
+              <th><abbr title="Points">Current Points</abbr></th>
             </tr>
           </thead>
           <tbody>
