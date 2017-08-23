@@ -5,11 +5,13 @@ import firebase from '../../fire';
 import createScene1 from './Scene1';
 import createScene2 from './Scene2';
 import InfoScreen from './InfoScreen';
-const auth = firebase.auth();
 import ScoreTable from './ScoreTable';
 import WinScreen from './WinScreen';
+import MuteSound from './MuteSound';
 
 const database = firebase.database();
+const auth = firebase.auth();
+
 let sceneNum = 1;
 let torus;
 let winPos;
@@ -19,7 +21,6 @@ const yAcceleration = 0;
 const changeScene = (num) => {
   sceneNum = num;
 };
-let info;
 
 class Game extends Component {
   constructor(props) {
@@ -27,6 +28,7 @@ class Game extends Component {
     this.state = {
       playersInGame: [],
       objects: [],
+      info: {},
     };
   }
 
@@ -38,22 +40,24 @@ class Game extends Component {
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
     let num = sceneNum;
+    let texture;
     let scene = createScene1(canvas, engine);
 
     database.ref('games/' + gameId + '/playersInGame').on('value', (players) => {
       const playersObj = players.val();
       for (const playerId in playersObj) {
-        console.log('playersIngame', this.state.playersInGame);
-        console.log('playersObj', playersObj);
         if (!this.state.playersInGame.includes(playerId) && playersObj[playerId].create) {
-          console.log('1', playersObj[user]);
-          const newPlayer = this.createPlayerOnConnect(scene, playerId);
+          database.ref('users/' + playerId + '/ball').on('value', (playersTexture) => {
+            texture = playersTexture.val();
+          });
+          const newPlayer = this.createPlayerOnConnect(scene, playerId, texture);
           if (newPlayer.id === user) {
             this.playerPosition(newPlayer);
-            // this.setColor(newPlayer, { b: Math.random(), g: Math.random(), r: Math.random() });
-            info = { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, color: newPlayer.material.diffuseColor };
-            database.ref('playerPosition/' + newPlayer.id).set(info);
+            this.setTexture(newPlayer, texture, scene);
+            this.setState({ info: { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, color: newPlayer.material.diffuseColor} });
+            database.ref('playerPosition/' + newPlayer.id).set(this.state.info);
           } else {
+            this.setTexture(newPlayer, texture, scene);
             database.ref('playerPosition/' + playerId).on('value', (playerInfo) => {
               if (playerInfo.val()) {
                 const x = playerInfo.val().x;
@@ -61,7 +65,6 @@ class Game extends Component {
                 const z = playerInfo.val().z;
                 const color = playerInfo.val().color;
                 this.setPosition(newPlayer, x, y, z);
-                // this.setColor(newPlayer, color);
               }
             });
           }
@@ -71,11 +74,10 @@ class Game extends Component {
           newPlayersState.push(playerId);
           this.setState({ objects: newState });
           this.setState({ playersInGame: newPlayersState });
-          console.log('playersIngame after push', this.state.playersInGame);
           const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene);
           if (playerId === user) {
             const playerDummy = this.createCameraObj(scene, newPlayer);
-            control(newPlayer);
+            control(newPlayer, this.state.info, playersObj);
             followCamera.lockedTarget = playerDummy;
             scene.activeCamera = followCamera;
             followCamera.radius = 15; // how far from the object to follow
@@ -85,10 +87,8 @@ class Game extends Component {
             followCamera.maxCameraSpeed = 10; // speed limit / 0.05
             followCamera.attachControl(canvas, true);
           }
-          console.log(newPlayer.id);
           database.ref(newPlayer.id).on('value', (otherPlayer) => {
             if (otherPlayer.val()) {
-              console.log(otherPlayer.val());
               newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(otherPlayer.val().zAcceleration, 0, otherPlayer.val().xAcceleration, 0));
             }
           });
@@ -97,7 +97,7 @@ class Game extends Component {
       for (let i = 0; i < this.state.objects.length; i++) {
         if (playersObj[this.state.playersInGame[i]]) {
           if (playersObj[this.state.playersInGame[i]].remove) {
-            console.log(playersObj[this.state.playersInGame[i]]);
+            database.ref('playerPosition/' + this.state.playersInGame[i]).off();
             this.state.objects[i].dispose();
             this.state.objects[i].physicsImpostor.dispose();
             const newState = this.state.playersInGame.filter(player => player !== this.state.objects[i].id);
@@ -105,8 +105,6 @@ class Game extends Component {
             this.setState({ objects: this.state.objects.filter((_, j) => j !== this.state.objects.indexOf(this.state.objects[i])) });
           }
         }
-        console.log(this.state.playersInGame);
-        console.log(this.state.objects);
       }
     });
 
@@ -158,9 +156,6 @@ class Game extends Component {
         setTimeout(scene.render(), 500);
       } else {
         const me = this.state.objects.filter(player => player.id === user)[0];
-        // if (me) {
-        //   database.ref('playerPosition/' + me.id).set({ color: 'black', x: me.position.x, y: me.position.y, z: me.position.z });
-        // }
         if (me && me.absolutePosition.y < -100) {
           this.playerPosition(me);
           database.ref(user).set({ 'xAcceleration': 0, 'zAcceleration': 0 });
@@ -217,7 +212,6 @@ class Game extends Component {
     const user = this.props.user.userId;
     const gameId = this.props.user.gameId;
     for (let i = 0; i < this.state.playersInGame.length; i++) {
-      console.log(this.state.playersInGame[i]);
       database.ref('playerPosition/' + this.state.playersInGame[i]).off();
     }
     database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true }).then(() => {
@@ -241,17 +235,15 @@ class Game extends Component {
     audio0.pause();
   }
 
-  createPlayerOnConnect(sce, id) {
+  createPlayerOnConnect(sce, id, texture) {
     const balls = ['/assets/textures/students/stone.png', '/assets/textures/students/net.png', '/assets/textures/students/alvin.png', '/assets/textures/students/andrew.png',
       '/assets/textures/students/denys.png', '/assets/textures/students/evan.png', '/assets/textures/students/snow.png', '/assets/textures/students/won_jun.png',
       '/assets/textures/students/grass-large.png'
     ];
-    const ballId = this.props.user.ball;
     const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); // Params: name, subdivs, size, scene
     player.checkCollisions = true;
     const ballMaterial = new BABYLON.StandardMaterial('material', sce);
-    const ballTexture = new BABYLON.Texture(`${balls[ballId]}`, sce);
-    ballMaterial.diffuseTexture = ballTexture;
+    const ballTexture = new BABYLON.Texture([balls][texture], sce);
     player.material = ballMaterial;
     player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.SphereImpostor, {
       mass: 1,
@@ -267,8 +259,12 @@ class Game extends Component {
     sphere.position.z = z;
   }
 
-  setColor(sphere, color) {
-    sphere.material.diffuseColor = new BABYLON.Color3(color.r, color.g, color.b);
+  setTexture(sphere, texture, scene) {
+    const balls = ['/assets/textures/students/stone.png', '/assets/textures/students/net.png', '/assets/textures/students/alvin.png', '/assets/textures/students/andrew.png',
+      '/assets/textures/students/denys.png', '/assets/textures/students/evan.png', '/assets/textures/students/snow.png', '/assets/textures/students/won_jun.png',
+      '/assets/textures/students/grass-large.png'
+    ];
+    sphere.material.diffuseTexture = new BABYLON.Texture(balls[texture], scene);
   }
 
   playerPosition(player) {
@@ -300,6 +296,7 @@ class Game extends Component {
   render() {
     return (
       <div>
+        <MuteSound />
         <WinScreen user={this.props.user} database={database} />
         <InfoScreen />
         <ScoreTable gameId={this.props.user.gameId} />
@@ -309,7 +306,7 @@ class Game extends Component {
   }
 }
 
-function control(user) {
+function control(user, info, playerObj) {
   const keyState = {};
 
   window.onkeydown = function(e) {
@@ -340,7 +337,9 @@ function control(user) {
   database.ref(user.id).set({ xAcceleration: 0, zAcceleration: 0 });
 
   function gameLoop() {
-    database.ref('playerPosition/' + user.id).set({ color: info.color, x: user.position.x, y: user.position.y, z: user.position.z });
+    if (!playerObj[user.id].remove) {
+      database.ref('playerPosition/' + user.id).set({ color: info.color, x: user.position.x, y: user.position.y, z: user.position.z });
+    }
     if (keyState[37] || keyState[65]) {
       if (xAcceleration < 5) {
         xAcceleration += 0.5;

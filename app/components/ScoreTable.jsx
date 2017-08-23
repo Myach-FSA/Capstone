@@ -7,34 +7,22 @@ class ScoreTable extends React.Component {
   constructor(props) {
     super(props);
     this.state={
-      children: [],
-      scores: []
+      children: []
     };
   }
   componentWillMount() {
     database.ref('users/').on('child_added', child => {
       const children = this.state.children;
       children.push(child.val());
-      this.setState({children: children});
-      console.log(child.val());
-      database.ref('games/'+this.props.gameId+'/playersInGame').on('value', player => {
-        children.find(element => {
-
-        });
-        const players=this.state.scores;
-        players.push(player.val());
-        this.setState({scores: players});
-        console.log('game player', player.val(), 'scores', this.state.scores);
-        // database.ref('games/'+this.props.gameId+'/playersInGame'+child.val()).userId).on('value', snapshot => {
-        //   const index=this.state.children.findIndex(element => element.userId===snapshot.val().userId);
-        //   children[index]=snapshot.val();
-        //   this.setState({children: children});
-        // });
-      });
-      database.ref('users/'+child.val().userId).on('value', snapshot => {
-        const index=this.state.children.findIndex(element => element.userId===snapshot.val().userId);
+      this.setState({ children: children });
+      database.ref('users/' + child.val().userId).on('value', snapshot => {
+        const index = this.state.children.findIndex(element => element.userId === snapshot.val().userId);
         children[index]=snapshot.val();
-        this.setState({children: children});
+        database.ref('games/' + snapshot.val().gameId + '/playersInGame/' + snapshot.val().userId+'/score').on('value', score => {
+          children[index].score=score.val();
+          this.setState({ children: children });
+        });
+        this.setState({ children: children });
       });
     });
   }
@@ -52,7 +40,7 @@ class ScoreTable extends React.Component {
                 <th id='tableList'><abbr title="Username">Username</abbr></th>
                 <th id='tableList'><abbr title="Won">Wins</abbr></th>
                 <th id='tableList'><abbr title="Lost">Losses</abbr></th>
-                <th id='tableList'><abbr title="Points">Total Points</abbr></th>
+                <th id='tableList'><abbr title="Points">Points</abbr></th>
               </tr>
             </thead>
             <tbody>
@@ -63,7 +51,7 @@ class ScoreTable extends React.Component {
                       <th id='tableList'>{child.username}</th>
                       <th id='tableList'>{child.wins}</th>
                       <th id='tableList'>{child.losses}</th>
-                      <th id='tableList'>{child.totalScore}</th>
+                      <th id='tableList'>{child.score}</th>
                     </tr>);
                 }
               }
