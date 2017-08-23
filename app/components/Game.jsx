@@ -54,7 +54,7 @@ class Game extends Component {
           if (newPlayer.id === user) {
             this.playerPosition(newPlayer);
             this.setTexture(newPlayer, texture, scene);
-            this.setState({ info: { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, color: newPlayer.material.diffuseColor} });
+            this.setState({ info: { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, color: newPlayer.material.diffuseColor } });
             database.ref('playerPosition/' + newPlayer.id).set(this.state.info);
           } else {
             this.setTexture(newPlayer, texture, scene);
@@ -148,21 +148,23 @@ class Game extends Component {
       if (!scene || (sceneNum !== num)) {
         num = sceneNum;
         switch (num) {
-        case 2:
-          scene = createScene2(canvas, engine);
-          break;
-        default: scene = createScene1(canvas, engine);
+          case 2:
+            scene = createScene2(canvas, engine);
+            break;
+          default: scene = createScene1(canvas, engine);
         }
         setTimeout(scene.render(), 500);
       } else {
         const me = this.state.objects.filter(player => player.id === user)[0];
-        if (me && me.absolutePosition.y < -100) {
-          this.playerPosition(me);
+        if (me && me.absolutePosition.y < -25) {
+          while (me.position.y < 0) {
+            this.playerPosition(me);
+          }
           database.ref(user).set({ 'xAcceleration': 0, 'zAcceleration': 0 });
           me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
           xAcceleration = 0;
           zAcceleration = 0;
-          database.ref('users/'+ user + '/totalScore').transaction((score) => {
+          database.ref('users/' + user + '/totalScore').transaction((score) => {
             score -= 1;
             return score;
           });
@@ -174,7 +176,7 @@ class Game extends Component {
         }
         if (winPos) {
           if (me && (Math.floor(me.absolutePosition.x) === winPos.x) && (Math.floor(me.absolutePosition.z) === winPos.z)) {
-            database.ref('users/'+ user + '/totalScore').transaction((score) => {
+            database.ref('users/' + user + '/totalScore').transaction((score) => {
               score += 1;
               return score;
             });
@@ -271,9 +273,9 @@ class Game extends Component {
     function randomPosition(min) {
       return Math.floor(Math.random() * min - min / 2);
     }
-    player.position.y = 2;
-    player.position.x = randomPosition(45);
-    player.position.z = randomPosition(45);
+    player.position.y = 5;
+    player.position.x = randomPosition(40);
+    player.position.z = randomPosition(40);
   }
 
   createCameraObj(scene, par) {
@@ -309,7 +311,7 @@ class Game extends Component {
 function control(user, info, playerObj) {
   const keyState = {};
 
-  window.onkeydown = function(e) {
+  window.onkeydown = function (e) {
     if (e.keyCode === 9) {
       e.preventDefault();
       document.getElementById('ScoreTable').className = 'scoreTable visible has-text-centered';
@@ -317,20 +319,20 @@ function control(user, info, playerObj) {
     }
   };
 
-  window.onkeyup = function(e) {
+  window.onkeyup = function (e) {
     if (e.keyCode === 9) {
       document.getElementById('ScoreTable').className = 'scoreTable invisible has-text-centered';
       document.getElementById('InfoScreen').className = 'infoScreen visible has-text-centered';
     }
   };
 
-  window.addEventListener('keydown', function(e) {
+  window.addEventListener('keydown', function (e) {
     keyState[e.keyCode || e.which] = true;
     if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
       e.preventDefault();
     }
   }, true);
-  window.addEventListener('keyup', function(e) {
+  window.addEventListener('keyup', function (e) {
     keyState[e.keyCode || e.which] = false;
   }, true);
 
@@ -338,7 +340,7 @@ function control(user, info, playerObj) {
 
   function gameLoop() {
     if (!playerObj[user.id].remove) {
-      database.ref('playerPosition/' + user.id).set({ color: info.color, x: user.position.x, y: user.position.y, z: user.position.z });
+      database.ref('playerPosition/' + user.id).set({ x: user.position.x, y: user.position.y, z: user.position.z });
     }
     if (keyState[37] || keyState[65]) {
       if (xAcceleration < 5) {
