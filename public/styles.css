@@ -219,14 +219,13 @@ body {
   color: #23d160;
 }
 
-#overlay {
+/* #overlay {
   position: absolute;
-  text-align: center;
+  justify-content: center;
   border: solid 2px white;
   z-index: 1;
-  transform: translateY(-1500%);
-  margin-left: 47%;
-}
+  transform: translateY(-50%);
+} */
 
 #choose {
   margin: 10% 10%;
@@ -262,4 +261,8 @@ body {
 
 .imgBall {
   border-radius: 50%;
+}
+
+#tableList {
+  color: #23d160;
 }
