@@ -18,6 +18,9 @@ const balls = [
 class ChooseBall extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      clicked: false,
+    }
     this.ballChoice = this.ballChoice.bind(this);
   }
 
@@ -27,6 +30,7 @@ class ChooseBall extends React.Component {
   }
 
   ballChoice(evt) {
+    this.setState({ clicked: true })
     this.props.chooseBall(+evt.target.id);
     this.sendDataToFB(+evt.target.id);
   }
@@ -37,7 +41,6 @@ class ChooseBall extends React.Component {
     const ref = firebase.database().ref('users/'+user.userId);
     user.ball=id;
     ref.child('wins').once('value').then(snapshot => {
-      console.log('snapshot', snapshot.exists());
       if (snapshot.exists())ref.update({gameId: user.gameId, ball: id});
       else ref.set(user);
     });
@@ -46,35 +49,35 @@ class ChooseBall extends React.Component {
   render() {
     const playerName = this.props.user.username && this.props.user.username ? this.props.user.username : 'Anonymous';
     const chosenBall = balls[this.props.user.ball];
-    const ballMessage = chosenBall ? `You have chosen ${chosenBall.name}` : 'You have not yet chosen a ball';
+    const ballMessage = this.state.clicked ? `You have chosen ${chosenBall.name}` : 'You have not yet chosen a ball';
 
     return (
-        <div className="content has-text-centered notification">
-          <h1><strong>Choose Your Ball</strong></h1>
-            <h5><strong>{ballMessage}</strong></h5>
-            <div className="horiz-marg">
-              <div className="columns is-multiline">
-                {balls && balls.map((ball, i) => (
-                  <article key={i}
-                    className="column is-one-third product-grid-item">
-                    <div key={ball.id} className="inner-product">
-                      <br />
-                      <figure className="image">
-                        <img src={ball.img} id={i} alt="Image" onClick={(evt) => this.ballChoice(evt)}/>
-                      </figure>
-                      <p className="subtitle">{ball.name}</p>
-                      <p className="subtitle">{ball.description}</p>
-                      <button id={i} onClick={(evt) => this.ballChoice(evt)}
-                        className="button is-success is-outlined">
-                        Choose Ball
+      <div className="content has-text-centered notification">
+        <h1><strong>Choose Your Ball</strong></h1>
+        <h5><strong>{ballMessage}</strong></h5>
+        <div className="horiz-marg">
+          <div className="columns is-multiline">
+            {balls && balls.map((ball, i) => (
+              <article key={i}
+                className="column is-one-third product-grid-item">
+                <div key={ball.id} className="inner-product">
+                  <br />
+                  <figure className="image">
+                    <img src={ball.img} className='imgBall' alt="Image" onClick={(evt) => this.ballChoice(evt)} />
+                  </figure>
+                  <p className="subtitle">{ball.name}</p>
+                  <p className="subtitle">{ball.description}</p>
+                  <button id={i} onClick={(evt) => this.ballChoice(evt)}
+                    className="button is-success is-outlined">
+                    Choose Ball
                       </button>
-                    </div>
-                  </article>
-                )
-                )}
-              </div>
-            </div>
+                </div>
+              </article>
+            )
+            )}
           </div>
+        </div>
+      </div>
     );
   }
 }

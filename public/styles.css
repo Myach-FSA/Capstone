@@ -45,7 +45,7 @@
 
 body {
   background: #191b21;
-  color: #1BC98E;
+  color: #23d160;
   font-family: Roboto, Helvetica, Arial, sans-serif;
   margin: 0;
   padding: 0;
@@ -59,31 +59,40 @@ body {
     box-shadow: none;
   }
   body {
-    border-top: 16px solid #1BC98E;
+    border-top: 16px solid #23d160;
   }
 }
 
 .notification {
   background-color: #191b21;
   border-style: dashed;
-  border-color: #1BC98E;
+  border-color: #23d160;
   margin-left: 5%;
   margin-right: 5%;
 }
 
 #neon {
-  background-color: #1BC98E;
+  background-color: #23d160;
   float: left;
   position: relative;
-  left: 50%;
-  width: 140px;
+  width: 180px;
   /* padding: 3px; */
   /* margin: 4px; */
   text-align: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
 }
 
 .notification strong {
   color: #1CA8DD;
+}
+
+.ingametext {
+  color: #23d160;
+  padding-top: 5%;
 }
 
 html,
@@ -110,11 +119,11 @@ body {
 }
 
 .icon .fa {
-  color: #1BC98E;
+  color: #23d160;
 }
 
 a {
-  color: #1BC98E;
+  color: #23d160;
 }
 
 #footersec {
@@ -212,17 +221,16 @@ body {
 }
 
 #greenText {
-  color: #1BC98E;
+  color: #23d160;
 }
 
-#overlay {
+/* #overlay {
   position: absolute;
-  text-align: center;
+  justify-content: center;
   border: solid 2px white;
   z-index: 1;
-  transform: translateY(-1500%);
-  margin-left: 47%;
-}
+  transform: translateY(-50%);
+} */
 
 #choose {
   margin: 10% 10%;
@@ -231,10 +239,11 @@ body {
 .winScreen {
   position: absolute;
   top: 30vh;
-  left: 15vw;
+  left: 20vw;
   height: 20vh;
-  width: 70vw;
+  width: 60vw;
 }
+
 .space {
   padding-top: 10%;
 }
@@ -249,4 +258,25 @@ body {
 
 #centerButtons {
   justify-content: center;
+}
+
+#muteSound {
+  position: absolute;
+  top: 1.5vh;
+  left: 5vw;
+  font-size: 30px;
+  color: white;
+  z-index: 100;
+}
+
+#noUnderline {
+  text-decoration: none;
+}
+
+.imgBall {
+  border-radius: 50%;
+}
+
+#tableList {
+  color: #23d160;
 }
