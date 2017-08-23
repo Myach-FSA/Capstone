@@ -1,52 +1,53 @@
 import React from 'react';
 import ReactDOM, { render } from 'react-dom';
-import { Link, NavLink, Router } from 'react-router-dom'
-import Firebase from 'firebase';
+import { Link, NavLink, Router } from 'react-router-dom';
+import firebase from 'firebase';
 
 const games = [
   { name: 'Mount Death', description: 'Mountains and stuff', img: '/assets/textures/grayball-choose.png' },
-  { name: 'Elysium', description: "Travel to the future", img: '/assets/textures/green_black_cubes.jpg' },
-  { name: 'Adventure Island', description: "Sand and stuff", img: '/assets/textures/netball-choose.png' },  
-]
+  { name: 'Elysium', description: 'Travel to the future', img: '/assets/textures/green_black_cubes.jpg' },
+  { name: 'Adventure Island', description: 'Sand and stuff', img: '/assets/textures/netball-choose.png' },
+];
 
 class ChooseGame extends React.Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.gameId = '';
-    this.initiateGame = this.initiateGame.bind(this)
-    this.joinGameId = this.joinGameId.bind(this)
+    this.initiateGame = this.initiateGame.bind(this);
+    this.joinGameId = this.joinGameId.bind(this);
   }
 
   gameChoice(evt) {
-    this.gameId = +evt.target.id
-    this.props.chooseGame(+evt.target.id)
+    this.gameId = +evt.target.id;
+    this.props.chooseGame(+evt.target.id);
   }
 
   initiateGame() {
-    let num = (Math.floor(Math.random() * 90000) + 10000).toString();
+    const num = (Math.floor(Math.random() * 90000) + 10000).toString();
     this.gameId = num;
-    this.props.chooseGame(num)
+    this.props.chooseGame(num);
     document.getElementById('gameID').value = num;
   }
 
   joinGameId() {
-    let num = document.getElementById('gameInput').value;
+    const num = document.getElementById('gameInput').value;
     this.gameId = num;
-    this.props.chooseGame(num)
+    this.props.chooseGame(num);
   }
 
-  sendDataToFB() {
+  sendDataToFB(input) {
+    console.log('input', input);
     const user = this.props.user;
-    const ref = firebase.database().ref("users/"+user.userId)
-    ref.set(user)
-    this.props.setUser(user)    
+    const ref = firebase.database().ref('users/'+user.userId);
+    ref.update({gameId: user.gameId});
+    this.props.setUser(user);
   }
 
   render() {
-    const playerName = this.props.user.username  && this.props.user.username ? this.props.user.username : 'Anonymous'
-    const chosenGame = games[this.props.user.gameId]
-    const gameMessage = chosenGame ? `You have chosen ${chosenGame.name}` : 'You have not yet chosen an arena'
-    const gameID = this.gameId && this.gameId
+    const playerName = this.props.user.username && this.props.user.username ? this.props.user.username : 'Anonymous';
+    const chosenGame = games[this.props.user.gameId];
+    const gameMessage = chosenGame ? `You have chosen ${chosenGame.name}` : 'You have not yet chosen an arena';
+    const gameID = this.gameId && this.gameId;
 
     return (
         <div className="content has-text-centered">
@@ -114,14 +115,14 @@ class ChooseGame extends React.Component {
 
 // /* -----------------    CONTAINER     ------------------ */
 
-import { setUser, chooseGame } from '../reducers/auth'
-import { connect } from 'react-redux'
+import { setUser, chooseGame } from '../reducers/auth';
+import { connect } from 'react-redux';
 import store from '../store';
 
 const mapStateToProps = (state) => ({
   user: state.auth.user
-})
+});
 
-const mapDispatch = ({ setUser, chooseGame })
+const mapDispatch = ({ setUser, chooseGame });
 
-export default connect(mapStateToProps, mapDispatch)(ChooseGame)
+export default connect(mapStateToProps, mapDispatch)(ChooseGame);
