@@ -38,7 +38,7 @@ class GameWaitRoom extends React.Component {
   getPlayers = (gameId, bool) => {
     if (bool) {
       firebase.database().ref('games').on('value', players => {
-        if (players.val()[gameId]) {
+        if (players.val()&&players.val()[gameId]) {
           this.setState({ numberOfPlayers: Object.keys(players.val()[gameId].playersInGame).length });
         }
       });
@@ -53,7 +53,7 @@ class GameWaitRoom extends React.Component {
   sendInfo = (info) => {
     const name = document.getElementById('nickname').value;
     this.props.submitName(name);
-    firebase.database().ref('users/' + this.props.user.userId).update({ 'username': name });  
+    firebase.database().ref('users/' + this.props.user.userId).update({ 'username': name });
 
     const database = firebase.database();
     const user = this.props.user;
