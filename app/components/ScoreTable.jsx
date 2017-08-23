@@ -6,8 +6,7 @@ const database = firebase.database();
 class ScoreTable extends React.Component {
   constructor(props) {
     super(props);
-    console.log('props', props);
-    this.state = {
+    this.state={
       children: []
     };
   }
@@ -26,9 +25,6 @@ class ScoreTable extends React.Component {
   componentWillUnmount() {
     database.ref('users/').off();
   }
-  // shouldComponentUpdate(nextProps) {
-  //   const different = this.state.children;
-  // }
   render() {
     return (
       <div id="ScoreTable" className="scoreTable invisible has-text-centered">
@@ -44,8 +40,12 @@ class ScoreTable extends React.Component {
           </thead>
           <tbody>
             {this.state.children.map(child => {
+<<<<<<< HEAD
               console.log('gameId', this.props.gameId);
               if (child.gameId === this.props.gameId) {
+=======
+              if (child.gameId===this.props.gameId) {
+>>>>>>> master
                 return (
                   <tr key={child.userId}>
                     <th>{child.username}</th>
