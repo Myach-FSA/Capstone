@@ -8,6 +8,7 @@ import InfoScreen from './InfoScreen';
 const auth = firebase.auth();
 import ScoreTable from './ScoreTable';
 import WinScreen from './WinScreen';
+import MuteSound from './MuteSound';
 
 const database = firebase.database();
 let sceneNum = 1;
@@ -292,6 +293,7 @@ class Game extends Component {
   render() {
     return (
       <div>
+        <MuteSound />
         <WinScreen user={this.props.user} database={database} />
         <InfoScreen />
         <ScoreTable gameId={this.props.user.gameId} />

@@ -231,10 +231,11 @@ body {
 .winScreen {
   position: absolute;
   top: 30vh;
-  left: 15vw;
+  left: 20vw;
   height: 20vh;
-  width: 70vw;
+  width: 60vw;
 }
+
 .space {
   padding-top: 10%;
 }
@@ -249,4 +250,13 @@ body {
 
 #centerButtons {
   justify-content: center;
+}
+
+#muteSound {
+  position: absolute;
+  top: 1.5vh;
+  left: 5vw;
+  font-size: 30px;
+  color: white;
+  z-index: 100;
 }
