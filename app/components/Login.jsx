@@ -32,5 +32,5 @@ export default ({ auth }) =>
   // redirect. If you prefer, you can signInWithRedirect, which always
   // redirects.
   <button className='facebook login'
-          onClick={() => auth.signInWithPopup(facebook)}>Login with Facebook</button>
+    onClick={() => auth.signInWithPopup(facebook)}>Login with Facebook</button>
 

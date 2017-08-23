@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM, {render} from 'react-dom';
+import ReactDOM, { render } from 'react-dom';
 
 class WinScreen extends React.Component {
   constructor(props) {
@@ -24,7 +24,7 @@ class WinScreen extends React.Component {
       const eventMessage = 'win,' + gameId + ',' + user;
       this.props.database.ref('event').set(eventMessage);
     }
-    return this.component;
+    return (<img className="winScreen invisible" src="/assets/winScreen.png" />);
   }
 };
 
