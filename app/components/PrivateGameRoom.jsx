@@ -46,7 +46,7 @@ class GameWaitRoom extends React.Component {
   getPlayers = (gameId, bool) => {
     if (bool) {
       firebase.database().ref('games').on('value', players => {
-        if (players.val()[gameId]) {
+        if (players.val()&&players.val()[gameId]) {
           this.setState({ numberOfPlayers: Object.keys(players.val()[gameId].playersInGame).length });
         }
       });

@@ -254,6 +254,7 @@ body {
 #centerButtons {
   justify-content: center;
 }
+<<<<<<< HEAD
 
 #noUnderline {
   text-decoration: none;
@@ -266,3 +267,5 @@ body {
 #tableList {
   color: #23d160;
 }
+=======
+>>>>>>> master
