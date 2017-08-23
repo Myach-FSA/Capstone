@@ -1,18 +1,18 @@
 import React from 'react';
 import ReactDOM, { render } from 'react-dom';
 import { Link, NavLink, Router } from 'react-router-dom';
-import Firebase from 'firebase';
+import firebase from 'firebase';
 
 const balls = [
   { name: 'Heavy Duty', description: 'Ball fashioned by the vikings themselves.', img: '/assets/textures/grayball-choose.png' },
-  { name: 'Sleuth', description: "You like things that move with the grace of a cheetah.", img: '/assets/textures/netball-choose.png' },
-  { name: 'Alvin', description: "Always win with Alvin.", img: '/assets/textures/students/alvin.png' },
-  { name: 'Andrew', description: "Andrew and his dog.", img: '/assets/textures/students/andrew.png' },
-  { name: 'Denis', description: "Pick Denis.", img: '/assets/textures/students/denys.png' },
-  { name: 'Evan', description: "You can never go wrong with this ball.", img: '/assets/textures/students/evan.png' }, 
-  { name: 'Snow', description: "No one wears fur like Snow.", img: '/assets/textures/students/snow.png' }, 
-  { name: 'Won Jun', description: "Won Jun is ... Won Jun.", img: '/assets/textures/students/won_jun.png' }, 
-  { name: 'Grass', description: "Maybe you like grass.", img: '/assets/textures/students/grass-large.png' },
+  { name: 'Sleuth', description: 'You like things that move with the grace of a cheetah.', img: '/assets/textures/netball-choose.png' },
+  { name: 'Alvin', description: 'Always win with Alvin.', img: '/assets/textures/students/alvin.png' },
+  { name: 'Andrew', description: 'Andrew and his dog.', img: '/assets/textures/students/andrew.png' },
+  { name: 'Denis', description: 'Pick Denis.', img: '/assets/textures/students/denys.png' },
+  { name: 'Evan', description: 'You can never go wrong with this ball.', img: '/assets/textures/students/evan.png' },
+  { name: 'Snow', description: 'No one wears fur like Snow.', img: '/assets/textures/students/snow.png' },
+  { name: 'Won Jun', description: 'Won Jun is ... Won Jun.', img: '/assets/textures/students/won_jun.png' },
+  { name: 'Grass', description: 'Maybe you like grass.', img: '/assets/textures/students/grass-large.png' },
 ];
 
 class ChooseBall extends React.Component {
@@ -28,13 +28,19 @@ class ChooseBall extends React.Component {
 
   ballChoice(evt) {
     this.props.chooseBall(+evt.target.id);
-    this.sendDataToFB();
+    this.sendDataToFB(+evt.target.id);
   }
 
-  sendDataToFB() {
+  sendDataToFB(id) {
+    console.log(this.props.user);
     const user = this.props.user;
     const ref = firebase.database().ref('users/'+user.userId);
-    ref.set(user);
+    user.ball=id;
+    ref.child('wins').once('value').then(snapshot => {
+      console.log('snapshot', snapshot.exists());
+      if (snapshot.exists())ref.update({gameId: user.gameId, ball: id});
+      else ref.set(user);
+    });
   }
 
   render() {
