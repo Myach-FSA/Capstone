@@ -5,11 +5,12 @@ import firebase from '../../fire';
 import createScene1 from './Scene1';
 import createScene2 from './Scene2';
 import InfoScreen from './InfoScreen';
-const auth = firebase.auth();
 import ScoreTable from './ScoreTable';
 import WinScreen from './WinScreen';
 
 const database = firebase.database();
+const auth = firebase.auth();
+
 let sceneNum = 1;
 let torus;
 let winPos;
@@ -19,7 +20,6 @@ const yAcceleration = 0;
 const changeScene = (num) => {
   sceneNum = num;
 };
-// let info;
 
 class Game extends Component {
   constructor(props) {
@@ -42,11 +42,9 @@ class Game extends Component {
 
     database.ref('games/' + gameId + '/playersInGame').on('value', (players) => {
       const playersObj = players.val();
+      console.log(playersObj);
       for (const playerId in playersObj) {
-        console.log('playersIngame', this.state.playersInGame.includes(playerId));
-        console.log('playersObj', playersObj);
         if (!this.state.playersInGame.includes(playerId) && playersObj[playerId].create) {
-          console.log('1', playersObj[playerId].create);
           const newPlayer = this.createPlayerOnConnect(scene, playerId);
           if (newPlayer.id === user) {
             this.playerPosition(newPlayer);
@@ -71,11 +69,10 @@ class Game extends Component {
           newPlayersState.push(playerId);
           this.setState({ objects: newState });
           this.setState({ playersInGame: newPlayersState });
-          console.log('playersIngame after push', this.state.playersInGame);
           const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene);
           if (playerId === user) {
             const playerDummy = this.createCameraObj(scene, newPlayer);
-            control(newPlayer, this.state.info);
+            control(newPlayer, this.state.info, playersObj);
             followCamera.lockedTarget = playerDummy;
             scene.activeCamera = followCamera;
             followCamera.radius = 15; // how far from the object to follow
@@ -85,10 +82,8 @@ class Game extends Component {
             followCamera.maxCameraSpeed = 10; // speed limit / 0.05
             followCamera.attachControl(canvas, true);
           }
-          console.log(newPlayer.id);
           database.ref(newPlayer.id).on('value', (otherPlayer) => {
             if (otherPlayer.val()) {
-              console.log(otherPlayer.val());
               newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(otherPlayer.val().zAcceleration, 0, otherPlayer.val().xAcceleration, 0));
             }
           });
@@ -98,18 +93,17 @@ class Game extends Component {
         console.log('fix null', playersObj[this.state.playersInGame[i]]);
         if (playersObj[this.state.playersInGame[i]]) {
           if (playersObj[this.state.playersInGame[i]].remove) {
-            console.log('this.state.objects', this.state.objects[i])
+            database.ref('playerPosition/' + this.state.playersInGame[i]).off();
             this.state.objects[i].dispose();
             this.state.objects[i].physicsImpostor.dispose();
             const newState = this.state.playersInGame.filter(player => { return player !== this.state.objects[i].id; });
             this.setState({ playersInGame: newState });
             this.setState({ objects: this.state.objects.filter((_, j) => { return j !== this.state.objects.indexOf(this.state.objects[i]); }) });
-            console.log('im stopping the engine');
+            console.log('playersInGame', this.state.playersInGame);
+            console.log('objects', this.state.objects);
             // engine.stopRenderLoop();
           }
         }
-        console.log(this.state.playersInGame);
-        console.log(this.state.objects);
       }
     });
 
@@ -304,7 +298,7 @@ class Game extends Component {
   }
 }
 
-function control(user, info) {
+function control(user, info, playerObj) {
   const keyState = {};
 
   window.onkeydown = function (e) {
@@ -335,7 +329,9 @@ function control(user, info) {
   database.ref(user.id).set({ xAcceleration: 0, zAcceleration: 0 });
 
   function gameLoop() {
-    database.ref('playerPosition/' + user.id).set({ color: info.color, x: user.position.x, y: user.position.y, z: user.position.z });
+    if (playerObj[user.id].remove) {
+      database.ref('playerPosition/' + user.id).set({ color: info.color, x: user.position.x, y: user.position.y, z: user.position.z });
+    }
     if (keyState[37] || keyState[65]) {
       if (xAcceleration < 5) {
         xAcceleration += 0.5;
