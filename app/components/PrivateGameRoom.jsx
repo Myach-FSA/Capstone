@@ -25,6 +25,7 @@ class GameWaitRoom extends React.Component {
       if (!a) {
         firebase.database().ref('games/' + user.gameId).set({ playersInGame: { [this.props.user.userId]: { 'score': 0, 'remove': false } } });
       } else {
+        this.setState({ isAdmin: false })        
         firebase.database().ref('games/' + user.gameId + '/playersInGame/' + this.props.user.userId).set({ 'score': 0, 'remove': false });
       }
     });
@@ -64,7 +65,7 @@ class GameWaitRoom extends React.Component {
     return (
       <div className='space'>
         <div className="content has-text-centered notification">
-          <h1><strong>Enter Username</strong></h1>
+          <h1><strong>Enter Your Name</strong></h1>
           <div id='centerInput' className="field has-addons">
             <p className="control">
               <input id='nickname' className="input" type="text" placeholder="Nickname" />
@@ -77,7 +78,7 @@ class GameWaitRoom extends React.Component {
               <h1><strong>Your Game ID: {this.props.user.gameId}</strong></h1>
               <p>Send this code to your friends!</p>
             </div>
-            <SceneList gameId={this.props.match.params.id} />
+            {/* <SceneList gameId={this.props.match.params.id} /> */}
           </div>
         )}
         <ChooseBall />
@@ -87,16 +88,16 @@ class GameWaitRoom extends React.Component {
             <p className="control">
               <Link to={`/game/${this.props.user.gameId}/play`}>
                 <button
-                  className="button is-success"
+                  className="button is-success is-large"
                   type="submit"
                   title="playbutton"
                   onClick={() => { this.sendInfo(); }}>
-                  Play Now!
+                    PLAY NOW!
               </button>
               </Link>
             </p>
             <p>
-              <button
+              {/* <button
                 className="button"
                 type="submit"
                 title="publicPrivate"
@@ -107,7 +108,7 @@ class GameWaitRoom extends React.Component {
                 {!this.state.publicGame &&
                   <i className="fa fa-lock"> Private</i>
                 }
-              </button>
+              </button> */}
             </p>
           </div>
         </div>

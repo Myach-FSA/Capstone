@@ -4,9 +4,11 @@ import { Link, NavLink, Router } from 'react-router-dom'
 import Firebase from 'firebase';
 
 const games = [
-  { name: 'Mount Death', description: 'Mountains and stuff', img: '/assets/textures/grayball-choose.png' },
+  { name: 'Land of Blue Fog', description: 'Where mysteries remain unsolved', img: '/assets/textures/bluefog.jpg' },
   { name: 'Elysium', description: "Travel to the future", img: '/assets/textures/green_black_cubes.jpg' },
-  { name: 'Adventure Island', description: "Sand and stuff", img: '/assets/textures/netball-choose.png' },  
+  { name: 'Red Cubes', description: "Danger awaits", img: '/assets/textures/red_cubes.jpg' },  
+  { name: 'Cube Mountain', description: "Steps to oblivion", img: '/assets/textures/stacked_cubes.jpg' },  
+  { name: 'Orb in the sky', description: "Heaven awaits for the victor", img: '/assets/textures/teddy-kelley-sky.jpg' },    
 ]
 
 class ChooseGame extends React.Component {

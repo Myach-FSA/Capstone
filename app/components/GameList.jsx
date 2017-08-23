@@ -42,7 +42,7 @@ class GameList extends React.Component {
           <thead>
             <tr>
               <th><abbr title='GameId'>GameId</abbr></th>
-              <th><abbr title='Map'>Map</abbr></th>
+              {/* <th><abbr title='Map'>Map</abbr></th> */}
               <th><abbr title='NumPlayers'>Player #</abbr></th>
               <th><abbr title='Security'>Private / Public</abbr></th>
               <th><abbr title='Select'>Select</abbr></th>
@@ -54,9 +54,9 @@ class GameList extends React.Component {
                 return (
                   <tr key={game} onClick={(evt) => this.selectGame(evt)}>
                     <th>{game}</th>
-                    <th>map name placeholder</th>
+                    {/* <th>map name placeholder</th> */}
                     <th>[{Object.keys(this.state.games[game].playersInGame).length}/4]</th>
-                    <th>Public/Private</th>
+                    <th>Public</th>
                     <th ><a name={game} onClick={(evt) => this.selectGame(evt)} className="button is-primary">JOIN</a></th>
                   </tr>
                 );

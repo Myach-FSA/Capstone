@@ -54,7 +54,7 @@ class ChooseBall extends React.Component {
                     <div key={ball.id} className="inner-product">
                       <br />
                       <figure className="image">
-                        <img src={ball.img} id={i} alt="Image" onClick={(evt) => this.ballChoice(evt)}/>
+                        <img src={ball.img} id='img' alt="Image" onClick={(evt) => this.ballChoice(evt)}/>
                       </figure>
                       <p className="subtitle">{ball.name}</p>
                       <p className="subtitle">{ball.description}</p>
