@@ -18,7 +18,7 @@ class InfoScreen extends React.Component {
         <h4>{totalScore}</h4>
         <br></br>
         <p>Points needed to win: </p>
-        <p>{10 - totalScore}</p>
+        <p>{5 - totalScore}</p>
       </div>
     );
   }
