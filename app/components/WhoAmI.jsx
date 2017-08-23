@@ -17,13 +17,13 @@ class LoginUser extends React.Component {
     const email = evt.target.email.value;
     const password = evt.target.password.value;
     auth.signInWithEmailAndPassword(email, password)
-    .then(response => {
-      this.props.login({ id: response.uid });
-    })
-    .then(() => {
-      this.props.history.push('/');
-    })
-    .catch(error => console.error(error));
+      .then(response => {
+        this.props.login({ id: response.uid });
+      })
+      .then(() => {
+        this.props.history.push('/');
+      })
+      .catch(error => console.error(error));
   }
 
   render() {
@@ -73,12 +73,12 @@ class LoginUser extends React.Component {
 /* -----------------    CONTAINER     ------------------ */
 
 import { login } from '../reducers/auth';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 
 const mapState = (state) => (
-  {user: state.user }
+  { user: state.user }
 );
 
-const mapDispatch = ({login});
+const mapDispatch = ({ login });
 
 export default withRouter(connect(mapState, mapDispatch)(LoginUser));
