@@ -10,9 +10,8 @@ import ScoreTable from './ScoreTable';
 import WinScreen from './WinScreen';
 
 const database = firebase.database();
-const objects = [];
-const thisPlayer = '';
-const playersInGame = {};
+// const objects = [];
+// const playersInGame = {};
 let sceneNum = 1;
 let torus;
 let winPos;
@@ -27,6 +26,10 @@ let info;
 class Game extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      playersInGame: {},
+      objects: [],
+    };
   }
 
   componentDidMount() {
@@ -36,12 +39,14 @@ class Game extends Component {
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
     let num = sceneNum;
+    const playersInGame = this.state.playersInGame;
     let scene = createScene1(canvas, engine);
 
     database.ref('games/' + gameId + '/playersInGame').on('value', (players) => {
       const playersObj = players.val();
       for (const playerId in playersObj) {
         if (!playersInGame[playerId] || playersInGame.scene) {
+          console.log('creating');
           const newPlayer = this.createPlayerOnConnect(scene, playerId);
           if (newPlayer.id === user) {
             this.playerPosition(newPlayer);
@@ -78,17 +83,24 @@ class Game extends Component {
               newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(otherPlayer.val().zAcceleration, 0, otherPlayer.val().xAcceleration, 0));
             }
           });
-          objects.push(newPlayer);
+          const newState = this.state.objects.slice();
+          newState.push(newPlayer);
+          console.log('adding to object', newState);
+          this.setState({ objects: newState });
           playersInGame[playerId] = true;
         }
       }
-      for (let i = 0; i < objects.length; i++) {
+      for (let i = 0; i < this.state.objects.length; i++) {
         if (playersObj) {
-          if (playersObj[objects[i].id].remove) {
-            objects[i].dispose();
+          if (playersObj[this.state.objects[i].id].remove) {
+            this.state.objects[i].dispose();
+            console.log(this.state.objects.filter((_, j) => { return j !== this.state.objects.indexOf(this.state.objects[i]); }));
+            // this.setState({playersInGame: })
+            this.setState({ objects: this.state.objects.filter((_, j) => { return j !== this.state.objects.indexOf(this.state.objects[i]); }) });
           }
         }
       }
+      console.log('objectss', this.state.objects);
     });
 
     database.ref('games/' + gameId).update({ 'winPosition': { x: 10, z: 10 } });
@@ -140,7 +152,8 @@ class Game extends Component {
         playersInGame.scene = true;
         playersInGame.scene = false;
       } else {
-        const me = objects.filter(player => player.id === user)[0];
+        // console.log(this.state.objects);
+        const me = this.state.objects.filter(player => player.id === user)[0];
         if (me && me.absolutePosition.y < -100) {
           this.playerPosition(me);
           database.ref(user).set({ 'xAcceleration': 0, 'zAcceleration': 0 });
@@ -200,6 +213,7 @@ class Game extends Component {
     database.ref('playerPosition/' + user).remove();
     database.ref(user).remove();
     database.ref('games/' + gameId + '/playersInGame').off();
+    database.ref(this.props.user.userId).off();
     audio0.pause();
   }
 
