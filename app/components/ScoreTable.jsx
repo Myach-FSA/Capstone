@@ -13,7 +13,7 @@ class ScoreTable extends React.Component {
   }
   componentWillMount() {
     database.ref('users/').on('child_added', child => {
-      const children=this.state.children;
+      const children = this.state.children;
       children.push(child.val());
       this.setState({children: children});
       console.log(child.val());
@@ -43,32 +43,34 @@ class ScoreTable extends React.Component {
   }
   render() {
     return (
-      <div id="ScoreTable" className="scoreTable invisible has-text-centered">
-        <h1>Scores</h1>
-        <table className="table">
-          <thead>
-            <tr>
-              <th><abbr title="Username">Username</abbr></th>
-              <th><abbr title="Won">Wins</abbr></th>
-              <th><abbr title="Lost">Losses</abbr></th>
-              <th><abbr title="Points">Current Points</abbr></th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.state.children.map(child => {
-              if (child.gameId===this.props.gameId) {
-                return (
-              <tr key={child.userId}>
-                <th>{child.username}</th>
-                <th>{child.wins}</th>
-                <th>{child.losses}</th>
-                <th>{child.totalScore}</th>
-              </tr>);
+      <div className="container is-fluid content has-text-centered">
+        <div id="ScoreTable" className="scoreTable invisible has-text-centered notification">
+          <h1><strong>Scores</strong></h1>
+          <table>
+            <thead>
+              <tr>
+                <th id='tableList'><abbr title="Username">Username</abbr></th>
+                <th id='tableList'><abbr title="Won">Wins</abbr></th>
+                <th id='tableList'><abbr title="Lost">Losses</abbr></th>
+                <th id='tableList'><abbr title="Points">Total Points</abbr></th>
+              </tr>
+            </thead>
+            <tbody>
+              {this.state.children.map(child => {
+                if (child.gameId === this.props.gameId) {
+                  return (
+                    <tr key={child.userId}>
+                      <th id='tableList'>{child.username}</th>
+                      <th id='tableList'>{child.wins}</th>
+                      <th id='tableList'>{child.losses}</th>
+                      <th id='tableList'>{child.totalScore}</th>
+                    </tr>);
+                }
               }
-            }
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     );
   };

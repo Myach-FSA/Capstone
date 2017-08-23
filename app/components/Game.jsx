@@ -31,6 +31,7 @@ class Game extends Component {
   }
 
   componentDidMount() {
+    database.ref('event').set('placeholder');
     audio0.play();
     const user = this.props.user.userId;
     const gameId = this.props.user.gameId;
@@ -299,7 +300,7 @@ class Game extends Component {
   render() {
     return (
       <div>
-        {/* <WinScreen user={this.props.user}/> */}
+        <WinScreen user={this.props.user} database={database} />
         <InfoScreen />
         <ScoreTable gameId={this.props.user.gameId} />
         <canvas className='gameDisplay ' ref="renderCanvas"></canvas>

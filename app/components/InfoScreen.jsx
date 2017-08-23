@@ -15,10 +15,10 @@ class InfoScreen extends React.Component {
       <div id="InfoScreen" className="infoScreen has-text-centered">
         <br></br>
         <h4>Your Score: </h4>
-        <h4>{ totalScore }</h4>
+        <h4>{totalScore}</h4>
         <br></br>
-          <p>Points needed to win: </p>
-          <p>{ 10 - totalScore }</p>
+        <p>Points needed to win: </p>
+        <p>{10 - totalScore}</p>
       </div>
     );
   }

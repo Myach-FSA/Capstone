@@ -8,10 +8,10 @@ class NavbarSection extends React.Component {
   }
 
   handleLogout() {
-    this.props.logOut()  
-    this.props.history.push('/')    
+    this.props.logOut()
+    this.props.history.push('/')
   };
-  
+
   render() {
     return (
       <header className="nav headersec">
@@ -54,12 +54,12 @@ class NavbarSection extends React.Component {
 /* -----------------    CONTAINER     ------------------ */
 
 import { logOut } from '../reducers/auth'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 const mapState = (state, componentProps) => (
-  {user: state.auth }
+  { user: state.auth }
 )
 
-const mapDispatch = ({logOut})
+const mapDispatch = ({ logOut })
 
 export default withRouter(connect(mapState, mapDispatch)(NavbarSection))
