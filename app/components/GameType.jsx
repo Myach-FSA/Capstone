@@ -59,19 +59,19 @@ class GameType extends React.Component {
             <div>
               {!this.props.gameList &&
                 <div className="field is-grouped" id="centerInput">
-                <p className='control'>
-                  <button className="button is-primary is-large" id="neon" onClick={() => this.initiateGame()}>
+                  <p className='control'>
+                    <button className="button is-primary is-large" id="neon" onClick={() => this.initiateGame()}>
                       Create a Game
                   </button>
-                </p>
-                <p>
-                  <button className="button is-primary is-large" id="neon" onClick={() => this.showJoinPage()}>
-                    <Link to={`/choose`} id='noUnderline'>
-                      Join a Game
+                  </p>
+                  <p>
+                    <button className="button is-primary is-large" id="neon" onClick={() => this.showJoinPage()}>
+                      <Link to={`/choose`} id='noUnderline'>
+                        Join a Game
                     </Link>
-                  </button>
-                </p>
-              </div>
+                    </button>
+                  </p>
+                </div>
               }
               {this.props.gameList &&
                 <Switch>

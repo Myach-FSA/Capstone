@@ -7,19 +7,19 @@ class ScoreTable extends React.Component {
   constructor(props) {
     super(props);
     console.log('props', props);
-    this.state={
+    this.state = {
       children: []
     };
   }
   componentWillMount() {
     database.ref('users/').on('child_added', child => {
-      const children=this.state.children;
+      const children = this.state.children;
       children.push(child.val());
-      this.setState({children: children});
-      database.ref('users/'+child.val().userId).on('value', snapshot => {
-        const index=this.state.children.findIndex(element => element.userId===snapshot.val().userId);
-        children[index]=snapshot.val();
-        this.setState({children: children});
+      this.setState({ children: children });
+      database.ref('users/' + child.val().userId).on('value', snapshot => {
+        const index = this.state.children.findIndex(element => element.userId === snapshot.val().userId);
+        children[index] = snapshot.val();
+        this.setState({ children: children });
       });
     });
   }
@@ -45,14 +45,14 @@ class ScoreTable extends React.Component {
           <tbody>
             {this.state.children.map(child => {
               console.log('gameId', this.props.gameId);
-              if (child.gameId===this.props.gameId) {
+              if (child.gameId === this.props.gameId) {
                 return (
-              <tr key={child.userId}>
-                <th>{child.username}</th>
-                <th>{child.wins}</th>
-                <th>{child.losses}</th>
-                <th>{child.totalScore}</th>
-              </tr>);
+                  <tr key={child.userId}>
+                    <th>{child.username}</th>
+                    <th>{child.wins}</th>
+                    <th>{child.losses}</th>
+                    <th>{child.totalScore}</th>
+                  </tr>);
               }
             }
             )}

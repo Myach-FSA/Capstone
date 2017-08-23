@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM, {render} from 'react-dom';
+import ReactDOM, { render } from 'react-dom';
 
 class WinScreen extends React.Component {
   constructor(props) {
@@ -12,7 +12,7 @@ class WinScreen extends React.Component {
       $('.winScreen').toggleClass('invisible');
       this.winImgVisible = true;
     }
-    return (<img className="winScreen invisible" src="/assets/winScreen.png"/>);
+    return (<img className="winScreen invisible" src="/assets/winScreen.png" />);
   }
 };
 

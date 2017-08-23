@@ -14,11 +14,12 @@ class GameWaitRoom extends React.Component {
       isAdmin: true,
       numberOfPlayers: 0,
       publicGame: false,
+      canPlay: false,
     };
   }
+
   componentDidMount() {
     const user = this.props.user;
-
     const userRef = firebase.database().ref('games/' + user.gameId);
     userRef.once('value', (snapshot) => {
       var a = snapshot.exists();
@@ -30,6 +31,12 @@ class GameWaitRoom extends React.Component {
       }
     });
     this.getPlayers(user.gameId, true);
+  }
+
+  shouldComponentUpdate(nextProps) {
+    const differentBallId = this.props.user.ball !== nextProps.ball;
+    this.setState({ canPlay: true })
+    return differentBallId;
   }
 
   componentWillUnmount() {
@@ -62,6 +69,26 @@ class GameWaitRoom extends React.Component {
   }
 
   render() {
+    
+    const yesPlay = 
+      <button
+        className="button is-success is-large"
+        type="submit"
+        title="playbutton"
+        onClick={() => { this.sendInfo(); }}
+        >
+        PLAY NOW!
+      </button>
+    const noCannotPlay =
+      <button
+      className="button is-success is-large"
+      type="submit"
+      title="playbutton"
+      onClick={() => { this.sendInfo(); }}
+      disabled>
+      PLAY NOW!
+    </button>
+    
     return (
       <div className='space'>
         <div className="content has-text-centered notification">
@@ -87,28 +114,10 @@ class GameWaitRoom extends React.Component {
           <div id='centerButtons' className="field is-grouped">
             <p className="control">
               <Link to={`/game/${this.props.user.gameId}/play`}>
-                <button
-                  className="button is-success is-large"
-                  type="submit"
-                  title="playbutton"
-                  onClick={() => { this.sendInfo(); }}>
-                    PLAY NOW!
-              </button>
               </Link>
             </p>
             <p>
-              {/* <button
-                className="button"
-                type="submit"
-                title="publicPrivate"
-                onClick={() => { this.security(); }}>
-                {this.state.publicGame &&
-                  <i className="fa fa-unlock"> Public</i>
-                }
-                {!this.state.publicGame &&
-                  <i className="fa fa-lock"> Private</i>
-                }
-              </button> */}
+              { this.state.canPlay ? yesPlay : noCannotPlay }
             </p>
           </div>
         </div>

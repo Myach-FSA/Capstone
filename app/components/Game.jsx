@@ -197,9 +197,9 @@ class Game extends Component {
   }
 
   createPlayerOnConnect(sce, id) {
-    const balls = ['/assets/textures/students/stone.png', '/assets/textures/students/net.png', '/assets/textures/students/alvin.png', '/assets/textures/students/andrew.png', 
-    '/assets/textures/students/denys.png', '/assets/textures/students/evan.png', '/assets/textures/students/snow.png', '/assets/textures/students/won_jun.png',
-    '/assets/textures/students/grass-large.png'
+    const balls = ['/assets/textures/students/stone.png', '/assets/textures/students/net.png', '/assets/textures/students/alvin.png', '/assets/textures/students/andrew.png',
+      '/assets/textures/students/denys.png', '/assets/textures/students/evan.png', '/assets/textures/students/snow.png', '/assets/textures/students/won_jun.png',
+      '/assets/textures/students/grass-large.png'
     ];
     const ballId = this.props.user.ball;
     const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); // Params: name, subdivs, size, scene
@@ -258,7 +258,7 @@ class Game extends Component {
       <div>
         {/* <WinScreen user={this.props.user}/> */}
         <InfoScreen />
-        <ScoreTable gameId={this.props.user.gameId}/>
+        <ScoreTable gameId={this.props.user.gameId} />
         <canvas className='gameDisplay ' ref="renderCanvas"></canvas>
       </div>
     );

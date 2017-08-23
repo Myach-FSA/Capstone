@@ -9,9 +9,9 @@ const balls = [
   { name: 'Alvin', description: "Always win with Alvin.", img: '/assets/textures/students/alvin.png' },
   { name: 'Andrew', description: "Andrew and his dog.", img: '/assets/textures/students/andrew.png' },
   { name: 'Denis', description: "Pick Denis.", img: '/assets/textures/students/denys.png' },
-  { name: 'Evan', description: "You can never go wrong with this ball.", img: '/assets/textures/students/evan.png' }, 
-  { name: 'Snow', description: "No one wears fur like Snow.", img: '/assets/textures/students/snow.png' }, 
-  { name: 'Won Jun', description: "Won Jun is ... Won Jun.", img: '/assets/textures/students/won_jun.png' }, 
+  { name: 'Evan', description: "You can never go wrong with this ball.", img: '/assets/textures/students/evan.png' },
+  { name: 'Snow', description: "No one wears fur like Snow.", img: '/assets/textures/students/snow.png' },
+  { name: 'Won Jun', description: "Won Jun is ... Won Jun.", img: '/assets/textures/students/won_jun.png' },
   { name: 'Grass', description: "Maybe you like grass.", img: '/assets/textures/students/grass-large.png' },
 ];
 
@@ -33,7 +33,7 @@ class ChooseBall extends React.Component {
 
   sendDataToFB() {
     const user = this.props.user;
-    const ref = firebase.database().ref('users/'+user.userId);
+    const ref = firebase.database().ref('users/' + user.userId);
     ref.set(user);
   }
 
@@ -43,32 +43,32 @@ class ChooseBall extends React.Component {
     const ballMessage = chosenBall ? `You have chosen ${chosenBall.name}` : 'You have not yet chosen a ball';
 
     return (
-        <div className="content has-text-centered notification">
-          <h1><strong>Choose Your Ball</strong></h1>
-            <h5><strong>{ballMessage}</strong></h5>
-            <div className="horiz-marg">
-              <div className="columns is-multiline">
-                {balls && balls.map((ball, i) => (
-                  <article key={i}
-                    className="column is-one-third product-grid-item">
-                    <div key={ball.id} className="inner-product">
-                      <br />
-                      <figure className="image">
-                        <img src={ball.img} id='img' alt="Image" onClick={(evt) => this.ballChoice(evt)}/>
-                      </figure>
-                      <p className="subtitle">{ball.name}</p>
-                      <p className="subtitle">{ball.description}</p>
-                      <button id={i} onClick={(evt) => this.ballChoice(evt)}
-                        className="button is-success is-outlined">
-                        Choose Ball
+      <div className="content has-text-centered notification">
+        <h1><strong>Choose Your Ball</strong></h1>
+        <h5><strong>{ballMessage}</strong></h5>
+        <div className="horiz-marg">
+          <div className="columns is-multiline">
+            {balls && balls.map((ball, i) => (
+              <article key={i}
+                className="column is-one-third product-grid-item">
+                <div key={ball.id} className="inner-product">
+                  <br />
+                  <figure className="image">
+                    <img src={ball.img} id='img' alt="Image" onClick={(evt) => this.ballChoice(evt)} />
+                  </figure>
+                  <p className="subtitle">{ball.name}</p>
+                  <p className="subtitle">{ball.description}</p>
+                  <button id={i} onClick={(evt) => this.ballChoice(evt)}
+                    className="button is-success is-outlined">
+                    Choose Ball
                       </button>
-                    </div>
-                  </article>
-                )
-                )}
-              </div>
-            </div>
+                </div>
+              </article>
+            )
+            )}
           </div>
+        </div>
+      </div>
     );
   }
 }
