@@ -83,8 +83,10 @@ class Game extends Component {
         }
       }
       for (let i = 0; i < objects.length; i++) {
-        if (playersObj[objects[i].id].remove) {
-          objects[i].dispose();
+        if (playersObj) {
+          if (playersObj[objects[i].id].remove) {
+            objects[i].dispose();
+          }
         }
       }
     });
