@@ -40,12 +40,7 @@ class ScoreTable extends React.Component {
           </thead>
           <tbody>
             {this.state.children.map(child => {
-<<<<<<< HEAD
-              console.log('gameId', this.props.gameId);
-              if (child.gameId === this.props.gameId) {
-=======
               if (child.gameId===this.props.gameId) {
->>>>>>> master
                 return (
                   <tr key={child.userId}>
                     <th>{child.username}</th>
