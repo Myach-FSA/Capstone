@@ -7,9 +7,6 @@ class WinScreen extends React.Component {
     this.winImgVisible = false;
     this.component = null;
   }
-  // componentWillMount() {
-  // }
-
   render() {
     this.props.database.ref('event').on('value', (eventMessage) => {
       const eventType = eventMessage.val().split(',')[0];
