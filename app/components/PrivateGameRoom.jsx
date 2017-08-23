@@ -23,9 +23,9 @@ class GameWaitRoom extends React.Component {
     userRef.once('value', (snapshot) => {
       var a = snapshot.exists();
       if (!a) {
-        firebase.database().ref('games/' + user.gameId).set({ playersInGame: { [this.props.user.userId]: { 'score': 0, 'remove': false } } });
+        firebase.database().ref('games/' + user.gameId).set({ playersInGame: { [this.props.user.userId]: { 'create': false, 'score': 0, 'remove': false } } });
       } else {
-        firebase.database().ref('games/' + user.gameId + '/playersInGame/' + this.props.user.userId).set({ 'score': 0, 'remove': false });
+        firebase.database().ref('games/' + user.gameId + '/playersInGame/' + this.props.user.userId).set({ 'create': false, 'score': 0, 'remove': false });
       }
     });
     this.getPlayers(user.gameId, true);
@@ -57,6 +57,15 @@ class GameWaitRoom extends React.Component {
 
     const database = firebase.database();
     const user = this.props.user;
+    const userRef = firebase.database().ref('games/' + user.gameId);
+    userRef.once('value', (snapshot) => {
+      var a = snapshot.exists();
+      if (!a) {
+        database.ref('games/' + user.gameId + '/playersInGame/' + this.props.user.userId).set({ 'score': 0, 'create': true, 'remove': false });
+      } else {
+        database.ref('games/' + user.gameId + '/playersInGame/' + this.props.user.userId).update({ 'score': 0, 'create': true, 'remove': false });
+      }
+    });
     // firebase.database().ref('games/' + user.gameId).update({ security: this.state.security });
   }
 
