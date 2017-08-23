@@ -17,29 +17,6 @@ class ChooseGame extends React.Component {
     this.joinGameId = this.joinGameId.bind(this)
   }
 
-//   componentDidMount() {
-//     const anonymousUser = {
-//       userId: this.props.loginObj.uid,
-//       username: this.props.loginObj.uid,
-//       wins: 0,
-//       totalScore: 0,
-//       losses: 0,
-//       ball: 0,
-//       gameId: 0,
-//     }
-//     const user = this.props.loginObj.email ? this.props.loginObj : anonymousUser
-//     this.gameChoice = this.gameChoice.bind(this)
-//     this.initiateGame = this.initiateGame.bind(this)
-//     this.joinGameId = this.joinGameId.bind(this)
-//     this.sendDataToFB = this.sendDataToFB.bind(this)
-//     this.props.setUser(user)      
-//   }
-
-//   shouldComponentUpdate(nextProps){
-//     const differentGameRoomId = this.props.user.gameId !== nextProps.gameId;
-//     return differentGameRoomId
-//   }
-
   gameChoice(evt) {
     this.gameId = +evt.target.id
     this.props.chooseGame(+evt.target.id)

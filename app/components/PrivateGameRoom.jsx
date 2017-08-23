@@ -35,12 +35,6 @@ class GameWaitRoom extends React.Component {
     firebase.database().ref('games').off();
   }
 
-  submitUserName(evt) {
-    evt.preventDefault();
-    const name = document.getElementById('nickname').value;
-    this.props.submitName(name);
-  }
-
   getPlayers = (gameId, bool) => {
     if (bool) {
       firebase.database().ref('games').on('value', players => {
@@ -57,6 +51,10 @@ class GameWaitRoom extends React.Component {
 
   // Will use sendInfo later for scene selection / public or private games
   sendInfo = (info) => {
+    const name = document.getElementById('nickname').value;
+    this.props.submitName(name);
+    firebase.database().ref('users/' + this.props.user.userId).update({ 'username': name });  
+
     const database = firebase.database();
     const user = this.props.user;
     // firebase.database().ref('games/' + user.gameId).update({ security: this.state.security });
@@ -67,14 +65,9 @@ class GameWaitRoom extends React.Component {
       <div className='space'>
         <div className="content has-text-centered notification">
           <h1><strong>Enter Username</strong></h1>
-          <div className="field has-addons">
+          <div id='centerInput' className="field has-addons">
             <p className="control">
               <input id='nickname' className="input" type="text" placeholder="Nickname" />
-            </p>
-            <p className="control">
-              <button className="button is-success" onClick={(evt) => this.submitUserName(evt)}>
-                Submit
-              </button>
             </p>
           </div>
         </div>
@@ -90,7 +83,7 @@ class GameWaitRoom extends React.Component {
         <ChooseBall />
         <div className="content has-text-centered notification">
           <h5 id="greenText">Current number of connected players: {this.state.numberOfPlayers}</h5>
-          <div className="field is-grouped">
+          <div id='centerButtons' className="field is-grouped">
             <p className="control">
               <Link to={`/game/${this.props.user.gameId}/play`}>
                 <button
