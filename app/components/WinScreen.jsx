@@ -1,31 +1,60 @@
 import React from 'react';
-import ReactDOM, { render } from 'react-dom';
+import { withRouter } from 'react-router-dom';
+import ReactDOM, {render} from 'react-dom';
 
 class WinScreen extends React.Component {
   constructor(props) {
     super(props);
-    this.winImgVisible = false;
-    this.component = null;
+    this.state = {
+      component: null
+    };
+    this.loop;
+    this.endGame = this
+      .endGame
+      .bind(this);
   }
+
+  endGame() {
+    setTimeout(() => {
+      this.props.history.push('/');
+    }, 5000);
+  }
+
   render() {
-    this.props.database.ref('event').on('value', (eventMessage) => {
-      const eventType = eventMessage.val().split(',')[0];
-      const gameId = eventMessage.val().split(',')[1];
-      const userId = eventMessage.val().split(',')[2];
-      if (eventType === 'win' && gameId === this.props.user.gameId && userId === this.props.user.userId) {
-        this.component = <img className="winScreen" src="/assets/winScreen.png"/>;
-      } else if (eventType === 'win' && gameId === this.props.user.gameId && userId !== this.props.user.userId) {
-        this.component = <img className="winScreen" src="/assets/defeatScreen.png"/>;
-      }
-    });
+    this
+      .props
+      .database
+      .ref('event')
+      .on('value', (eventMessage) => {
+        const eventType = eventMessage
+          .val()
+          .split(',')[0];
+        const gameId = eventMessage
+          .val()
+          .split(',')[1];
+        const userId = eventMessage
+          .val()
+          .split(',')[2];
+        if (eventType === 'win' && gameId === this.props.user.gameId && userId === this.props.user.userId && !this.state.component) {
+          this.setState({component: <img className="winScreen" src="/assets/winScreen.png"/>});
+          this.endGame();
+        } else if (eventType === 'win' && gameId === this.props.user.gameId && userId !== this.props.user.userId && !this.state.component) {
+          this.setState({component: <img className="winScreen" src="/assets/defeatScreen.png"/>});
+          this.endGame();
+        }
+      });
     const gameId = this.props.user.gameId;
     const user = this.props.user.userId;
-    if (this.props.user.totalScore > 1) {
+    if (this.props.user.totalScore > 5) {
       const eventMessage = 'win,' + gameId + ',' + user;
-      this.props.database.ref('event').set(eventMessage);
+      this
+        .props
+        .database
+        .ref('event')
+        .set(eventMessage);
     }
-    return (<img className="winScreen invisible" src="/assets/winScreen.png" />);
+    return this.state.component;
   }
 };
 
-export default WinScreen;
+export default withRouter(WinScreen);
