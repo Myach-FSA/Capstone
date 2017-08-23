@@ -6,7 +6,7 @@ const database = firebase.database();
 class ScoreTable extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
+    this.state={
       children: []
     };
   }
@@ -17,7 +17,11 @@ class ScoreTable extends React.Component {
       this.setState({ children: children });
       database.ref('users/' + child.val().userId).on('value', snapshot => {
         const index = this.state.children.findIndex(element => element.userId === snapshot.val().userId);
-        children[index] = snapshot.val();
+        children[index]=snapshot.val();
+        database.ref('games/' + snapshot.val().gameId + '/playersInGame/' + snapshot.val().userId+'/score').on('value', score => {
+          children[index].score=score.val();
+          this.setState({ children: children });
+        });
         this.setState({ children: children });
       });
     });
@@ -36,7 +40,7 @@ class ScoreTable extends React.Component {
                 <th id='tableList'><abbr title="Username">Username</abbr></th>
                 <th id='tableList'><abbr title="Won">Wins</abbr></th>
                 <th id='tableList'><abbr title="Lost">Losses</abbr></th>
-                <th id='tableList'><abbr title="Points">Total Points</abbr></th>
+                <th id='tableList'><abbr title="Points">Points</abbr></th>
               </tr>
             </thead>
             <tbody>
@@ -47,7 +51,7 @@ class ScoreTable extends React.Component {
                       <th id='tableList'>{child.username}</th>
                       <th id='tableList'>{child.wins}</th>
                       <th id='tableList'>{child.losses}</th>
-                      <th id='tableList'>{child.totalScore}</th>
+                      <th id='tableList'>{child.score}</th>
                     </tr>);
                 }
               }

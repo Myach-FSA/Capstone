@@ -26,7 +26,7 @@ class GameWaitRoom extends React.Component {
       if (!a) {
         firebase.database().ref('games/' + user.gameId).set({ playersInGame: { [this.props.user.userId]: { 'create': false, 'score': 0, 'remove': false } } });
       } else {
-        this.setState({ isAdmin: false })        
+        this.setState({ isAdmin: false })
         firebase.database().ref('games/' + user.gameId + '/playersInGame/' + this.props.user.userId).set({ 'create': false, 'score': 0, 'remove': false });
       }
     });
@@ -65,13 +65,13 @@ class GameWaitRoom extends React.Component {
     }
 
     this.props.submitName(name);
-    
+
     firebase.database().ref('users/' + this.props.user.userId).update({ 'username': name });
 
     const user = this.props.user;
     const userRef = firebase.database().ref('games/' + user.gameId);
     const database = firebase.database();
-    
+
     userRef.once('value', (snapshot) => {
       var a = snapshot.exists();
       if (!a) {
@@ -84,8 +84,8 @@ class GameWaitRoom extends React.Component {
   }
 
   render() {
-    
-    const yesPlay = 
+
+    const yesPlay =
       <button
         className="button is-success is-large"
         type="submit"
@@ -103,7 +103,7 @@ class GameWaitRoom extends React.Component {
       disabled>
       PLAY NOW!
     </button>
-    
+
     return (
       <div className='space'>
         <div className="content has-text-centered notification">
@@ -133,7 +133,8 @@ class GameWaitRoom extends React.Component {
               className="button is-success"
               type="submit"
               title="playbutton"
-              onClick={() => { this.sendInfo(); }}>
+              onClick={() => { this.sendInfo(); }}
+              >
               Play Now!
           </button>
           </Link>
