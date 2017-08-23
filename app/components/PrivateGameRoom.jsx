@@ -61,11 +61,13 @@ class GameWaitRoom extends React.Component {
   sendInfo = (info) => {
     const name = document.getElementById('nickname').value;
     this.props.submitName(name);
+    
     firebase.database().ref('users/' + this.props.user.userId).update({ 'username': name });
 
-    const database = firebase.database();
     const user = this.props.user;
     const userRef = firebase.database().ref('games/' + user.gameId);
+    const database = firebase.database();
+    
     userRef.once('value', (snapshot) => {
       var a = snapshot.exists();
       if (!a) {

@@ -18,6 +18,9 @@ const balls = [
 class ChooseBall extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      clicked: false,
+    }
     this.ballChoice = this.ballChoice.bind(this);
   }
 
@@ -27,20 +30,19 @@ class ChooseBall extends React.Component {
   }
 
   ballChoice(evt) {
+    this.setState({ clicked: true })
     this.props.chooseBall(+evt.target.id);
     this.sendDataToFB();
   }
 
   sendDataToFB() {
     const user = this.props.user;
-    const ref = firebase.database().ref('users/' + user.userId);
-    ref.set(user);
   }
 
   render() {
     const playerName = this.props.user.username && this.props.user.username ? this.props.user.username : 'Anonymous';
     const chosenBall = balls[this.props.user.ball];
-    const ballMessage = chosenBall ? `You have chosen ${chosenBall.name}` : 'You have not yet chosen a ball';
+    const ballMessage = this.state.clicked ? `You have chosen ${chosenBall.name}` : 'You have not yet chosen a ball';
 
     return (
       <div className="content has-text-centered notification">
