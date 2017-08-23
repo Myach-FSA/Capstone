@@ -36,12 +36,11 @@ class ChooseBall extends React.Component {
     const user = this.props.user;
     const ref = firebase.database().ref('users/'+user.userId);
     user.ball=id;
-    const userRef=firebase.database().ref('users/');
-    userRef.on('child_added', (child) => {
-      console.log('child added', child.val().userId, 'user id', user.userId);
-      if (child.val().userId===undefined)ref.set(user);
+    ref.child('wins').once('value').then(snapshot => {
+      console.log('snapshot', snapshot.exists());
+      if (snapshot.exists())ref.update({gameId: user.gameId, ball: id});
+      else ref.set(user);
     });
-    ref.update({gameId: user.gameId, ball: id});
   }
 
   render() {
