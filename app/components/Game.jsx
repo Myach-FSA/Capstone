@@ -39,19 +39,24 @@ class Game extends Component {
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
     let num = sceneNum;
+    let texture;
     let scene = createScene1(canvas, engine);
 
     database.ref('games/' + gameId + '/playersInGame').on('value', (players) => {
       const playersObj = players.val();
       for (const playerId in playersObj) {
         if (!this.state.playersInGame.includes(playerId) && playersObj[playerId].create) {
-          const newPlayer = this.createPlayerOnConnect(scene, playerId);
+          database.ref('users/' + playerId + '/ball').on('value', (playersTexture) => {
+            texture = playersTexture.val();
+          });
+          const newPlayer = this.createPlayerOnConnect(scene, playerId, texture);
           if (newPlayer.id === user) {
             this.playerPosition(newPlayer);
-            // this.setColor(newPlayer, { b: Math.random(), g: Math.random(), r: Math.random() });
-            this.setState({info: { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, color: newPlayer.material.diffuseColor }});
+            this.setTexture(newPlayer, texture, scene);
+            this.setState({ info: { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, color: newPlayer.material.diffuseColor} });
             database.ref('playerPosition/' + newPlayer.id).set(this.state.info);
           } else {
+            this.setTexture(newPlayer, texture, scene);
             database.ref('playerPosition/' + playerId).on('value', (playerInfo) => {
               if (playerInfo.val()) {
                 const x = playerInfo.val().x;
@@ -59,7 +64,6 @@ class Game extends Component {
                 const z = playerInfo.val().z;
                 const color = playerInfo.val().color;
                 this.setPosition(newPlayer, x, y, z);
-                // this.setColor(newPlayer, color);
               }
             });
           }
@@ -151,9 +155,6 @@ class Game extends Component {
         setTimeout(scene.render(), 500);
       } else {
         const me = this.state.objects.filter(player => player.id === user)[0];
-        // if (me) {
-        //   database.ref('playerPosition/' + me.id).set({ color: 'black', x: me.position.x, y: me.position.y, z: me.position.z });
-        // }
         if (me && me.absolutePosition.y < -100) {
           this.playerPosition(me);
           database.ref(user).set({ 'xAcceleration': 0, 'zAcceleration': 0 });
@@ -225,17 +226,15 @@ class Game extends Component {
     audio0.pause();
   }
 
-  createPlayerOnConnect(sce, id) {
+  createPlayerOnConnect(sce, id, texture) {
     const balls = ['/assets/textures/students/stone.png', '/assets/textures/students/net.png', '/assets/textures/students/alvin.png', '/assets/textures/students/andrew.png',
       '/assets/textures/students/denys.png', '/assets/textures/students/evan.png', '/assets/textures/students/snow.png', '/assets/textures/students/won_jun.png',
       '/assets/textures/students/grass-large.png'
     ];
-    const ballId = this.props.user.ball;
     const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); // Params: name, subdivs, size, scene
     player.checkCollisions = true;
     const ballMaterial = new BABYLON.StandardMaterial('material', sce);
-    const ballTexture = new BABYLON.Texture(`${balls[ballId]}`, sce);
-    ballMaterial.diffuseTexture = ballTexture;
+    const ballTexture = new BABYLON.Texture([balls][texture], sce);
     player.material = ballMaterial;
     player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.SphereImpostor, {
       mass: 1,
@@ -251,8 +250,12 @@ class Game extends Component {
     sphere.position.z = z;
   }
 
-  setColor(sphere, color) {
-    sphere.material.diffuseColor = new BABYLON.Color3(color.r, color.g, color.b);
+  setTexture(sphere, texture, scene) {
+    const balls = ['/assets/textures/students/stone.png', '/assets/textures/students/net.png', '/assets/textures/students/alvin.png', '/assets/textures/students/andrew.png',
+      '/assets/textures/students/denys.png', '/assets/textures/students/evan.png', '/assets/textures/students/snow.png', '/assets/textures/students/won_jun.png',
+      '/assets/textures/students/grass-large.png'
+    ];
+    sphere.material.diffuseTexture = new BABYLON.Texture(balls[texture], scene);
   }
 
   playerPosition(player) {
@@ -324,7 +327,7 @@ function control(user, info, playerObj) {
   database.ref(user.id).set({ xAcceleration: 0, zAcceleration: 0 });
 
   function gameLoop() {
-    if (playerObj[user.id].remove) {
+    if (!playerObj[user.id].remove) {
       database.ref('playerPosition/' + user.id).set({ color: info.color, x: user.position.x, y: user.position.y, z: user.position.z });
     }
     if (keyState[37] || keyState[65]) {

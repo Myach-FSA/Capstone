@@ -5,16 +5,6 @@ import firebase from 'firebase';
 
 const balls = [
   { name: 'Heavy Duty', description: 'Ball fashioned by the vikings themselves.', img: '/assets/textures/grayball-choose.png' },
-<<<<<<< HEAD
-  { name: 'Sleuth', description: "You like things that move with the grace of a cheetah.", img: '/assets/textures/netball-choose.png' },
-  { name: 'Alvin', description: "Always win with Alvin.", img: '/assets/textures/students/alvin.png' },
-  { name: 'Andrew', description: "Andrew and his dog.", img: '/assets/textures/students/andrew.png' },
-  { name: 'Denis', description: "Pick Denis.", img: '/assets/textures/students/denys.png' },
-  { name: 'Evan', description: "You can never go wrong with this ball.", img: '/assets/textures/students/evan.png' },
-  { name: 'Snow', description: "No one wears fur like Snow.", img: '/assets/textures/students/snow.png' },
-  { name: 'Won Jun', description: "Won Jun is ... Won Jun.", img: '/assets/textures/students/won_jun.png' },
-  { name: 'Grass', description: "Maybe you like grass.", img: '/assets/textures/students/grass-large.png' },
-=======
   { name: 'Sleuth', description: 'You like things that move with the grace of a cheetah.', img: '/assets/textures/netball-choose.png' },
   { name: 'Alvin', description: 'Always win with Alvin.', img: '/assets/textures/students/alvin.png' },
   { name: 'Andrew', description: 'Andrew and his dog.', img: '/assets/textures/students/andrew.png' },
@@ -23,7 +13,6 @@ const balls = [
   { name: 'Snow', description: 'No one wears fur like Snow.', img: '/assets/textures/students/snow.png' },
   { name: 'Won Jun', description: 'Won Jun is ... Won Jun.', img: '/assets/textures/students/won_jun.png' },
   { name: 'Grass', description: 'Maybe you like grass.', img: '/assets/textures/students/grass-large.png' },
->>>>>>> 7ece5d24c1f1def773ca49446f992444a3584fbd
 ];
 
 class ChooseBall extends React.Component {
