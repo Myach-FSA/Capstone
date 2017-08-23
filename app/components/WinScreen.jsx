@@ -45,7 +45,7 @@ class WinScreen extends React.Component {
       });
     const gameId = this.props.user.gameId;
     const user = this.props.user.userId;
-    if (this.props.user.totalScore > 5) {
+    if (this.props.user.totalScore >= 5) {
       const eventMessage = 'win,' + gameId + ',' + user;
       this
         .props
