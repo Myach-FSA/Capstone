@@ -46,6 +46,7 @@ class Game extends Component {
       const playersObj = players.val();
       for (const playerId in playersObj) {
         console.log(this.state.playersInGame, 'allPLayers')
+        console.log(playersObj, 'playersObj')
         if (!this.state.playersInGame.includes(playerId)) {
           console.log('creating');
           const newPlayer = this.createPlayerOnConnect(scene, playerId);
@@ -66,6 +67,12 @@ class Game extends Component {
               }
             });
           }
+          const newState = this.state.objects.slice();
+          const newPlayersState = this.state.playersInGame.slice();
+          newState.push(newPlayer);
+          newPlayersState.push(playerId);
+          this.setState({ objects: newState });
+          this.setState({ playersInGame: newPlayersState });
           const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene);
           if (playerId === user) {
             const playerDummy = this.createCameraObj(scene, newPlayer);
@@ -84,22 +91,18 @@ class Game extends Component {
               newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(otherPlayer.val().zAcceleration, 0, otherPlayer.val().xAcceleration, 0));
             }
           });
-          const newState = this.state.objects.slice();
-          const newPlayersState = this.state.playersInGame.slice();
-          newState.push(newPlayer);
-          newPlayersState.push(playerId);
-          this.setState({ objects: newState });
-          this.setState({ playersInGame: newPlayersState });
         }
       }
       for (let i = 0; i < this.state.objects.length; i++) {
         if (playersObj) {
           if (playersObj[this.state.objects[i].id].remove) {
             this.state.objects[i].dispose();
-            const newState = this.state.playersInGame.filter(player => { player !== this.state.objects[i].id; });
+            const newState = this.state.playersInGame.filter(player => { return player !== this.state.objects[i].id; });
             console.log('newState', newState);
             this.setState({playersInGame: newState});
             this.setState({ objects: this.state.objects.filter((_, j) => { return j !== this.state.objects.indexOf(this.state.objects[i]); }) });
+            console.log('playersInGame', this.state.playersInGame);
+            console.log('objects', this.state.objects);
           }
         }
       }
