@@ -6,11 +6,11 @@ import Firebase from 'firebase';
 const balls = [
   { name: 'Heavy Duty', description: 'Ball fashioned by the vikings themselves.', img: '/assets/textures/grayball-choose.png' },
   { name: 'Sleuth', description: "You like things that move with the grace of a cheetah.", img: '/assets/textures/netball-choose.png' },
-  { name: 'Alvin', description: "Always win with Alvin.", img: '/assets/textures/students/alvin.png' },
+  { name: 'Alvin', description: "Always eat well with Alvin.", img: '/assets/textures/students/alvin.png' },
   { name: 'Andrew', description: "Andrew and his dog.", img: '/assets/textures/students/andrew.png' },
   { name: 'Denis', description: "Pick Denis.", img: '/assets/textures/students/denys.png' },
-  { name: 'Evan', description: "You can never go wrong with this ball.", img: '/assets/textures/students/evan.png' },
-  { name: 'Snow', description: "No one wears fur like Snow.", img: '/assets/textures/students/snow.png' },
+  { name: 'Evan', description: "Forever cheery.", img: '/assets/textures/students/evan.png' },
+  { name: 'Snow', description: "Battle the great frost with Snow.", img: '/assets/textures/students/snow.png' },
   { name: 'Won Jun', description: "Won Jun is ... Won Jun.", img: '/assets/textures/students/won_jun.png' },
   { name: 'Grass', description: "Maybe you like grass.", img: '/assets/textures/students/grass-large.png' },
 ];
@@ -54,7 +54,7 @@ class ChooseBall extends React.Component {
                 <div key={ball.id} className="inner-product">
                   <br />
                   <figure className="image">
-                    <img src={ball.img} id='img' alt="Image" onClick={(evt) => this.ballChoice(evt)} />
+                    <img src={ball.img} className='imgBall' alt="Image" onClick={(evt) => this.ballChoice(evt)} />
                   </figure>
                   <p className="subtitle">{ball.name}</p>
                   <p className="subtitle">{ball.description}</p>

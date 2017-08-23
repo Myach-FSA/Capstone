@@ -68,7 +68,7 @@ class GameType extends React.Component {
                     <button className="button is-primary is-large" id="neon" onClick={() => this.showJoinPage()}>
                       <Link to={`/choose`} id='noUnderline'>
                         Join a Game
-                    </Link>
+                      </Link>
                     </button>
                   </p>
                 </div>
