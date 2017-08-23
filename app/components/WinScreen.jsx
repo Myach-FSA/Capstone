@@ -22,7 +22,6 @@ class WinScreen extends React.Component {
     const user = this.props.user.userId;
     if (this.props.user.totalScore > 1) {
       const eventMessage = 'win,' + gameId + ',' + user;
-      console.log(eventMessage);
       this.props.database.ref('event').set(eventMessage);
     }
     return this.component;
