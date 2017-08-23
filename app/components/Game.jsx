@@ -27,7 +27,7 @@ class Game extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      playersInGame: {},
+      playersInGame: [],
       objects: [],
     };
   }
@@ -39,13 +39,14 @@ class Game extends Component {
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
     let num = sceneNum;
-    const playersInGame = this.state.playersInGame;
+    const allPlayersInGame = this.state.playersInGame;
     let scene = createScene1(canvas, engine);
 
     database.ref('games/' + gameId + '/playersInGame').on('value', (players) => {
       const playersObj = players.val();
       for (const playerId in playersObj) {
-        if (!playersInGame[playerId] || playersInGame.scene) {
+        console.log(this.state.playersInGame, 'allPLayers')
+        if (!this.state.playersInGame.includes(playerId)) {
           console.log('creating');
           const newPlayer = this.createPlayerOnConnect(scene, playerId);
           if (newPlayer.id === user) {
@@ -84,23 +85,24 @@ class Game extends Component {
             }
           });
           const newState = this.state.objects.slice();
+          const newPlayersState = this.state.playersInGame.slice();
           newState.push(newPlayer);
-          console.log('adding to object', newState);
+          newPlayersState.push(playerId);
           this.setState({ objects: newState });
-          playersInGame[playerId] = true;
+          this.setState({ playersInGame: newPlayersState });
         }
       }
       for (let i = 0; i < this.state.objects.length; i++) {
         if (playersObj) {
           if (playersObj[this.state.objects[i].id].remove) {
             this.state.objects[i].dispose();
-            console.log(this.state.objects.filter((_, j) => { return j !== this.state.objects.indexOf(this.state.objects[i]); }));
-            // this.setState({playersInGame: })
+            const newState = this.state.playersInGame.filter(player => { player !== this.state.objects[i].id; });
+            console.log('newState', newState);
+            this.setState({playersInGame: newState});
             this.setState({ objects: this.state.objects.filter((_, j) => { return j !== this.state.objects.indexOf(this.state.objects[i]); }) });
           }
         }
       }
-      console.log('objectss', this.state.objects);
     });
 
     database.ref('games/' + gameId).update({ 'winPosition': { x: 10, z: 10 } });
@@ -149,8 +151,8 @@ class Game extends Component {
           default: scene = createScene1(canvas, engine);
         }
         setTimeout(scene.render(), 500);
-        playersInGame.scene = true;
-        playersInGame.scene = false;
+        // playersInGame.scene = true;
+        // playersInGame.scene = false;
       } else {
         // console.log(this.state.objects);
         const me = this.state.objects.filter(player => player.id === user)[0];
