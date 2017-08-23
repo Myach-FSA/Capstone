@@ -120,9 +120,11 @@ class Game extends Component {
     });
 
     engine.runRenderLoop(() => {
-      if ((torus.position.x !== winPos.x) || (torus.position.z !== winPos.z)) {
-        torus.position.x = winPos.x;
-        torus.position.z = winPos.z;
+      if (winPos) {
+        if ((torus.position.x !== winPos.x) || (torus.position.z !== winPos.z)) {
+          torus.position.x = winPos.x;
+          torus.position.z = winPos.z;
+        }
       }
       if (!scene || (sceneNum !== num)) {
         num = sceneNum;
@@ -149,19 +151,21 @@ class Game extends Component {
             return score;
           });
         }
-        if (me && (Math.floor(me.absolutePosition.x) === winPos.x) && (Math.floor(me.absolutePosition.z) === winPos.z)) {
-          database.ref('games/' + gameId + '/playersInGame/' + user + '/score').transaction((score) => {
-            this.props.changeScore(1);
-            score += 1;
-            if (score >= 10) {
-              database.ref('games/' + gameId + '/playersInGame/').update({ 'winner': user });
-              score = 0;
-            }
-            return score;
-          });
-          const x = Math.floor(Math.random() * 50 - 25);
-          const z = Math.floor(Math.random() * 50 - 25);
-          database.ref('games/' + gameId + '/winPosition').set({ 'x': x, 'z': z });
+        if (winPos) {
+          if (me && (Math.floor(me.absolutePosition.x) === winPos.x) && (Math.floor(me.absolutePosition.z) === winPos.z)) {
+            database.ref('games/' + gameId + '/playersInGame/' + user + '/score').transaction((score) => {
+              this.props.changeScore(1);
+              score += 1;
+              if (score >= 10) {
+                database.ref('games/' + gameId + '/playersInGame/').update({ 'winner': user });
+                score = 0;
+              }
+              return score;
+            });
+            const x = Math.floor(Math.random() * 50 - 25);
+            const z = Math.floor(Math.random() * 50 - 25);
+            database.ref('games/' + gameId + '/winPosition').set({ 'x': x, 'z': z });
+          }
         }
         scene.render();
       }
@@ -193,13 +197,14 @@ class Game extends Component {
     });
     database.ref('playerPosition/' + user).remove();
     database.ref(user).remove();
+    database.ref('games/' + gameId + '/playersInGame').off();
     audio0.pause();
   }
 
   createPlayerOnConnect(sce, id) {
-    const balls = ['/assets/textures/students/stone.png', '/assets/textures/students/net.png', '/assets/textures/students/alvin.png', '/assets/textures/students/andrew.png', 
-    '/assets/textures/students/denys.png', '/assets/textures/students/evan.png', '/assets/textures/students/snow.png', '/assets/textures/students/won_jun.png',
-    '/assets/textures/students/grass-large.png'
+    const balls = ['/assets/textures/students/stone.png', '/assets/textures/students/net.png', '/assets/textures/students/alvin.png', '/assets/textures/students/andrew.png',
+      '/assets/textures/students/denys.png', '/assets/textures/students/evan.png', '/assets/textures/students/snow.png', '/assets/textures/students/won_jun.png',
+      '/assets/textures/students/grass-large.png'
     ];
     const ballId = this.props.user.ball;
     const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); // Params: name, subdivs, size, scene
@@ -253,12 +258,11 @@ class Game extends Component {
   }
 
   render() {
-    console.log(this.props.user);
     return (
       <div>
         {/* <WinScreen user={this.props.user}/> */}
         <InfoScreen />
-        <ScoreTable gameId={this.props.user.gameId}/>
+        <ScoreTable gameId={this.props.user.gameId} />
         <canvas className='gameDisplay ' ref="renderCanvas"></canvas>
       </div>
     );
