@@ -19,7 +19,7 @@ const yAcceleration = 0;
 const changeScene = (num) => {
   sceneNum = num;
 };
-let info;
+// let info;
 
 class Game extends Component {
   constructor(props) {
@@ -27,6 +27,7 @@ class Game extends Component {
     this.state = {
       playersInGame: [],
       objects: [],
+      info: {},
     };
   }
 
@@ -42,16 +43,16 @@ class Game extends Component {
     database.ref('games/' + gameId + '/playersInGame').on('value', (players) => {
       const playersObj = players.val();
       for (const playerId in playersObj) {
-        console.log('playersIngame', this.state.playersInGame)
+        console.log('playersIngame', this.state.playersInGame.includes(playerId));
         console.log('playersObj', playersObj);
         if (!this.state.playersInGame.includes(playerId) && playersObj[playerId].create) {
-          console.log('1', playersObj[user]);
+          console.log('1', playersObj[playerId].create);
           const newPlayer = this.createPlayerOnConnect(scene, playerId);
           if (newPlayer.id === user) {
             this.playerPosition(newPlayer);
             // this.setColor(newPlayer, { b: Math.random(), g: Math.random(), r: Math.random() });
-            info = { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, color: newPlayer.material.diffuseColor };
-            database.ref('playerPosition/' + newPlayer.id).set(info);
+            this.setState({info: { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, color: newPlayer.material.diffuseColor }});
+            database.ref('playerPosition/' + newPlayer.id).set(this.state.info);
           } else {
             database.ref('playerPosition/' + playerId).on('value', (playerInfo) => {
               if (playerInfo.val()) {
@@ -74,7 +75,7 @@ class Game extends Component {
           const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene);
           if (playerId === user) {
             const playerDummy = this.createCameraObj(scene, newPlayer);
-            control(newPlayer);
+            control(newPlayer, this.state.info);
             followCamera.lockedTarget = playerDummy;
             scene.activeCamera = followCamera;
             followCamera.radius = 15; // how far from the object to follow
@@ -94,14 +95,17 @@ class Game extends Component {
         }
       }
       for (let i = 0; i < this.state.objects.length; i++) {
+        console.log('fix null', playersObj[this.state.playersInGame[i]]);
         if (playersObj[this.state.playersInGame[i]]) {
           if (playersObj[this.state.playersInGame[i]].remove) {
-            console.log(playersObj[this.state.playersInGame[i]]);
+            console.log('this.state.objects', this.state.objects[i])
             this.state.objects[i].dispose();
             this.state.objects[i].physicsImpostor.dispose();
             const newState = this.state.playersInGame.filter(player => { return player !== this.state.objects[i].id; });
             this.setState({ playersInGame: newState });
             this.setState({ objects: this.state.objects.filter((_, j) => { return j !== this.state.objects.indexOf(this.state.objects[i]); }) });
+            console.log('im stopping the engine');
+            // engine.stopRenderLoop();
           }
         }
         console.log(this.state.playersInGame);
@@ -300,7 +304,7 @@ class Game extends Component {
   }
 }
 
-function control(user) {
+function control(user, info) {
   const keyState = {};
 
   window.onkeydown = function (e) {
