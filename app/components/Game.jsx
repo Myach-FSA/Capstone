@@ -262,9 +262,14 @@ class Game extends Component {
   }
 
   setTexture(sphere, texture, scene) {
-    const balls = ['/assets/textures/students/stone.png', '/assets/textures/students/net.png', '/assets/textures/students/alvin.png', '/assets/textures/students/andrew.png',
-      '/assets/textures/students/denys.png', '/assets/textures/students/evan.png', '/assets/textures/students/snow.png', '/assets/textures/students/won_jun.png',
-      '/assets/textures/students/grass-large.png'
+    const balls = [ '/assets/textures/students/3dsquares.png', '/assets/textures/students/floweryglass.png', 
+    '/assets/textures/students/andrew-collins-1616.png', '/assets/textures/students/grass-large.png', 
+    '/assets/textures/students/stone.png', '/assets/textures/students/billy-huynh-278252.png', 
+    '/assets/textures/students/joel-filipe-196000.png', '/assets/textures/students/joel-filipe-200538.png', 
+    '/assets/textures/students/kai-oberhauser-221328.png', '/assets/textures/students/lyndsey-b-35202.png', 
+    '/assets/textures/students/mink-mingle-245030.png', '/assets/textures/students/net.png', 
+    '/assets/textures/students/octavian-rosca-208933.png', '/assets/textures/students/paul-volkmer-135317.png',
+    '/assets/textures/students/rusty.png', '/assets/textures/students/silvio-kundt-65518.png',
     ];
     sphere.material.diffuseTexture = new BABYLON.Texture(balls[texture], scene);
   }

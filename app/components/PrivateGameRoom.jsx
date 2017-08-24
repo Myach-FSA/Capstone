@@ -8,8 +8,8 @@ import ChooseBall from './ChooseBall';
 import { submitName } from '../reducers/auth';
 
 class GameWaitRoom extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       isAdmin: true,
       numberOfPlayers: 0,
@@ -25,6 +25,7 @@ class GameWaitRoom extends React.Component {
       var a = snapshot.exists();
       if (!a) {
         firebase.database().ref('games/' + user.gameId).set({ playersInGame: { [this.props.user.userId]: { 'create': false, 'score': 0, 'remove': false } } });
+        firebase.database().ref('games/' + user.gameId + '/gameInfo/').set({ 'admin': this.props.user.userId, 'gameName': 'Test' });        
       } else {
         this.setState({ isAdmin: false })
         firebase.database().ref('games/' + user.gameId + '/playersInGame/' + this.props.user.userId).set({ 'create': false, 'score': 0, 'remove': false });
@@ -84,25 +85,6 @@ class GameWaitRoom extends React.Component {
   }
 
   render() {
-
-    const yesPlay =
-      <button
-        className="button is-success is-large"
-        type="submit"
-        title="playbutton"
-        onClick={() => { this.sendInfo(); }}
-        >
-        PLAY NOW!
-      </button>
-    const noCannotPlay =
-      <button
-      className="button is-success is-large"
-      type="submit"
-      title="playbutton"
-      onClick={() => { this.sendInfo(); }}
-      disabled>
-      PLAY NOW!
-    </button>
 
     return (
       <div className='space'>

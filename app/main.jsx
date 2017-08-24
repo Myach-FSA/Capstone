@@ -19,6 +19,7 @@ import PrivateGameRoom from './components/PrivateGameRoom';
 import ChooseGame from './components/ChooseGame';
 import GameType from './components/GameType';
 import GameList from './components/GameList';
+import CreateGameName from './components/CreateGameName';
 
 import firebase from 'APP/fire';
 
@@ -54,6 +55,7 @@ const App = ({ children }) =>
         <Route exact path="/choose" render={() => <GameType auth={auth} loginObj={loginObj}/>}/>
         <Route exact path="/game/:id/ball" render={() => <ChooseBall auth={auth} loginObj={loginObj}/>}/>
         <Route exact path="/scores" component={Scores}/>
+        <Route exact path="/create" component={CreateGameName}/>
         <Route exact path="/login" render={() => <WhoAmI auth={auth} loginObj={loginObj}/>} />
         <Route exact path="/signup" render={() => <Register auth={auth} />} />
         <Route component={NotFound}/>
