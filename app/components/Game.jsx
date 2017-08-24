@@ -8,6 +8,7 @@ import InfoScreen from './InfoScreen';
 import ScoreTable from './ScoreTable';
 import WinScreen from './WinScreen';
 import MuteSound from './MuteSound';
+import balls from './balls';
 
 const database = firebase.database();
 const auth = firebase.auth();
@@ -128,10 +129,6 @@ class Game extends Component {
           });
         }
         const myScore = this.props.user.totalScore;
-        // database.ref('users/' + user + '/totalScore').transaction((score) => {
-        //   score += myScore;
-        //   return score;
-        // });
         this.props.changeScore(-myScore);
         database.ref('games/' + gameId + '/playersInGame/' + user).update({ 'score': 0 });
         database.ref('games/' + gameId + '/playersInGame/winner').remove();
@@ -238,10 +235,6 @@ class Game extends Component {
   }
 
   createPlayerOnConnect(sce, id, texture) {
-    const balls = ['/assets/textures/students/stone.png', '/assets/textures/students/net.png', '/assets/textures/students/alvin.png', '/assets/textures/students/andrew.png',
-      '/assets/textures/students/denys.png', '/assets/textures/students/evan.png', '/assets/textures/students/snow.png', '/assets/textures/students/won_jun.png',
-      '/assets/textures/students/grass-large.png'
-    ];
     const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); // Params: name, subdivs, size, scene
     player.checkCollisions = true;
     const ballMaterial = new BABYLON.StandardMaterial('material', sce);
@@ -262,16 +255,8 @@ class Game extends Component {
   }
 
   setTexture(sphere, texture, scene) {
-    const balls = [ '/assets/textures/students/3dsquares.png', '/assets/textures/students/floweryglass.png', 
-    '/assets/textures/students/andrew-collins-1616.png', '/assets/textures/students/grass-large.png', 
-    '/assets/textures/students/stone.png', '/assets/textures/students/billy-huynh-278252.png', 
-    '/assets/textures/students/joel-filipe-196000.png', '/assets/textures/students/joel-filipe-200538.png', 
-    '/assets/textures/students/kai-oberhauser-221328.png', '/assets/textures/students/lyndsey-b-35202.png', 
-    '/assets/textures/students/mink-mingle-245030.png', '/assets/textures/students/net.png', 
-    '/assets/textures/students/octavian-rosca-208933.png', '/assets/textures/students/paul-volkmer-135317.png',
-    '/assets/textures/students/rusty.png', '/assets/textures/students/silvio-kundt-65518.png',
-    ];
-    sphere.material.diffuseTexture = new BABYLON.Texture(balls[texture], scene);
+    console.log('in set texture', sphere, texture, scene)
+    sphere.material.diffuseTexture = new BABYLON.Texture(balls[texture-1].img, scene);
   }
 
   playerPosition(player) {

@@ -25,10 +25,9 @@ class ChooseBall extends React.Component {
   }
 
   sendDataToFB(id) {
-    console.log(this.props.user);
     const user = this.props.user;
     const ref = firebase.database().ref('users/'+user.userId);
-    user.ball=id;
+    user.ball = id;
     ref.child('wins').once('value').then(snapshot => {
       if (snapshot.exists())ref.update({gameId: user.gameId, ball: id});
       else ref.set(user);
@@ -37,7 +36,7 @@ class ChooseBall extends React.Component {
 
   render() {
     const playerName = this.props.user.username && this.props.user.username ? this.props.user.username : 'Anonymous';
-    const chosenBall = balls[this.props.user.ball];
+    const chosenBall = balls[this.props.user.ball - 1];
     const ballMessage = this.state.clicked ? `You have chosen ${chosenBall.name}` : 'You have not yet chosen a ball';
 
     return (
@@ -49,17 +48,17 @@ class ChooseBall extends React.Component {
             {balls && balls.map((ball, i) => (
               <article key={i}
                 className="column is-one-quarter product-grid-item">
-                <div key={ball.id} className="inner-product">
+                <div key={i+1} className="inner-product">
                   <br />
                   <figure className="image">
                     <img src={ball.img} className='imgBall' alt="Image" onClick={(evt) => this.ballChoice(evt)} />
                   </figure>
                   <p className="subtitle">{ball.name}</p>
                   <p className="subtitle">{ball.description}</p>
-                  <button id={i} onClick={(evt) => this.ballChoice(evt)}
+                  <button id={i+1} onClick={(evt) => this.ballChoice(evt)}
                     className="button is-success is-outlined">
                     Choose Ball
-                      </button>
+                  </button>
                 </div>
               </article>
             )

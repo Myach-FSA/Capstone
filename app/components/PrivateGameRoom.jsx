@@ -25,7 +25,7 @@ class GameWaitRoom extends React.Component {
       var a = snapshot.exists();
       if (!a) {
         firebase.database().ref('games/' + user.gameId).set({ playersInGame: { [this.props.user.userId]: { 'create': false, 'score': 0, 'remove': false } } });
-        firebase.database().ref('games/' + user.gameId + '/gameInfo/').set({ 'admin': this.props.user.userId, 'gameName': 'Test' });        
+        firebase.database().ref('games/' + user.gameId + '/gameInfo/').set({ 'admin': this.props.user.userId });        
       } else {
         this.setState({ isAdmin: false })
         firebase.database().ref('games/' + user.gameId + '/playersInGame/' + this.props.user.userId).set({ 'create': false, 'score': 0, 'remove': false });
@@ -58,7 +58,6 @@ class GameWaitRoom extends React.Component {
     this.setState({ publicGame: !this.state.publicGame });
   }
 
-  // Will use sendInfo later for scene selection / public or private games
   sendInfo = (info) => {
     let name = document.getElementById('nickname').value;
     if(name === '') {
@@ -85,6 +84,28 @@ class GameWaitRoom extends React.Component {
   }
 
   render() {
+    
+    const showPlayButton = 
+    <button
+      className="button is-success"
+      type="submit"
+      title="playbutton"
+      onClick={() => { this.sendInfo(); }}
+      >
+      Play Now!
+    </button>
+
+    const disablePlayButon = 
+    <button
+      className="button is-success"
+      type="submit"
+      title="playbutton"
+      disabled
+      >
+      Play Now!
+    </button>
+
+    const playNowButton = this.props.user.ball ? showPlayButton : disablePlayButon;
 
     return (
       <div className='space'>
@@ -111,14 +132,7 @@ class GameWaitRoom extends React.Component {
           <div id='centerButtons' className="field is-grouped">
           <p className="control">
           <Link to={`/game/${this.props.user.gameId}/play`}>
-            <button
-              className="button is-success"
-              type="submit"
-              title="playbutton"
-              onClick={() => { this.sendInfo(); }}
-              >
-              Play Now!
-          </button>
+            { playNowButton }
           </Link>
         </p>
         </div>
