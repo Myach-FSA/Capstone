@@ -8,6 +8,7 @@ import InfoScreen from './InfoScreen';
 import ScoreTable from './ScoreTable';
 import WinScreen from './WinScreen';
 import MuteSound from './MuteSound';
+import balls from './balls';
 
 const database = firebase.database();
 const auth = firebase.auth();
@@ -128,10 +129,6 @@ class Game extends Component {
           });
         }
         const myScore = this.props.user.totalScore;
-        // database.ref('users/' + user + '/totalScore').transaction((score) => {
-        //   score += myScore;
-        //   return score;
-        // });
         this.props.changeScore(-myScore);
         database.ref('games/' + gameId + '/playersInGame/' + user).update({ 'score': 0 });
         database.ref('games/' + gameId + '/playersInGame/winner').remove();
@@ -238,10 +235,6 @@ class Game extends Component {
   }
 
   createPlayerOnConnect(sce, id, texture) {
-    const balls = ['/assets/textures/students/stone.png', '/assets/textures/students/net.png', '/assets/textures/students/alvin.png', '/assets/textures/students/andrew.png',
-      '/assets/textures/students/denys.png', '/assets/textures/students/evan.png', '/assets/textures/students/snow.png', '/assets/textures/students/won_jun.png',
-      '/assets/textures/students/grass-large.png'
-    ];
     const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); // Params: name, subdivs, size, scene
     player.checkCollisions = true;
     const ballMaterial = new BABYLON.StandardMaterial('material', sce);
@@ -262,11 +255,8 @@ class Game extends Component {
   }
 
   setTexture(sphere, texture, scene) {
-    const balls = ['/assets/textures/students/stone.png', '/assets/textures/students/net.png', '/assets/textures/students/alvin.png', '/assets/textures/students/andrew.png',
-      '/assets/textures/students/denys.png', '/assets/textures/students/evan.png', '/assets/textures/students/snow.png', '/assets/textures/students/won_jun.png',
-      '/assets/textures/students/grass-large.png'
-    ];
-    sphere.material.diffuseTexture = new BABYLON.Texture(balls[texture], scene);
+    console.log('in set texture', sphere, texture, scene)
+    sphere.material.diffuseTexture = new BABYLON.Texture(balls[texture-1].img, scene);
   }
 
   playerPosition(player) {

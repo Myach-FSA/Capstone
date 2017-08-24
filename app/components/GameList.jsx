@@ -51,7 +51,7 @@ class GameList extends React.Component {
             {this.state.games &&
               Object.keys(this.state.games).map((game) => {
                 return (
-                  <tr key={game} onClick={(evt) => this.selectGame(evt)}>
+                  <tr key={game}>
                     <th id='tableList'>{game}</th>
                     <th id='tableList'>[{Object.keys(this.state.games[game].playersInGame).length}/4]</th>
                     <th id='tableList'>Public</th>
