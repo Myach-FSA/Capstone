@@ -88,7 +88,9 @@ class Game extends Component {
           }
           database.ref(newPlayer.id).on('value', (otherPlayer) => {
             if (otherPlayer.val()) {
-              newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(otherPlayer.val().zAcceleration, 0, otherPlayer.val().xAcceleration, 0));
+              if (!newPlayer.physicsImpostor.isDisposed) {
+                newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(otherPlayer.val().zAcceleration, 0, otherPlayer.val().xAcceleration, 0));
+              }
             }
           });
         }
