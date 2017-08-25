@@ -32,7 +32,6 @@ class Game extends Component {
       info: {},
     };
   }
-
   componentDidMount() {
     database.ref('event').set('placeholder');
     audio0.play();
@@ -60,7 +59,7 @@ class Game extends Component {
           } else {
             this.setTexture(newPlayer, texture, scene);
             database.ref('playerPosition/' + playerId).on('value', (playerInfo) => {
-              if (!playersObj[playerId].remove) {
+              if (playerInfo.val()) {
                 const x = playerInfo.val().x;
                 const y = playerInfo.val().y;
                 const z = playerInfo.val().z;
@@ -90,7 +89,9 @@ class Game extends Component {
           }
           database.ref(newPlayer.id).on('value', (otherPlayer) => {
             if (otherPlayer.val()) {
-              newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(otherPlayer.val().zAcceleration, 0, otherPlayer.val().xAcceleration, 0));
+              if (!newPlayer.physicsImpostor.isDisposed) {
+                newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(otherPlayer.val().zAcceleration, 0, otherPlayer.val().xAcceleration, 0));
+              }
             }
           });
         }
@@ -98,7 +99,6 @@ class Game extends Component {
           if (playersObj[this.state.playersInGame[i]]) {
             if (playersObj[this.state.playersInGame[i]].remove) {
               database.ref('playerPosition/' + this.state.playersInGame[i]).off();
-              this.state.objects[i].physicsImpostor.dispose();
               this.state.objects[i].dispose();
               const newState = this.state.playersInGame.filter(player => player !== this.state.objects[i].id);
               this.setState({ playersInGame: newState });
@@ -210,10 +210,8 @@ class Game extends Component {
   componentWillUnmount() {
     const user = this.props.user.userId;
     const gameId = this.props.user.gameId;
-    for (let i = 0; i < this.state.playersInGame.length; i++) {
-      database.ref('playerPosition/' + this.state.playersInGame[i]).off();
-    }
     database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true });
+    database.ref('games/' + gameId + '/playersInGame').off();
     database.ref('games/' + gameId + '/playersInGame/' + user).remove().then(() => {
       database.ref('games/' + gameId).once('value').then(allPlayers => {
         allPlayers = allPlayers.val();
@@ -222,15 +220,12 @@ class Game extends Component {
         }
       });
     });
-    database.ref('games/' + gameId + '/playersInGame').off();
-    database.ref('playerPosition/' + user).off();
-    database.ref(user).off();
-    database.ref('playerPosition/' + user).remove().then((val) => {
-      database.ref('playerPosition/').once('value').then((allPlayers) => {
-      });
-    });
     database.ref(user).remove();
-    database.ref('games/' + gameId + '/playersInGame').off();
+    database.ref(user).off();
+    database.ref('playerPosition/' + user).remove();
+    database.ref('playerPosition/' + user).off();
+    database.ref('games/' + gameId + '/winPosition').off();
+    database.ref('games/' + gameId + '/playersInGame/winner').off();
     audio0.pause();
   }
 
@@ -257,8 +252,7 @@ class Game extends Component {
   }
 
   setTexture(sphere, texture, scene) {
-    console.log('in set texture', sphere, texture, scene)
-    sphere.material.diffuseTexture = new BABYLON.Texture(balls[texture-1].img, scene);
+    sphere.material.diffuseTexture = new BABYLON.Texture(balls[texture - 1].img, scene);
   }
 
   playerPosition(player) {
@@ -272,12 +266,6 @@ class Game extends Component {
 
   createCameraObj(scene, par) {
     const head = BABYLON.MeshBuilder.CreateSphere('camera', 16, scene);
-    const headMaterial = new BABYLON.StandardMaterial('material', scene);
-    const headTexture = new BABYLON.Texture('/assets/textures/net.png', scene);
-    headMaterial.diffuseTexture = headTexture;
-    headMaterial.diffuseColor = new BABYLON.Color3(2.0, 1, 0.7);
-    headMaterial.diffuseTexture.hasAlpha = true;
-    head.material = headMaterial;
     head.parent = par;
     return head;
   }
@@ -364,7 +352,7 @@ function control(user, info, playerObj) {
       database.ref(user.id).set({ xAcceleration, zAcceleration });
     }
   }
-  const gameInterval = setInterval(gameLoop, 50);
+  const gameInterval = setInterval(gameLoop, 49);
   database.ref(`/games/${info.gameId}/playersInGame`).on('value', (playersInGameArray) => {
     if (playersInGameArray.val()[user.id].remove) {
       clearInterval(gameInterval);
