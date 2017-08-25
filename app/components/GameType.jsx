@@ -55,6 +55,7 @@ class GameType extends React.Component {
         <div className="content has-text-centered">
           <div id="choose" className="notification">
             <h1><strong>Choose Your Game</strong></h1>
+            <h4>You can choose to create a game and invite your friends or simply join a game.</h4>
             <br></br>
             <div>
               {!this.props.gameList &&
@@ -81,7 +82,6 @@ class GameType extends React.Component {
                 </Switch>
               }
             </div>
-            <br></br>
           </div>
         </div>
       </div>

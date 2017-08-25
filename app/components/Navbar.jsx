@@ -27,24 +27,6 @@ class NavbarSection extends React.Component {
           <NavLink className="navbar-item itemsec" to="/choose">
             play now
           </NavLink>
-          <div id="navMenuExample" className="navbar-menu">
-            <div className="navbar-end navbar-item has-dropdown is-hoverable">
-              <NavLink className="navbar-link is-active has-text-centered" to="/profile">
-                <div className="navbar-item title">
-                  <i className="fa fa-user-circle-o" aria-hidden="true"></i>
-                </div>
-              </NavLink>
-              <div className="navbar-dropdown ">
-                <NavLink className="navbar-item " to="/signup">
-                  Register
-                </NavLink>
-                <NavLink className="navbar-item " to="/login">
-                  Login
-                </NavLink>
-                <a className='halflink' onClick={this.handleLogout}>Logout</a>
-              </div>
-            </div>
-          </div>
         </div>
       </header>
     );
