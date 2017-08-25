@@ -255,7 +255,6 @@ class Game extends Component {
   }
 
   setTexture(sphere, texture, scene) {
-    console.log('in set texture', sphere, texture, scene)
     sphere.material.diffuseTexture = new BABYLON.Texture(balls[texture-1].img, scene);
   }
 

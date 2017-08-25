@@ -24,11 +24,11 @@ class GameWaitRoom extends React.Component {
     userRef.once('value', (snapshot) => {
       var a = snapshot.exists();
       if (!a) {
-        firebase.database().ref('games/' + user.gameId).set({ playersInGame: { [this.props.user.userId]: { 'create': false, 'score': 0, 'remove': false } } });
-        firebase.database().ref('games/' + user.gameId + '/gameInfo/').set({ 'admin': this.props.user.userId });        
+        firebase.database().ref('games/' + user.gameId).set({ playersInGame: { [this.props.user.userId]: { 'create': false, 'score': 0, 'remove': false, 'ready': false } } });
+        firebase.database().ref('games/' + user.gameId + '/gameInfo/').set({ 'admin': this.props.user.userId, 'startGame': false });        
       } else {
         this.setState({ isAdmin: false })
-        firebase.database().ref('games/' + user.gameId + '/playersInGame/' + this.props.user.userId).set({ 'create': false, 'score': 0, 'remove': false });
+        firebase.database().ref('games/' + user.gameId + '/playersInGame/' + this.props.user.userId).set({ 'create': false, 'score': 0, 'remove': false, 'ready': false });
       }
     });
     this.getPlayers(user.gameId, true);
@@ -60,12 +60,8 @@ class GameWaitRoom extends React.Component {
 
   sendInfo = (info) => {
     let name = document.getElementById('nickname').value;
-    if(name === '') {
-      name = 'Anonymous ID: ' + this.props.user.userId.substr(0, 4)
-    }
-
+    if(name === '') name = 'Anonymous ID: ' + this.props.user.userId.substr(0, 4)
     this.props.submitName(name);
-
     firebase.database().ref('users/' + this.props.user.userId).update({ 'username': name });
 
     const user = this.props.user;
@@ -75,11 +71,16 @@ class GameWaitRoom extends React.Component {
     userRef.once('value', (snapshot) => {
       var a = snapshot.exists();
       if (!a) {
-        database.ref('games/' + user.gameId + '/playersInGame/' + this.props.user.userId).set({ 'score': 0, 'create': true, 'remove': false });
+        database.ref('games/' + user.gameId + '/playersInGame/' + user.userId).set({ 'score': 0, 'create': true, 'remove': false, 'ready': true });
       } else {
-        database.ref('games/' + user.gameId + '/playersInGame/' + this.props.user.userId).update({ 'score': 0, 'create': true, 'remove': false });
+        database.ref('games/' + user.gameId + '/playersInGame/' + user.userId).update({ 'score': 0, 'create': true, 'remove': false, 'ready': true });
+      if(this.state.isAdmin) {
+        firebase.database().ref('games/' + user.gameId + '/gameInfo/').update({ 'startGame': true });        
+      } 
       }
     });
+
+
     // firebase.database().ref('games/' + user.gameId).update({ security: this.state.security });
   }
 
@@ -92,7 +93,7 @@ class GameWaitRoom extends React.Component {
       title="playbutton"
       onClick={() => { this.sendInfo(); }}
       >
-      Play Now!
+      Ready!
     </button>
 
     const disablePlayButon = 

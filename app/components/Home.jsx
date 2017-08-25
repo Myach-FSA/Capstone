@@ -5,6 +5,9 @@ import PlayNow from './PlayNow';
 const Home = () => (
     <section id="contain" className="hero">
     <PlayNow />
+    <div className='notification homeScreen'>
+      <img src="/assets/howtoplay.png"/>
+    </div>
     <div className="slider">
     <img id="photoobj" className="media-object" src='assets/textures/blue_walkway_thin.png' />
     </div>
