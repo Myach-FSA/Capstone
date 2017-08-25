@@ -32,7 +32,6 @@ class Game extends Component {
       info: {},
     };
   }
-
   componentDidMount() {
     database.ref('event').set('placeholder');
     audio0.play();
@@ -47,7 +46,7 @@ class Game extends Component {
     database.ref('games/' + gameId + '/playersInGame').on('value', (players) => {
       const playersObj = players.val();
       for (const playerId in playersObj) {
-        if (!this.state.playersInGame.includes(playerId) && playersObj[playerId].create) {
+        if (!this.state.playersInGame.includes(playerId) && playersObj[playerId].create && !playersObj[playerId].remove) {
           database.ref('users/' + playerId + '/ball').on('value', (playersTexture) => {
             texture = playersTexture.val();
           });
@@ -55,7 +54,7 @@ class Game extends Component {
           if (newPlayer.id === user) {
             this.playerPosition(newPlayer);
             this.setTexture(newPlayer, texture, scene);
-            this.setState({ info: { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, color: newPlayer.material.diffuseColor } });
+            this.setState({ info: { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, color: newPlayer.material.diffuseColor, gameId } });
             database.ref('playerPosition/' + newPlayer.id).set(this.state.info);
           } else {
             this.setTexture(newPlayer, texture, scene);
@@ -90,20 +89,21 @@ class Game extends Component {
           }
           database.ref(newPlayer.id).on('value', (otherPlayer) => {
             if (otherPlayer.val()) {
-              newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(otherPlayer.val().zAcceleration, 0, otherPlayer.val().xAcceleration, 0));
+              if (!newPlayer.physicsImpostor.isDisposed) {
+                newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(otherPlayer.val().zAcceleration, 0, otherPlayer.val().xAcceleration, 0));
+              }
             }
           });
         }
-      }
-      for (let i = 0; i < this.state.objects.length; i++) {
-        if (playersObj[this.state.playersInGame[i]]) {
-          if (playersObj[this.state.playersInGame[i]].remove) {
-            database.ref('playerPosition/' + this.state.playersInGame[i]).off();
-            this.state.objects[i].dispose();
-            this.state.objects[i].physicsImpostor.dispose();
-            const newState = this.state.playersInGame.filter(player => player !== this.state.objects[i].id);
-            this.setState({ playersInGame: newState });
-            this.setState({ objects: this.state.objects.filter((_, j) => j !== this.state.objects.indexOf(this.state.objects[i])) });
+        for (let i = 0; i < this.state.objects.length; i++) {
+          if (playersObj[this.state.playersInGame[i]]) {
+            if (playersObj[this.state.playersInGame[i]].remove) {
+              database.ref('playerPosition/' + this.state.playersInGame[i]).off();
+              this.state.objects[i].dispose();
+              const newState = this.state.playersInGame.filter(player => player !== this.state.objects[i].id);
+              this.setState({ playersInGame: newState });
+              this.setState({ objects: this.state.objects.filter((_, j) => j !== this.state.objects.indexOf(this.state.objects[i])) });
+            }
           }
         }
       }
@@ -210,12 +210,8 @@ class Game extends Component {
   componentWillUnmount() {
     const user = this.props.user.userId;
     const gameId = this.props.user.gameId;
-    for (let i = 0; i < this.state.playersInGame.length; i++) {
-      database.ref('playerPosition/' + this.state.playersInGame[i]).off();
-    }
-    database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true }).then(() => {
-      database.ref('playerPosition/' + user).remove();
-    });
+    database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true });
+    database.ref('games/' + gameId + '/playersInGame').off();
     database.ref('games/' + gameId + '/playersInGame/' + user).remove().then(() => {
       database.ref('games/' + gameId).once('value').then(allPlayers => {
         allPlayers = allPlayers.val();
@@ -224,13 +220,12 @@ class Game extends Component {
         }
       });
     });
-    database.ref('games/' + gameId + '/playersInGame').off();
-    database.ref('playerPosition').off();
-    database.ref('playerPosition/' + user).off();
+    database.ref(user).remove();
     database.ref(user).off();
     database.ref('playerPosition/' + user).remove();
-    database.ref(user).remove();
-    database.ref(this.props.user.userId).off();
+    database.ref('playerPosition/' + user).off();
+    database.ref('games/' + gameId + '/winPosition').off();
+    database.ref('games/' + gameId + '/playersInGame/winner').off();
     audio0.pause();
   }
 
@@ -240,11 +235,13 @@ class Game extends Component {
     const ballMaterial = new BABYLON.StandardMaterial('material', sce);
     const ballTexture = new BABYLON.Texture([balls][texture], sce);
     player.material = ballMaterial;
-    player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.SphereImpostor, {
-      mass: 1,
-      friction: 0.5,
-      restitution: 0.7
-    }, sce);
+    if (!player.physicsImpostor) {
+      player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.SphereImpostor, {
+        mass: 1,
+        friction: 0.5,
+        restitution: 0.7
+      }, sce);
+    }
     return player;
   }
 
@@ -255,7 +252,7 @@ class Game extends Component {
   }
 
   setTexture(sphere, texture, scene) {
-    sphere.material.diffuseTexture = new BABYLON.Texture(balls[texture-1].img, scene);
+    sphere.material.diffuseTexture = new BABYLON.Texture(balls[texture - 1].img, scene);
   }
 
   playerPosition(player) {
@@ -269,12 +266,6 @@ class Game extends Component {
 
   createCameraObj(scene, par) {
     const head = BABYLON.MeshBuilder.CreateSphere('camera', 16, scene);
-    const headMaterial = new BABYLON.StandardMaterial('material', scene);
-    const headTexture = new BABYLON.Texture('/assets/textures/net.png', scene);
-    headMaterial.diffuseTexture = headTexture;
-    headMaterial.diffuseColor = new BABYLON.Color3(2.0, 1, 0.7);
-    headMaterial.diffuseTexture.hasAlpha = true;
-    head.material = headMaterial;
     head.parent = par;
     return head;
   }
@@ -328,9 +319,7 @@ function control(user, info, playerObj) {
   database.ref(user.id).set({ xAcceleration: 0, zAcceleration: 0 });
 
   function gameLoop() {
-    if (!playerObj[user.id].remove) {
-      database.ref('playerPosition/' + user.id).set({ x: user.position.x, y: user.position.y, z: user.position.z });
-    }
+    database.ref('playerPosition/' + user.id).set({ x: user.position.x, y: user.position.y, z: user.position.z });
     if (keyState[37] || keyState[65]) {
       if (xAcceleration < 5) {
         xAcceleration += 0.5;
@@ -362,9 +351,13 @@ function control(user, info, playerObj) {
       }
       database.ref(user.id).set({ xAcceleration, zAcceleration });
     }
-    setTimeout(gameLoop, 50);
   }
-  gameLoop();
+  const gameInterval = setInterval(gameLoop, 49);
+  database.ref(`/games/${info.gameId}/playersInGame`).on('value', (playersInGameArray) => {
+    if (playersInGameArray.val()[user.id].remove) {
+      clearInterval(gameInterval);
+    }
+  });
 }
 
 // /* -----------------    CONTAINER     ------------------ */
