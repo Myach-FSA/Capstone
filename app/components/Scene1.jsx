@@ -115,17 +115,8 @@ const createScene1 = (canvas, engine) => {
 
   // ---- MATERIAL ----
 
-  // var ballMaterial = new BABYLON.StandardMaterial('material', scene);
-  var tubeMaterial = new BABYLON.StandardMaterial('material', scene);
-  var textureTube = new BABYLON.Texture('/assets/textures/students/stone.png', scene);
-  // var textureBall = new BABYLON.Texture('/assets/textures/net.png', scene);
-  // ballMaterial.diffuseColor = new BABYLON.Color3(2.0, 1, 0.7);
-  // ballMaterial.diffuseTexture = textureBall;
-  // ballMaterial.diffuseTexture.hasAlpha = true;
-  tubeMaterial.diffuseTexture = textureTube;
-  tubeMaterial.diffuseTexture.hasAlpha = true;
   var groundMaterial = new BABYLON.StandardMaterial('material', scene);
-  var textureNet = new BABYLON.Texture('/assets/textures/students/net.jpg', scene);
+  var textureNet = new BABYLON.Texture('textures', scene);
   groundMaterial.diffuseTexture = textureNet;
   const groundColor = new BABYLON.Color3(0, 1, 0);
   groundColor.hasAlpha = true;
