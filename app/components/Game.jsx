@@ -32,7 +32,6 @@ class Game extends Component {
       info: {},
     };
   }
-
   componentDidMount() {
     database.ref('event').set('placeholder');
     audio0.play();
@@ -60,11 +59,13 @@ class Game extends Component {
           } else {
             this.setTexture(newPlayer, texture, scene);
             database.ref('playerPosition/' + playerId).on('value', (playerInfo) => {
-              const x = playerInfo.val().x;
-              const y = playerInfo.val().y;
-              const z = playerInfo.val().z;
-              const color = playerInfo.val().color;
-              this.setPosition(newPlayer, x, y, z);
+              if (playerInfo.val()) {
+                const x = playerInfo.val().x;
+                const y = playerInfo.val().y;
+                const z = playerInfo.val().z;
+                const color = playerInfo.val().color;
+                this.setPosition(newPlayer, x, y, z);
+              }
             });
           }
           const newState = this.state.objects.slice();
@@ -219,13 +220,12 @@ class Game extends Component {
         }
       });
     });
-    database.ref('playerPosition/' + user).remove().then((val) => {
-      database.ref('playerPosition/').once('value').then((allPlayers) => {
-      });
-    });
-    database.ref('playerPosition/' + user).off();
-    database.ref(user).off();
     database.ref(user).remove();
+    database.ref(user).off();
+    database.ref('playerPosition/' + user).remove();
+    database.ref('playerPosition/' + user).off();
+    database.ref('games/' + gameId + '/winPosition').off();
+    database.ref('games/' + gameId + '/playersInGame/winner').off();
     audio0.pause();
   }
 
@@ -352,7 +352,7 @@ function control(user, info, playerObj) {
       database.ref(user.id).set({ xAcceleration, zAcceleration });
     }
   }
-  const gameInterval = setInterval(gameLoop, 50);
+  const gameInterval = setInterval(gameLoop, 49);
   database.ref(`/games/${info.gameId}/playersInGame`).on('value', (playersInGameArray) => {
     if (playersInGameArray.val()[user.id].remove) {
       clearInterval(gameInterval);

@@ -6,7 +6,7 @@ const database = firebase.database();
 class ScoreTable extends React.Component {
   constructor(props) {
     super(props);
-    this.state={
+    this.state = {
       children: []
     };
   }
@@ -17,9 +17,9 @@ class ScoreTable extends React.Component {
       this.setState({ children: children });
       database.ref('users/' + child.val().userId).on('value', snapshot => {
         const index = this.state.children.findIndex(element => element.userId === snapshot.val().userId);
-        children[index]=snapshot.val();
-        database.ref('games/' + snapshot.val().gameId + '/playersInGame/' + snapshot.val().userId+'/score').on('value', score => {
-          children[index].score=score.val();
+        children[index] = snapshot.val();
+        database.ref('games/' + snapshot.val().gameId + '/playersInGame/' + snapshot.val().userId + '/score').on('value', score => {
+          children[index].score = score.val();
           this.setState({ children: children });
         });
         this.setState({ children: children });
@@ -28,6 +28,11 @@ class ScoreTable extends React.Component {
   }
   componentWillUnmount() {
     database.ref('users/').off();
+    database.ref('users/').once('value').then(allUsers => {
+      const user = allUsers.val()[this.props.user.userId];
+      database.ref('users/' + user.userId).off();
+      database.ref('games/' + user.gameId + '/playersInGame/' + user.userId + '/score').off();
+    });
   }
   render() {
     return (
