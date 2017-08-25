@@ -51,7 +51,10 @@ const App = ({ children }) =>
           ? <Game auth={auth} loginObj={loginObj}/>
           : <Redirect to ='/' />)}/>
         <Route exact path="/game/:id/private" component={PrivateGameRoom}/>
-        <Route exact path="/choose" render={() => <GameType auth={auth} loginObj={loginObj}/>}/>
+        <Route exact path="/choose" render={() => (
+          loginObj.uid
+          ? <GameType auth={auth} loginObj={loginObj}/>
+          : <Redirect to ='/' />)}/>
         <Route exact path="/game/:id/ball" render={() => <ChooseBall auth={auth} loginObj={loginObj}/>}/>
         <Route exact path="/scores" component={Scores}/>
         <Route exact path="/login" render={() => <WhoAmI auth={auth} loginObj={loginObj}/>} />
