@@ -30,8 +30,9 @@ class ScoreTable extends React.Component {
     database.ref('users/').off();
     database.ref('users/').once('value').then(allUsers => {
       const user = allUsers.val()[this.props.user.userId];
-      database.ref('users/' + user.userId).off();
-      database.ref('games/' + user.gameId + '/playersInGame/' + user.userId + '/score').off();
+      const usersArr = Object.keys(allUsers.val());
+      usersArr.forEach((element, index, array) => database.ref('users/' + element).off());
+      usersArr.forEach((element, index, array) => database.ref('games/' + user.gameId + '/playersInGame/' + element + '/score').off());
     });
   }
   render() {
