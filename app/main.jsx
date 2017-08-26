@@ -11,6 +11,7 @@ import NotFound from './components/NotFound';
 import Game from './components/Game';
 import Home from './components/Home';
 import NavbarSection from './components/Navbar';
+import FooterSection from './components/Footer';
 import Scores from './components/Scores';
 import ChooseBall from './components/ChooseBall';
 import Register from './components/Register';
@@ -60,6 +61,7 @@ const App = ({ children }) =>
         <Route exact path="/signup" render={() => <Register auth={auth} />} />
         <Route component={NotFound}/>
       </Switch>
+      <FooterSection />
     </div>
   </Router>;
 
