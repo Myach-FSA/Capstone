@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM, { render } from 'react-dom';
-import { Link, withRouter } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import firebase from 'firebase';
 import SceneList from './SceneList';
@@ -20,9 +20,7 @@ class GameWaitRoom extends React.Component {
 
   componentDidMount() {
     const user = this.props.user;
-
     const userRef = firebase.database().ref('games/' + user.gameId);
- 
     userRef.once('value', (snapshot) => {
       var a = snapshot.exists();
       if (!a) {
@@ -34,12 +32,6 @@ class GameWaitRoom extends React.Component {
       }
     });
     this.getPlayers(user.gameId, true);
-
-    firebase.database().ref('games/' + user.gameId + '/gameInfo/startGame').on('value', (snapshot) => {
-      if (snapshot.val()) {
-        this.props.history.push(`/game/${user.gameId}/play`)
-      }
-    });
   }
 
   shouldComponentUpdate(nextProps) {
@@ -49,10 +41,7 @@ class GameWaitRoom extends React.Component {
   }
 
   componentWillUnmount() {
-    const user = this.props.user;
-    
     firebase.database().ref('games').off();
-    firebase.database().ref('games' + user.gameId + '/gameInfo/startGame').off();    
   }
 
   getPlayers = (gameId, bool) => {
@@ -85,21 +74,20 @@ class GameWaitRoom extends React.Component {
         database.ref('games/' + user.gameId + '/playersInGame/' + user.userId).set({ 'score': 0, 'create': true, 'remove': false, 'ready': true });
       } else {
         database.ref('games/' + user.gameId + '/playersInGame/' + user.userId).update({ 'score': 0, 'create': true, 'remove': false, 'ready': true });
-        if(this.state.isAdmin) {
-          firebase.database().ref('games/' + user.gameId + '/gameInfo/').update({ 'startGame': true });        
-        } 
+      if(this.state.isAdmin) {
+        firebase.database().ref('games/' + user.gameId + '/gameInfo/').update({ 'startGame': true });        
+      } 
       }
     });
+
+
     // firebase.database().ref('games/' + user.gameId).update({ security: this.state.security });
   }
 
   render() {
     
     const showPlayButton = 
-    <div>
-    <p className='has-text-centered'>Click below to notify the game creator that you are ready!</p>
     <button
-      id='centerButtons'
       className="button is-success"
       type="submit"
       title="playbutton"
@@ -107,23 +95,8 @@ class GameWaitRoom extends React.Component {
       >
       Ready!
     </button>
-    </div>
 
-    const showPlayButtonAdmin = 
-    <div>
-    <p className='has-text-centered'>Once players have connected, click the botton below to start the game!</p>
-    <button
-      id='centerButtons'
-      className="button is-success"
-      type="submit"
-      title="playbutton"
-      onClick={() => { this.sendInfo(); }}
-      >
-      Start Game
-    </button>
-    </div>
-
-    const disablePlayButton = 
+    const disablePlayButon = 
     <button
       className="button is-success"
       type="submit"
@@ -133,15 +106,7 @@ class GameWaitRoom extends React.Component {
       Play Now!
     </button>
 
-    let playNowButton = disablePlayButton;
-
-    if(this.props.user.ball) {
-      if(this.state.isAdmin) {
-        playNowButton = showPlayButtonAdmin;
-      } else {
-        playNowButton = showPlayButton;
-      }
-    }
+    const playNowButton = this.props.user.ball ? showPlayButton : disablePlayButon;
 
     return (
       <div className='space'>
@@ -165,8 +130,12 @@ class GameWaitRoom extends React.Component {
         <ChooseBall />
         <div className="content has-text-centered notification">
           <h5 id="greenText">Current number of connected players: {this.state.numberOfPlayers}</h5>
-          <div id='centerButtons'>
-            { playNowButton || playNowButtonAdmin }
+          <div id='centerButtons' className="field is-grouped">
+          <p className="control">
+          <Link to={`/game/${this.props.user.gameId}/play`}>
+            { playNowButton }
+          </Link>
+        </p>
         </div>
         </div>
         <div>
@@ -183,4 +152,4 @@ const mapStateToProps = (state) => ({
 
 const mapDispatch = ({ submitName });
 
-export default withRouter(connect(mapStateToProps, mapDispatch)(GameWaitRoom));
+export default connect(mapStateToProps, mapDispatch)(GameWaitRoom);
