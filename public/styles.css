@@ -88,6 +88,10 @@ body {
   text-decoration: none;
 }
 
+strong {
+  color: #1CA8DD;
+}
+
 .notification strong {
   color: #1CA8DD;
 }
@@ -180,13 +184,14 @@ a.halflink:hover {
   position: absolute;
   top: 73%;
   left: 4%;
-  width: 15vw;
+  width: 17vw;
   height: 20vh;
+  padding: 1%;
   background-color: rgba(0, 0, 0, 0.48);
   border: 2px solid #00a9b2;
   border-radius: 10px;
   color: #00a9b2;
-  font-size: 2vh;
+  font-size: 1.75vh;
   box-shadow: 0 0 100px 2px rgb(18, 156, 132);
 }
 
@@ -267,8 +272,8 @@ body {
 
 #muteSound {
   position: absolute;
-  top: 1.5vh;
-  left: 5vw;
+  top: 2%;
+  left: 90%;
   font-size: 30px;
   color: white;
   z-index: 100;
@@ -287,12 +292,14 @@ body {
 }
 
 .playNow {
+  width: 30%;
+  left: 35%;
   position: absolute;
   top: 15%;
-  justify-content: center;
+  /* justify-content: center; */
   height: 8vh;
   padding: 10px;
-  margin-left: 32%;
+  /* margin-left: 32%; */
   border: 2px solid black;
   border-radius: 10px;
   background-color: #002b41;
@@ -306,9 +313,8 @@ body {
 .homeScreen {
   position: absolute;
   top: 25%;
-  /* display: flex;
-  flex-direction: row; */
-  margin-left: 24%;
+  width: 70%;
+  left: 10%;
   justify-content: center;
   padding: 1px;
   border-radius: 10px;

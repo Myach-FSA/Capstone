@@ -7,7 +7,7 @@ class MuteSound extends React.Component {
     this.clickHandler = this
       .clickHandler
       .bind(this);
-    this.class = 'fa fa-volume-up fa-4x';
+    this.class = 'fa fa-volume-off fa-4x';
     this.isPlaying = true;
   }
 
@@ -30,7 +30,7 @@ class MuteSound extends React.Component {
     return (<i
       id="muteSound"
       onClick={(evt) => this.clickHandler(evt)}
-      className="fa fa-volume-off fa-4x"
+      className="fa fa-volume-up fa-4x"
       aria-hidden="true"/>);
   }
 };
