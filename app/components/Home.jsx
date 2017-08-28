@@ -3,15 +3,17 @@ import ReactDOM, { render } from 'react-dom';
 import PlayNow from './PlayNow';
 
 const Home = () => (
-    <section id="contain" className="hero">
-    <div className="slider">
-    <PlayNow />
+  <section id="contain" className="hero">
+    <div className='homeContainer'>
+      <PlayNow />
+    </div>
     <div className='notification homeScreen'>
-      <img src="/assets/howtoplay.png"/>
+      <img id='tutorial' src="/assets/howtoplay.png" />
     </div>
-    <img id="photoobj" className="media-object" src='assets/textures/blue_walkway_thin.png' />
+    <div className="slider">
+      <img id="photoobj" className="media-object" src='assets/textures/blue_walkway_thin.png' />
     </div>
-    </section>
-  );
+  </section>
+);
 
 export default Home;
