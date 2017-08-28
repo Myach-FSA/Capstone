@@ -25,7 +25,7 @@ class GameWaitRoom extends React.Component {
       var a = snapshot.exists();
       if (!a) {
         firebase.database().ref('games/' + user.gameId).set({ playersInGame: { [this.props.user.userId]: { 'create': false, 'score': 0, 'remove': false, 'ready': false } } });
-        firebase.database().ref('games/' + user.gameId + '/gameInfo/').set({ 'admin': this.props.user.userId, 'startGame': false });        
+        firebase.database().ref('games/' + user.gameId + '/gameInfo/').set({ 'admin': this.props.user.userId, 'startGame': false });
       } else {
         this.setState({ isAdmin: false })
         firebase.database().ref('games/' + user.gameId + '/playersInGame/' + this.props.user.userId).set({ 'create': false, 'score': 0, 'remove': false, 'ready': false });
@@ -36,7 +36,7 @@ class GameWaitRoom extends React.Component {
 
   shouldComponentUpdate(nextProps) {
     const differentBallId = this.props.user.ball !== nextProps.ball;
-    this.setState({ canPlay: true })
+    this.setState({ canPlay: true });
     return differentBallId;
   }
 
@@ -75,8 +75,8 @@ class GameWaitRoom extends React.Component {
       } else {
         database.ref('games/' + user.gameId + '/playersInGame/' + user.userId).update({ 'score': 0, 'create': true, 'remove': false, 'ready': true });
       if(this.state.isAdmin) {
-        firebase.database().ref('games/' + user.gameId + '/gameInfo/').update({ 'startGame': true });        
-      } 
+        firebase.database().ref('games/' + user.gameId + '/gameInfo/').update({ 'startGame': true });
+      }
       }
     });
 
@@ -85,8 +85,8 @@ class GameWaitRoom extends React.Component {
   }
 
   render() {
-    
-    const showPlayButton = 
+
+    const showPlayButton =
     <button
       className="button is-success"
       type="submit"
@@ -96,7 +96,7 @@ class GameWaitRoom extends React.Component {
       Ready!
     </button>
 
-    const disablePlayButon = 
+    const disablePlayButon =
     <button
       className="button is-success"
       type="submit"
