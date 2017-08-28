@@ -45,13 +45,10 @@ class WinScreen extends React.Component {
       });
     const gameId = this.props.user.gameId;
     const user = this.props.user.userId;
-    if (this.props.user.totalScore >= 5) {
+    if (this.props.user.totalScore >= 10) {
       const eventMessage = 'win,' + gameId + ',' + user;
-      this
-        .props
-        .database
-        .ref('event')
-        .set(eventMessage);
+      this.props.database.ref('event').set(eventMessage);
+      this.props.database.ref('users/' + user).update({totalScore: 0});
     }
     return this.state.component;
   }
