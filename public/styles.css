@@ -312,3 +312,7 @@ body {
 .content h4 {
   color: white;
 }
+
+#tutorial {
+  margin: auto;
+}
