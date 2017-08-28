@@ -30,7 +30,7 @@ class Scores extends React.Component {
       <div className="container is-fluid">
         <div className="content has-text-centered">
           <div id="choose" className="notification">
-          <h1 className='ingametext'><strong>Scores</strong></h1>
+            <h1 className='ingametext'><strong>Scores</strong></h1>
             <table>
               <thead>
                 <tr>
@@ -42,7 +42,6 @@ class Scores extends React.Component {
               </thead>
               <tbody>
                 {this.state.children.map(child => {
-                  console.log(child.username);
                   return (
                     <tr key={child.userId}>
                       <th id='tableList'>{child.username}</th>
@@ -57,19 +56,19 @@ class Scores extends React.Component {
           </div>
         </div>
       </div>
-      );
+    );
   };
 }
 // /* -----------------    CONTAINER     ------------------ */
 
-import {fetchUser} from '../reducers/auth';
-import {connect} from 'react-redux';
+import { fetchUser } from '../reducers/auth';
+import { connect } from 'react-redux';
 import store from '../store';
 
 const mapStateToProps = (state) => ({
-            user: state.auth.user
+  user: state.auth.user
 });
 
-const mapDispatch = ({fetchUser});
+const mapDispatch = ({ fetchUser });
 
 export default connect(mapStateToProps, mapDispatch)(Scores);

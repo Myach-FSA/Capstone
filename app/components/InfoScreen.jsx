@@ -14,11 +14,11 @@ class InfoScreen extends React.Component {
     return (
       <div id="InfoScreen" className="infoScreen has-text-centered">
         <br></br>
-        <h4>Your Score: </h4>
-        <h4>{totalScore}</h4>
+        <p>You are { this.props.user.username }</p>
         <br></br>
-        <p>Points needed to win: </p>
-        <p>{5 - totalScore}</p>
+        <p>Your Score: { totalScore } / 10</p>
+        <br></br>
+        <p>Click <strong>tab</strong> to see all scores</p>
       </div>
     );
   }
