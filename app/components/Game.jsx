@@ -255,7 +255,7 @@ class Game extends Component {
   }
 
   playerPosition(player) {
-    randomPosition = (min) => Math.floor(Math.random() * min - min / 2);
+    const randomPosition = (min) => Math.floor(Math.random() * min - min / 2);
     player.position.y = 5;
     player.position.x = randomPosition(40);
     player.position.z = randomPosition(40);
