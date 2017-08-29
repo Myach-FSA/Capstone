@@ -14,7 +14,7 @@ class About extends React.Component {
                 <ul><a href="https://github.com/nilyu">Yu Lin</a></ul>
                 <ul><a href="https://github.com/nancyvelasquez">Nancy Velasquez</a></ul>
             <br></br>
-            <h1><strong>Music by </strong></h1>
+            <h1><strong>Music by Ibraim Soltonbaev</strong></h1>
           </div>
         </div>
       </div>
