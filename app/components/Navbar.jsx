@@ -21,6 +21,9 @@ class NavbarSection extends React.Component {
               M Y A C H
           </h1>
           </NavLink>
+          <NavLink className="navbar-item itemsec" to="/about">
+            about
+          </NavLink>
           <NavLink className="navbar-item itemsec" to="/scores">
             scores
           </NavLink>
