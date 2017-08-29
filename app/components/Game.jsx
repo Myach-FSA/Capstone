@@ -129,6 +129,7 @@ class Game extends Component {
             return losses;
           });
         }
+
         const myScore = this.props.user.totalScore;
         this.props.changeScore(-myScore);
         database.ref('games/' + gameId + '/playersInGame/' + user).update({ 'score': 0 });
@@ -201,7 +202,6 @@ class Game extends Component {
     });
     window.addEventListener('beforeunload', () => {
       database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true });
-      // Need to find a way to call promises to remove one user and check for remainder before removing parent node
       database.ref('games/' + gameId).remove();
       database.ref('playerPosition/' + user).remove();
       database.ref(user).remove();
@@ -216,9 +216,7 @@ class Game extends Component {
     database.ref('games/' + gameId + '/playersInGame/' + user).remove().then(() => {
       database.ref('games/' + gameId).once('value').then(allPlayers => {
         allPlayers = allPlayers.val();
-        if (!allPlayers.playersInGame) {
-          database.ref('games/' + gameId).remove();
-        }
+        (!allPlayers.playersInGame) && database.ref('games/' + gameId).remove();
       });
     });
     database.ref(user).remove();
@@ -243,7 +241,7 @@ class Game extends Component {
         restitution: 0.7
       }, sce);
     }
-    return player;
+    return player
   }
 
   setPosition(sphere, x, y, z) {
@@ -257,9 +255,7 @@ class Game extends Component {
   }
 
   playerPosition(player) {
-    function randomPosition(min) {
-      return Math.floor(Math.random() * min - min / 2);
-    }
+    randomPosition = (min) => Math.floor(Math.random() * min - min / 2);
     player.position.y = 5;
     player.position.x = randomPosition(40);
     player.position.z = randomPosition(40);
