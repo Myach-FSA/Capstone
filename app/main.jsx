@@ -15,7 +15,6 @@ import Scores from './components/Scores';
 import ChooseBall from './components/ChooseBall';
 import Register from './components/Register';
 import PrivateGameRoom from './components/PrivateGameRoom';
-import ChooseGame from './components/ChooseGame';
 import GameType from './components/GameType';
 import GameList from './components/GameList';
 import About from './components/About';

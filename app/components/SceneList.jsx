@@ -24,13 +24,6 @@ class ChooseGame extends React.Component {
     this.setState({ sceneId: +evt.target.id });
   }
 
-  //   sendDataToFB() {
-  //     const user = this.props.user;
-  //     const ref = firebase.database().ref("users/"+user.userId)
-  //     ref.set(user)
-  //     this.props.setUser(user)    
-  //   }
-
   render() {
 
     return (

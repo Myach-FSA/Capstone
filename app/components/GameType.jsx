@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM, { render } from 'react-dom';
 import { Route, Link, NavLink, Router, Switch, withRouter } from 'react-router-dom';
 import firebase from 'firebase';
-import ChooseGame from './ChooseGame';
 import GameList from './GameList';
 import { setUser, chooseGame } from '../reducers/auth';
 import { showGameList } from '../reducers/conditionals';

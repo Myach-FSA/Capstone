@@ -9,6 +9,7 @@ import ScoreTable from './ScoreTable';
 import WinScreen from './WinScreen';
 import MuteSound from './MuteSound';
 import balls from './balls';
+import control from './Control';
 
 const database = firebase.database();
 const auth = firebase.auth();
@@ -128,6 +129,7 @@ class Game extends Component {
             return losses;
           });
         }
+
         const myScore = this.props.user.totalScore;
         this.props.changeScore(-myScore);
         database.ref('games/' + gameId + '/playersInGame/' + user).update({ 'score': 0 });
@@ -200,7 +202,6 @@ class Game extends Component {
     });
     window.addEventListener('beforeunload', () => {
       database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true });
-      // Need to find a way to call promises to remove one user and check for remainder before removing parent node
       database.ref('games/' + gameId).remove();
       database.ref('playerPosition/' + user).remove();
       database.ref(user).remove();
@@ -215,9 +216,7 @@ class Game extends Component {
     database.ref('games/' + gameId + '/playersInGame/' + user).remove().then(() => {
       database.ref('games/' + gameId).once('value').then(allPlayers => {
         allPlayers = allPlayers.val();
-        if (!allPlayers.playersInGame) {
-          database.ref('games/' + gameId).remove();
-        }
+        (!allPlayers.playersInGame) && database.ref('games/' + gameId).remove();
       });
     });
     database.ref(user).remove();
@@ -242,7 +241,7 @@ class Game extends Component {
         restitution: 0.7
       }, sce);
     }
-    return player;
+    return player
   }
 
   setPosition(sphere, x, y, z) {
@@ -256,9 +255,7 @@ class Game extends Component {
   }
 
   playerPosition(player) {
-    function randomPosition(min) {
-      return Math.floor(Math.random() * min - min / 2);
-    }
+    const randomPosition = (min) => Math.floor(Math.random() * min - min / 2);
     player.position.y = 5;
     player.position.x = randomPosition(40);
     player.position.z = randomPosition(40);
@@ -269,6 +266,7 @@ class Game extends Component {
     head.parent = par;
     return head;
   }
+
   createWinPoint(scene) {
     torus = BABYLON.Mesh.CreateTorus('torus', 2, 0.5, 10, scene);
     torus.position.x = 10;
@@ -286,78 +284,6 @@ class Game extends Component {
       </div>
     );
   }
-}
-
-function control(user, info, playerObj) {
-  const keyState = {};
-
-  window.onkeydown = function (e) {
-    if (e.keyCode === 9) {
-      e.preventDefault();
-      document.getElementById('ScoreTable').className = 'scoreTable visible has-text-centered';
-      document.getElementById('InfoScreen').className = 'infoScreen invisible has-text-centered';
-    }
-  };
-
-  window.onkeyup = function (e) {
-    if (e.keyCode === 9) {
-      document.getElementById('ScoreTable').className = 'scoreTable invisible has-text-centered';
-      document.getElementById('InfoScreen').className = 'infoScreen visible has-text-centered';
-    }
-  };
-
-  window.addEventListener('keydown', function (e) {
-    keyState[e.keyCode || e.which] = true;
-    if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
-      e.preventDefault();
-    }
-  }, true);
-  window.addEventListener('keyup', function (e) {
-    keyState[e.keyCode || e.which] = false;
-  }, true);
-
-  database.ref(user.id).set({ xAcceleration: 0, zAcceleration: 0 });
-
-  function gameLoop() {
-    database.ref('playerPosition/' + user.id).set({ x: user.position.x, y: user.position.y, z: user.position.z });
-    if (keyState[37] || keyState[65]) {
-      if (xAcceleration < 5) {
-        xAcceleration += 0.5;
-        database.ref(user.id).set({ xAcceleration, zAcceleration });
-      }
-    }
-    if (keyState[39] || keyState[68]) {
-      if (xAcceleration > -5) {
-        xAcceleration -= 0.5;
-        database.ref(user.id).set({ xAcceleration, zAcceleration });
-      }
-    }
-    if (keyState[38] || keyState[87]) {
-      if (zAcceleration < 5) {
-        zAcceleration += 0.5;
-        database.ref(user.id).set({ xAcceleration, zAcceleration });
-      }
-    }
-    if (keyState[40] || keyState[83]) {
-      if (zAcceleration > -5) {
-        zAcceleration -= 0.5;
-        database.ref(user.id).set({ xAcceleration, zAcceleration });
-      }
-    }
-    if (keyState[32]) {
-      var forceVector = new BABYLON.Vector3(0, 10, 0);
-      if (user.position.y < 1.1) {
-        user.applyImpulse(forceVector, user.position);
-      }
-      database.ref(user.id).set({ xAcceleration, zAcceleration });
-    }
-  }
-  const gameInterval = setInterval(gameLoop, 49);
-  database.ref(`/games/${info.gameId}/playersInGame`).on('value', (playersInGameArray) => {
-    if (playersInGameArray.val()[user.id].remove) {
-      clearInterval(gameInterval);
-    }
-  });
 }
 
 // /* -----------------    CONTAINER     ------------------ */
