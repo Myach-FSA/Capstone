@@ -300,7 +300,6 @@ body {
 }
 
 .homeScreen {
-  display: flex;
   position: absolute;
   top: 25%;
   left: 20%;
@@ -317,5 +316,6 @@ body {
 
 #tutorial {
   margin: auto;
+  display: block;
 }
 
