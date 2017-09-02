@@ -12,24 +12,24 @@ const app = require('.')
       build: task(app.package.scripts['build-watch'], {color: green}),
       lint: task(app.package.scripts['lint-watch'], {color: cyan}),
       test: task(app.package.scripts['test-watch'], {color: yellow})
-    })
+    });
 
 const taskEnvironment = (path=require('path')) => {
-  const env = {}
+  const env = {};
   for (const key in process.env) {
-    env[key] = process.env[key]
+    env[key] = process.env[key];
   }
   Object.assign(env, {
     NODE_ENV: 'development',
     PATH: [ path.join(app.root, 'node_modules', '.bin')
           , process.env.PATH ].join(path.delimiter)
-  })
-  return env
-}
+  });
+  return env;
+};
 
 function run(tasks) {
   Object.keys(tasks)
-    .map(name => tasks[name](name))
+    .map(name => tasks[name](name));
 }
 
 function task(command, {
@@ -46,12 +46,12 @@ function task(command, {
           env: taskEnvironment(),
         }).on('error', stderr)
           .on('exit', (code, signal) => {
-            stderr(`Exited with code ${code}`)
-            if (signal) stderr(`Exited with signal ${signal}`)
-          })
-    proc.stdout.on('data', stdout)
-    proc.stderr.on('data', stderr)
-  }
+            stderr(`Exited with code ${code}`);
+            if (signal) stderr(`Exited with signal ${signal}`);
+          });
+    proc.stdout.on('data', stdout);
+    proc.stderr.on('data', stderr);
+  };
 }
 
 function log({
@@ -66,14 +66,14 @@ function log({
     .replace('\u001b[2J', '')
     .replace('\u001b[1;3H', '')
     .split('\n')
-    .forEach(line => out.write(`${color(`${ts()} ${name}   \t⎹ `)}${text(line)}\n`))
+    .forEach(line => out.write(`${color(`${ts()} ${name}   \t⎹ `)}${text(line)}\n`));
 }
 
-const dateformat = require('dateformat')
+const dateformat = require('dateformat');
 function timestamp() {
-  return dateformat('yyyy-mm-dd HH:MM:ss (Z)')
+  return dateformat('yyyy-mm-dd HH:MM:ss (Z)');
 }
 
-function none(x) { return x }
+function none(x) { return x; }
 
-if (module === require.main) { dev() }
+if (module === require.main) { dev(); }

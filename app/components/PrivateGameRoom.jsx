@@ -27,7 +27,7 @@ class GameWaitRoom extends React.Component {
         firebase.database().ref('games/' + user.gameId).set({ playersInGame: { [this.props.user.userId]: { 'create': false, 'score': 0, 'remove': false, 'ready': false } } });
         firebase.database().ref('games/' + user.gameId + '/gameInfo/').set({ 'admin': this.props.user.userId, 'startGame': false });
       } else {
-        this.setState({ isAdmin: false })
+        this.setState({ isAdmin: false });
         firebase.database().ref('games/' + user.gameId + '/playersInGame/' + this.props.user.userId).set({ 'create': false, 'score': 0, 'remove': false, 'ready': false });
       }
     });
@@ -47,7 +47,7 @@ class GameWaitRoom extends React.Component {
   getPlayers = (gameId, bool) => {
     if (bool) {
       firebase.database().ref('games').on('value', players => {
-        if (players.val()&&players.val()[gameId]) {
+        if (players.val() && players.val()[gameId]) {
           this.setState({ numberOfPlayers: Object.keys(players.val()[gameId].playersInGame).length });
         }
       });
@@ -60,7 +60,7 @@ class GameWaitRoom extends React.Component {
 
   sendInfo = (info) => {
     let name = document.getElementById('nickname').value;
-    if(name === '') name = 'Anonymous ID: ' + this.props.user.userId.substr(0, 4)
+    if (name === '') name = 'Anonymous ID: ' + this.props.user.userId.substr(0, 4);
     this.props.submitName(name);
     firebase.database().ref('users/' + this.props.user.userId).update({ 'username': name });
 
@@ -74,37 +74,35 @@ class GameWaitRoom extends React.Component {
         database.ref('games/' + user.gameId + '/playersInGame/' + user.userId).set({ 'score': 0, 'create': true, 'remove': false, 'ready': true });
       } else {
         database.ref('games/' + user.gameId + '/playersInGame/' + user.userId).update({ 'score': 0, 'create': true, 'remove': false, 'ready': true });
-      if(this.state.isAdmin) {
-        firebase.database().ref('games/' + user.gameId + '/gameInfo/').update({ 'startGame': true });
-      }
+        if (this.state.isAdmin) {
+          firebase.database().ref('games/' + user.gameId + '/gameInfo/').update({ 'startGame': true });
+        }
       }
     });
-
 
     // firebase.database().ref('games/' + user.gameId).update({ security: this.state.security });
   }
 
   render() {
-
     const showPlayButton =
-    <button
-      className="button is-success"
-      type="submit"
-      title="playbutton"
-      onClick={() => { this.sendInfo(); }}
+      <button
+        className="button is-success"
+        type="submit"
+        title="playbutton"
+        onClick={() => { this.sendInfo(); }}
       >
-      Ready!
-    </button>
+        Ready!
+    </button>;
 
     const disablePlayButon =
-    <button
-      className="button is-success"
-      type="submit"
-      title="playbutton"
-      disabled
+      <button
+        className="button is-success"
+        type="submit"
+        title="playbutton"
+        disabled
       >
-      Play Now!
-    </button>
+        Play Now!
+    </button>;
 
     const playNowButton = this.props.user.ball ? showPlayButton : disablePlayButon;
 
@@ -131,12 +129,12 @@ class GameWaitRoom extends React.Component {
         <div className="content has-text-centered notification">
           <h5 id="greenText">Current number of connected players: {this.state.numberOfPlayers}</h5>
           <div id='centerButtons' className="field is-grouped">
-          <p className="control">
-          <Link to={`/game/${this.props.user.gameId}/play`}>
-            { playNowButton }
-          </Link>
-        </p>
-        </div>
+            <p className="control">
+              <Link to={`/game/${this.props.user.gameId}/play`}>
+                {playNowButton}
+              </Link>
+            </p>
+          </div>
         </div>
         <div>
           <h4></h4>

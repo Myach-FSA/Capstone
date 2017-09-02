@@ -2,14 +2,14 @@ import React from 'react';
 import ReactDOM, { render } from 'react-dom';
 import { Link, NavLink, Router } from 'react-router-dom';
 import firebase from 'firebase';
-import balls from './balls'
+import balls from './balls';
 
 class ChooseBall extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       clicked: false,
-    }
+    };
     this.ballChoice = this.ballChoice.bind(this);
   }
 
@@ -19,7 +19,7 @@ class ChooseBall extends React.Component {
   }
 
   ballChoice(evt) {
-    this.setState({ clicked: true })
+    this.setState({ clicked: true });
     this.props.chooseBall(+evt.target.id);
     this.sendDataToFB(+evt.target.id);
   }
