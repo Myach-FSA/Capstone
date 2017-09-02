@@ -50,7 +50,7 @@ class ChooseBall extends React.Component {
                 className="column is-one-quarter product-grid-item">
                 <div key={i+1} className="inner-product">
                   <br />
-                  <figure className="image">
+                  <figure>
                     <img src={ball.img} className='imgBall' alt="Image" onClick={(evt) => this.ballChoice(evt)} />
                   </figure>
                   <p className="subtitle">{ball.name}</p>

@@ -267,6 +267,8 @@ body {
 
 .imgBall {
   border-radius: 50%;
+  height: 10em;
+  width: 10em;
 }
 
 #tableList {
@@ -316,3 +318,4 @@ body {
 #tutorial {
   margin: auto;
 }
+
