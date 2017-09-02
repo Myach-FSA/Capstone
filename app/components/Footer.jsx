@@ -1,8 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-const FooterSection = () => {
-  return (
+const FooterSection = () => (
     <footer id="footersec">
       <div className="container has-text-centered">
         <p>By Dan, Denis, Yu, and Nancy</p>
@@ -14,6 +13,5 @@ const FooterSection = () => {
       </div>
     </footer>
   );
-};
 
 export default FooterSection;

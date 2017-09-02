@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM, { render } from 'react-dom';
 
 class About extends React.Component {
-
   render() {
     return (
       <div className="container is-fluid">

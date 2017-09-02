@@ -1,16 +1,16 @@
-import React from 'react'
+import React from 'react';
 
-import firebase from 'APP/fire'
+import firebase from 'APP/fire';
 
 // const google = new firebase.auth.GoogleAuthProvider()
 
 // Firebase has several built in auth providers:
-const facebook = new firebase.auth.FacebookAuthProvider()
+const facebook = new firebase.auth.FacebookAuthProvider();
 // // const twitter = new firebase.auth.TwitterAuthProvider()
 // // const github = new firebase.auth.GithubAuthProvider()
 // // // This last one is the email and password login we all know and
 // // // vaguely tolerate:
-const email = new firebase.auth.EmailAuthProvider()
+const email = new firebase.auth.EmailAuthProvider();
 
 // If you want to request additional permissions, you'd do it
 // like so:
@@ -25,12 +25,9 @@ const email = new firebase.auth.EmailAuthProvider()
 //
 // google.addScope('https://mail.google.com/')
 
-const facebook = new firebase.auth.FacebookAuthProvider()
-const email = new firebase.auth.EmailAuthProvider()
 export default ({ auth }) =>
   // signInWithPopup will try to open a login popup, and if it's blocked, it'll
   // redirect. If you prefer, you can signInWithRedirect, which always
   // redirects.
   <button className='facebook login'
-    onClick={() => auth.signInWithPopup(facebook)}>Login with Facebook</button>
-
+    onClick={() => auth.signInWithPopup(facebook)}>Login with Facebook</button>;

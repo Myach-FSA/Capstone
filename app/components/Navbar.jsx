@@ -1,5 +1,5 @@
-import React from 'react'
-import { NavLink, withRouter } from 'react-router-dom'
+import React from 'react';
+import { NavLink, withRouter } from 'react-router-dom';
 
 class NavbarSection extends React.Component {
   constructor() {
@@ -8,8 +8,8 @@ class NavbarSection extends React.Component {
   }
 
   handleLogout() {
-    this.props.logOut()
-    this.props.history.push('/')
+    this.props.logOut();
+    this.props.history.push('/');
   };
 
   render() {
@@ -38,13 +38,13 @@ class NavbarSection extends React.Component {
 
 /* -----------------    CONTAINER     ------------------ */
 
-import { logOut } from '../reducers/auth'
-import { connect } from 'react-redux'
+import { logOut } from '../reducers/auth';
+import { connect } from 'react-redux';
 
 const mapState = (state, componentProps) => (
   { user: state.auth }
-)
+);
 
-const mapDispatch = ({ logOut })
+const mapDispatch = ({ logOut });
 
-export default withRouter(connect(mapState, mapDispatch)(NavbarSection))
+export default withRouter(connect(mapState, mapDispatch)(NavbarSection));

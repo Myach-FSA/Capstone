@@ -19,13 +19,13 @@ class Register extends React.Component {
     const username = evt.target.username.value;
 
     auth.createUserWithEmailAndPassword(email, password)
-    .then(user => {
-      this.props.signUp({ userId: user.uid, email, username});
-    })
-    .then(() => {
-      this.props.history.push('/');
-    })
-    .catch(error => console.error(error));
+      .then(user => {
+        this.props.signUp({ userId: user.uid, email, username });
+      })
+      .then(() => {
+        this.props.history.push('/');
+      })
+      .catch(error => console.error(error));
   }
 
   render() {
@@ -36,7 +36,7 @@ class Register extends React.Component {
         </div>
         <div className="column is-one-third columnspace formspacing">
           <form className="formspacing" onSubmit={evt => this.handleSignUp(evt)}>
-          <div className="field">
+            <div className="field">
               <p className="control has-icons-left has-icons-right">
                 <input name="username" className="input" type="username" placeholder="Username" />
                 <span className="icon is-small is-left">
@@ -84,14 +84,14 @@ class Register extends React.Component {
 
 // /* -----------------    CONTAINER     ------------------ */
 
-import {signUp} from '../reducers/auth';
-import {connect} from 'react-redux';
+import { signUp } from '../reducers/auth';
+import { connect } from 'react-redux';
 import store from '../store';
 
 const mapState = (state, componentProps) => (
-  {user: state.user }
+  { user: state.user }
 );
 
-const mapDispatch = ({signUp});
+const mapDispatch = ({ signUp });
 
 export default withRouter(connect(mapState, mapDispatch)(Register));

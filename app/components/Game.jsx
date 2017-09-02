@@ -241,7 +241,7 @@ class Game extends Component {
         restitution: 0.7
       }, sce);
     }
-    return player
+    return player;
   }
 
   setPosition(sphere, x, y, z) {

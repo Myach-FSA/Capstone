@@ -12,7 +12,7 @@ class GameList extends React.Component {
     this.state = {
       games: false,
     };
-    this.selectGame = this.selectGame.bind(this)
+    this.selectGame = this.selectGame.bind(this);
   }
   componentWillMount() {
     const database = firebase.database();
@@ -26,7 +26,7 @@ class GameList extends React.Component {
   }
 
   selectGame(evt) {
-    let game = evt.target.name;
+    const game = evt.target.name;
     this.props.chooseGame(game);
     this.props.history.push(`/game/${game}/private`);
   }
@@ -49,16 +49,14 @@ class GameList extends React.Component {
           </thead>
           <tbody>
             {this.state.games &&
-              Object.keys(this.state.games).map((game) => {
-                return (
+              Object.keys(this.state.games).map((game) => (
                   <tr key={game}>
                     <th id='tableList'>{game}</th>
                     <th id='tableList'>[{Object.keys(this.state.games[game].playersInGame).length}]</th>
                     <th id='tableList'>Public</th>
                     <th id='tableList'><a name={game} onClick={(evt) => this.selectGame(evt)} className="button is-primary">JOIN</a></th>
                   </tr>
-                );
-              })
+                ))
             }
           </tbody>
         </table>
