@@ -14,3 +14,5 @@ npm-debug.log
 # Firebase debug log
 firebase-debug.log
 fire/index.js
+
+.DS_Store

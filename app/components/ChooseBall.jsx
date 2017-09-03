@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM, { render } from 'react-dom';
 import { Link, NavLink, Router } from 'react-router-dom';
 import firebase from 'firebase';
-import balls from './balls';
+import ballImages from './balls';
 
 class ChooseBall extends React.Component {
   constructor(props) {
@@ -36,7 +36,7 @@ class ChooseBall extends React.Component {
 
   render() {
     const playerName = this.props.user.username && this.props.user.username ? this.props.user.username : 'Anonymous';
-    const chosenBall = balls[this.props.user.ball - 1];
+    const chosenBall = ballImages[this.props.user.ball - 1];
     const ballMessage = this.state.clicked ? `You have chosen ${chosenBall.name}` : 'You have not yet chosen a ball';
 
     return (
@@ -45,12 +45,12 @@ class ChooseBall extends React.Component {
         <h5><strong>{ballMessage}</strong></h5>
         <div className="horiz-marg">
           <div className="columns is-multiline">
-            {balls && balls.map((ball, i) => (
+            {ballImages && ballImages.map((ball, i) => (
               <article key={i}
                 className="column is-one-quarter product-grid-item">
                 <div key={i+1} className="inner-product">
                   <br />
-                  <figure className="image">
+                  <figure>
                     <img src={ball.img} className='imgBall' alt="Image" onClick={(evt) => this.ballChoice(evt)} />
                   </figure>
                   <p className="subtitle">{ball.name}</p>

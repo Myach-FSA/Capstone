@@ -267,6 +267,8 @@ body {
 
 .imgBall {
   border-radius: 50%;
+  height: 10em;
+  width: 10em;
 }
 
 #tableList {
@@ -298,7 +300,6 @@ body {
 }
 
 .homeScreen {
-  display: flex;
   position: absolute;
   top: 25%;
   left: 20%;
@@ -315,4 +316,6 @@ body {
 
 #tutorial {
   margin: auto;
+  display: block;
 }
+

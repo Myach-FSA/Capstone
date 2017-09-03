@@ -11,7 +11,7 @@ class PlayNow extends React.Component {
   render() {
     return (
     <Link to="/choose">
-      <img className="playNow" src="/assets/PlayNow.png"/>
+      <img className="playNow" src="/assets/PlayNow.webp"/>
     </Link>);
   }
 }
