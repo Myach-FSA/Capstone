@@ -74,6 +74,8 @@ const Control = (user, info, playerObj) => {
   database.ref(`/games/${info.gameId}/playersInGame`).on('value', (playersInGameArray) => {
     if (playersInGameArray.val()[user.id].remove) {
       clearInterval(gameInterval);
+      window.onkeydown = null;
+      window.onkeyup = null;
     }
   });
 };
