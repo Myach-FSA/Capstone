@@ -25,7 +25,7 @@ class WinScreen extends React.Component {
   componentDidUpdate(prevProps) {
     const gameId = this.props.user.gameId;
     const user = this.props.user.userId;
-    if (this.props.user.totalScore >= 2 && this.props.user.totalScore !== prevProps.user.totalScore) {
+    if (this.props.user.totalScore >= 10 && this.props.user.totalScore !== prevProps.user.totalScore) {
       this.props.database.ref('games/' + gameId + '/gameInfo').update({ winner: user });
       this.props.database.ref('users/' + user).update({ totalScore: 0 });
     }
