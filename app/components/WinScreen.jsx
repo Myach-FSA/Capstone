@@ -1,6 +1,5 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
-import ReactDOM, { render } from 'react-dom';
 
 class WinScreen extends React.Component {
   constructor(props) {
