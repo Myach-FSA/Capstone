@@ -108,6 +108,12 @@ class Game extends Component {
           }
         }
       }
+      const removeGame = Object.keys(playersObj).every(player => {
+        return playersObj[player].remove;
+      });
+      if (removeGame) {
+        database.ref('games/' + gameId).remove();
+      }
     });
 
     database.ref('games/' + gameId).update({ 'winPosition': { x: 10, z: 10 } });
@@ -202,7 +208,6 @@ class Game extends Component {
     });
     window.addEventListener('beforeunload', () => {
       database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true });
-      database.ref('games/' + gameId).remove();
       database.ref('playerPosition/' + user).remove();
       database.ref(user).remove();
     });
