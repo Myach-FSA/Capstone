@@ -11,6 +11,7 @@ const LiveReloadPlugin = require('webpack-livereload-plugin')
  */
 
     , USE_FAST_SOURCE_MAPS = false
+const webpack = require('webpack');
 
 module.exports = {
   entry: './app/main.jsx',
@@ -39,5 +40,12 @@ module.exports = {
   },
   plugins: devMode
     ? [new LiveReloadPlugin({appendScriptTag: true})]
-    : []
-}
+    : [
+      new webpack.DefinePlugin({
+        'process.env': {
+          NODE_ENV: JSON.stringify('production')
+        }
+      }),
+      new webpack.optimize.UglifyJsPlugin()
+    ],
+};
