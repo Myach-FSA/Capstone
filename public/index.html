@@ -12,15 +12,13 @@
   <!-- include only the Firebase features as you need -->
   <script defer src="/__/firebase/4.2.0/firebase-auth.js"></script>
   <script defer src="/__/firebase/4.2.0/firebase-database.js"></script>
-  <script defer src="/__/firebase/4.2.0/firebase-messaging.js"></script>
-  <script defer src="/__/firebase/4.2.0/firebase-storage.js"></script>
   <!-- initialize the SDK after all desired features are loaded -->
   <script defer src="/__/firebase/init.js"></script>
-  <script src="/bundle.js" defer></script>
+  <script defer src="/bundle.js"></script>
   <link rel="stylesheet" type='text/css' href='/styles.css' />
-  <script src="/babylon.js"></script>
-   <script src="/audio.js"></script>
-  <script src="/cannon.js"></script>
+  <script defer src="/babylon.js"></script>
+  <script defer src="/audio.js"></script>
+  <script defer src="/cannon.js"></script>
 </head>
 
 <body>
@@ -29,30 +27,6 @@
   <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js"></script>
   <!-- <p id="load">Firebase SDK Loading&hellip;</p> -->
-
-  <script>
-    // document.addEventListener('DOMContentLoaded', function () {
-    //   // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-    //   // // The Firebase SDK is initialized and available here!
-    //   //
-    //   // firebase.auth().onAuthStateChanged(user => { });
-    //   // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-    //   // firebase.messaging().requestPermission().then(() => { });
-    //   // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-    //   //
-    //   // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-
-    //   try {
-    //     let app = firebase.app();
-    //     let features = ['auth', 'database', 'messaging', 'storage'].filter(feature => typeof app[feature] ===
-    //       'function');
-    //     document.getElementById('load').innerHTML = `Firebase SDK loaded with ${features.join(', ')}`;
-    //   } catch (e) {
-    //     console.error(e);
-    //     document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
-    //   }
-    // });
-  </script>
 </body>
 
 </html>
