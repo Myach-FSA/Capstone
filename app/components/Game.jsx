@@ -46,15 +46,15 @@ class Game extends Component {
     database.ref('games/' + gameId + '/playersInGame').on('value', (players) => {
       const playersObj = players.val();
       for (const playerId in playersObj) {
-        if (!this.state.playersInGame.includes(playerId) && playersObj[playerId].create && !playersObj[playerId].remove) {
-          database.ref('users/' + playerId + '/ball').on('value', (playersTexture) => {
+        if (!this.state.playersInGame.includes(playerId) && playersObj[playerId].create) {
+          database.ref('users/' + playerId + '/ball').once('value', (playersTexture) => {
             texture = playersTexture.val();
           });
           const newPlayer = createPlayerOnConnect(scene, playerId, texture);
           if (newPlayer.id === user) {
             playerPosition(newPlayer);
             setTexture(newPlayer, texture, scene);
-            this.setState({ info: { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, color: newPlayer.material.diffuseColor, gameId } });
+            this.setState({ info: { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, gameId } });
             database.ref('playerPosition/' + newPlayer.id).set(this.state.info);
           } else {
             setTexture(newPlayer, texture, scene);
@@ -94,22 +94,7 @@ class Game extends Component {
             }
           });
         }
-        for (let i = 0; i < this.state.objects.length; i++) {
-          if (playersObj[this.state.playersInGame[i]]) {
-            if (playersObj[this.state.playersInGame[i]].remove) {
-              database.ref('playerPosition/' + this.state.playersInGame[i]).off();
-              this.state.objects[i].dispose();
-              const newState = this.state.playersInGame.filter(player => player !== this.state.objects[i].id);
-              this.setState({ playersInGame: newState });
-              this.setState({ objects: this.state.objects.filter((_, j) => j !== this.state.objects.indexOf(this.state.objects[i])) });
-            }
-          }
-        }
       }
-      // const removeGame = Object.keys(playersObj).every(player => playersObj[player].remove);
-      // if (removeGame) {
-      //   database.ref('games/' + gameId).remove();
-      // }
     });
 
     database.ref('games/' + gameId).update({ 'winPosition': { x: 10, z: 10 } });
@@ -218,7 +203,6 @@ class Game extends Component {
   componentWillUnmount() {
     const user = this.props.user.userId;
     const gameId = this.props.user.gameId;
-    // database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true });
     database.ref('games/' + gameId + '/playersInGame/' + user).remove();
     database.ref('games/' + gameId + '/playersInGame').off();
     database.ref('games/' + gameId + '/playersInGame/' + user).remove().then(() => {
