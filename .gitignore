@@ -16,3 +16,4 @@ firebase-debug.log
 fire/index.js
 
 .DS_Store
+.vscode

@@ -1,14 +1,14 @@
-const firebase = require('firebase')
+const firebase = require('firebase');
 
 // -- // -- // -- // Firebase Config // -- // -- // -- //
 const config = {
-  apiKey: "AIzaSyD5CuKXBrzpUH_m8ovpCdXCNbQ5uRKkPmI",
-  authDomain: "myach-fsa.firebaseapp.com",
-  databaseURL: "https://myach-fsa.firebaseio.com",
-  projectId: "myach-fsa",
-  storageBucket: "myach-fsa.appspot.com",
-  messagingSenderId: "51959276382"
-}
+  apiKey: 'AIzaSyD5CuKXBrzpUH_m8ovpCdXCNbQ5uRKkPmI',
+  authDomain: 'myach-fsa.firebaseapp.com',
+  databaseURL: 'https://myach-fsa.firebaseio.com',
+  projectId: 'myach-fsa',
+  storageBucket: 'myach-fsa.appspot.com',
+  messagingSenderId: '51959276382'
+};
 // -- // -- // -- // -- // -- // -- // -- // -- // -- //
 
 // Initialize the app, but make sure to do it only once.
@@ -18,6 +18,6 @@ const config = {
 //   initialize the app again, which causes Firebase to throw.
 //
 //   This is why global state makes a sad panda.)
-firebase.__bonesApp || (firebase.__bonesApp = firebase.initializeApp(config))
+firebase.__bonesApp || (firebase.__bonesApp = firebase.initializeApp(config));
 
-module.exports = firebase
+module.exports = firebase;

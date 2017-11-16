@@ -34,7 +34,6 @@ class Game extends Component {
     };
   }
   componentDidMount() {
-    database.ref('event').set('placeholder');
     audio0.play();
     const user = this.props.user.userId;
     const gameId = this.props.user.gameId;
@@ -108,9 +107,7 @@ class Game extends Component {
           }
         }
       }
-      const removeGame = Object.keys(playersObj).every(player => {
-        return playersObj[player].remove;
-      });
+      const removeGame = Object.keys(playersObj).every(player => playersObj[player].remove);
       if (removeGame) {
         database.ref('games/' + gameId).remove();
       }
@@ -153,10 +150,10 @@ class Game extends Component {
       if (!scene || (sceneNum !== num)) {
         num = sceneNum;
         switch (num) {
-          case 2:
-            scene = createScene2(canvas, engine);
-            break;
-          default: scene = createScene1(canvas, engine);
+        case 2:
+          scene = createScene2(canvas, engine);
+          break;
+        default: scene = createScene1(canvas, engine);
         }
         setTimeout(scene.render(), 500);
       } else {
