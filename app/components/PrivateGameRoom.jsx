@@ -20,10 +20,10 @@ class GameWaitRoom extends React.Component {
 
   componentDidMount() {
     const user = this.props.user;
-    const userRef = firebase.database().ref('games/' + user.gameId);
+    const userRef = firebase.database().ref(`games/${user.gameId}`);
     window.addEventListener('beforeunload', () => {
-      firebase.database().ref('games/' + user.gameId + '/playersInGame/' + user.userId).remove();
-      firebase.database().ref('games/' + user.gameId + '/gameInfo/admin').once('value', (admin) => {
+      firebase.database().ref(`games/${user.gameId}/playersInGame/${user.userId}`).remove();
+      firebase.database().ref(`games/${user.gameId}/gameInfo/admin`).once('value', (admin) => {
         if (admin.val() === user.userId) {
           firebase.database().ref('games/' + user.gameId).remove();
         };
@@ -32,11 +32,11 @@ class GameWaitRoom extends React.Component {
     userRef.once('value', (snapshot) => {
       var a = snapshot.exists();
       if (!a) {
-        firebase.database().ref('games/' + user.gameId).set({ playersInGame: { [this.props.user.userId]: { 'create': false, 'score': 0, 'remove': false, 'ready': false } } });
-        firebase.database().ref('games/' + user.gameId + '/gameInfo/').set({ 'admin': this.props.user.userId, 'startGame': false });
+        firebase.database().ref(`games/${user.gameId}`).set({ playersInGame: { [user.userId]: { 'create': false, 'score': 0, 'remove': false, 'ready': false } } });
+        firebase.database().ref(`games/${user.gameId}/gameInfo/`).set({ 'admin': user.userId, 'startGame': false });
       } else {
         this.setState({ isAdmin: false });
-        firebase.database().ref('games/' + user.gameId + '/playersInGame/' + this.props.user.userId).set({ 'create': false, 'score': 0, 'remove': false, 'ready': false });
+        firebase.database().ref(`games/${user.gameId}/playersInGame/${user.userId}`).set({ 'create': false, 'score': 0, 'remove': false, 'ready': false });
       }
     });
     this.getPlayers(user.gameId, true);
@@ -50,9 +50,9 @@ class GameWaitRoom extends React.Component {
 
   componentWillUnmount() {
     const user = this.props.user;
-    firebase.database().ref('games/' + user.gameId + '/gameInfo/admin').once('value', (admin) => {
+    firebase.database().ref(`games/${user.gameId}/gameInfo/admin`).once('value', (admin) => {
       if (admin.val() === user.userId) {
-        firebase.database().ref('games/' + user.gameId).remove();
+        firebase.database().ref(`games/${user.gameId}`).remove();
       };
     });
     firebase.database().ref('games').off();
@@ -68,28 +68,23 @@ class GameWaitRoom extends React.Component {
     }
   }
 
-  security = () => {
-    this.setState({ publicGame: !this.state.publicGame });
-  }
-
   sendInfo = (info) => {
-    let name = document.getElementById('nickname').value;
-    if (name === '') name = 'Anonymous ID: ' + this.props.user.userId.substr(0, 4);
-    this.props.submitName(name);
-    firebase.database().ref('users/' + this.props.user.userId).update({ 'username': name });
-
     const user = this.props.user;
-    const userRef = firebase.database().ref('games/' + user.gameId);
+    const userRef = firebase.database().ref(`games/${user.gameId}`);
     const database = firebase.database();
+    let name = document.getElementById('nickname').value;
 
+    if (name === '') name = 'Anonymous ID: ' + user.userId.substr(0, 4);
+    this.props.submitName(name);
+    firebase.database().ref(`users/${user.userId}`).update({ 'username': name });
     userRef.once('value', (snapshot) => {
       var a = snapshot.exists();
       if (!a) {
-        database.ref('games/' + user.gameId + '/playersInGame/' + user.userId).set({ 'score': 0, 'create': true, 'remove': false, 'ready': true });
+        database.ref(`games/${user.gameId}/playersInGame/${user.userId}`).set({ 'score': 0, 'create': true, 'remove': false, 'ready': true });
       } else {
-        database.ref('games/' + user.gameId + '/playersInGame/' + user.userId).update({ 'score': 0, 'create': true, 'remove': false, 'ready': true });
+        database.ref(`games/${user.gameId}/playersInGame/${user.userId}`).update({ 'score': 0, 'create': true, 'remove': false, 'ready': true });
         if (this.state.isAdmin) {
-          firebase.database().ref('games/' + user.gameId + '/gameInfo/').update({ 'startGame': true });
+          firebase.database().ref(`games/${user.gameId}/gameInfo/`).update({ 'startGame': true });
         }
       }
     });
