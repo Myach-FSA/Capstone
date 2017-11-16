@@ -1,6 +1,5 @@
 import React from 'react';
 import game, {createScene, getScene} from '../reducers';
-import createScene2 from './Scene2';
 import {changeScene} from './Game';
 
 /* global BABYLON */

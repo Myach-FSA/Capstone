@@ -3,7 +3,6 @@
 import React, { Component } from 'react';
 import firebase from '../../fire';
 import createScene1 from './Scene1';
-import createScene2 from './Scene2';
 import InfoScreen from './InfoScreen';
 import ScoreTable from './ScoreTable';
 import WinScreen from './WinScreen';
