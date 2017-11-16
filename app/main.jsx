@@ -21,8 +21,6 @@ import About from './components/About';
 
 import firebase from 'APP/fire';
 
-import Demos from 'APP/demos';
-
 const auth = firebase.auth();
 var loginObj = {};
 
