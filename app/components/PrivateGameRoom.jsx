@@ -21,6 +21,14 @@ class GameWaitRoom extends React.Component {
   componentDidMount() {
     const user = this.props.user;
     const userRef = firebase.database().ref('games/' + user.gameId);
+    window.addEventListener('beforeunload', () => {
+      firebase.database().ref('games/' + user.gameId + '/playersInGame/' + user.userId).remove();
+      firebase.database().ref('games/' + user.gameId + '/gameInfo/admin').once('value', (admin) => {
+        if (admin.val() === user.userId) {
+          firebase.database().ref('games/' + user.gameId).remove();
+        };
+      });
+    });
     userRef.once('value', (snapshot) => {
       var a = snapshot.exists();
       if (!a) {
@@ -41,6 +49,12 @@ class GameWaitRoom extends React.Component {
   }
 
   componentWillUnmount() {
+    const user = this.props.user;
+    firebase.database().ref('games/' + user.gameId + '/gameInfo/admin').once('value', (admin) => {
+      if (admin.val() === user.userId) {
+        firebase.database().ref('games/' + user.gameId).remove();
+      };
+    });
     firebase.database().ref('games').off();
   }
 
@@ -79,8 +93,6 @@ class GameWaitRoom extends React.Component {
         }
       }
     });
-
-    // firebase.database().ref('games/' + user.gameId).update({ security: this.state.security });
   }
 
   render() {
@@ -122,7 +134,6 @@ class GameWaitRoom extends React.Component {
               <h1><strong>Your Game ID: {this.props.user.gameId}</strong></h1>
               <p>Send this code to your friends!</p>
             </div>
-            {/* <SceneList gameId={this.props.match.params.id} /> */}
           </div>
         )}
         <ChooseBall />
