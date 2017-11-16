@@ -9,6 +9,7 @@ import WinScreen from './WinScreen';
 import MuteSound from './MuteSound';
 import balls from './balls';
 import control from './Control';
+import {createPlayerOnConnect, setPosition, setTexture, playerPosition, createCameraObj} from '../utils/gameFn';
 
 const database = firebase.database();
 const auth = firebase.auth();
@@ -49,21 +50,20 @@ class Game extends Component {
           database.ref('users/' + playerId + '/ball').on('value', (playersTexture) => {
             texture = playersTexture.val();
           });
-          const newPlayer = this.createPlayerOnConnect(scene, playerId, texture);
+          const newPlayer = createPlayerOnConnect(scene, playerId, texture);
           if (newPlayer.id === user) {
-            this.playerPosition(newPlayer);
-            this.setTexture(newPlayer, texture, scene);
+            playerPosition(newPlayer);
+            setTexture(newPlayer, texture, scene);
             this.setState({ info: { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, color: newPlayer.material.diffuseColor, gameId } });
             database.ref('playerPosition/' + newPlayer.id).set(this.state.info);
           } else {
-            this.setTexture(newPlayer, texture, scene);
+            setTexture(newPlayer, texture, scene);
             database.ref('playerPosition/' + playerId).on('value', (playerInfo) => {
               if (playerInfo.val()) {
                 const x = playerInfo.val().x;
                 const y = playerInfo.val().y;
                 const z = playerInfo.val().z;
-                const color = playerInfo.val().color;
-                this.setPosition(newPlayer, x, y, z);
+                setPosition(newPlayer, x, y, z);
               }
             });
           }
@@ -75,7 +75,7 @@ class Game extends Component {
           this.setState({ playersInGame: newPlayersState });
           const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene);
           if (playerId === user) {
-            const playerDummy = this.createCameraObj(scene, newPlayer);
+            const playerDummy = createCameraObj(scene, newPlayer);
             control(newPlayer, this.state.info);
             followCamera.lockedTarget = playerDummy;
             scene.activeCamera = followCamera;
@@ -159,7 +159,7 @@ class Game extends Component {
         const me = this.state.objects.filter(player => player.id === user)[0];
         if (me && me.absolutePosition.y < -25) {
           while (me.position.y < 0) {
-            this.playerPosition(me);
+            playerPosition(me);
           }
           database.ref(user).set({ 'xAcceleration': 0, 'zAcceleration': 0 });
           me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
@@ -204,7 +204,6 @@ class Game extends Component {
     });
     window.addEventListener('beforeunload', () => {
       database.ref('games/' + gameId + '/playersInGame/' + user).remove();
-      // database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true });
       database.ref('playerPosition/' + user).remove();
       database.ref(user).remove();
     });
@@ -237,50 +236,11 @@ class Game extends Component {
     audio0.pause();
   }
 
-  createPlayerOnConnect(sce, id, texture) {
-    const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); // Params: name, subdivs, size, scene
-    player.checkCollisions = true;
-    const ballMaterial = new BABYLON.StandardMaterial('material', sce);
-    const ballTexture = new BABYLON.Texture([balls][texture], sce);
-    player.material = ballMaterial;
-    if (!player.physicsImpostor) {
-      player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.SphereImpostor, {
-        mass: 1,
-        friction: 0.5,
-        restitution: 0.7
-      }, sce);
-    }
-    return player;
-  }
-
-  setPosition(sphere, x, y, z) {
-    sphere.position.x = x;
-    sphere.position.y = y;
-    sphere.position.z = z;
-  }
-
-  setTexture(sphere, texture, scene) {
-    sphere.material.diffuseTexture = new BABYLON.Texture(balls[texture - 1].img, scene);
-  }
-
-  playerPosition(player) {
-    const randomPosition = (min) => Math.floor(Math.random() * min - min / 2);
-    player.position.y = 5;
-    player.position.x = randomPosition(40);
-    player.position.z = randomPosition(40);
-  }
-
-  createCameraObj(scene, par) {
-    const head = BABYLON.MeshBuilder.CreateSphere('camera', 16, scene);
-    head.parent = par;
-    return head;
-  }
-
   createWinPoint(scene) {
     torus = BABYLON.Mesh.CreateTorus('torus', 2, 0.5, 10, scene);
     torus.position.x = 10;
     torus.position.z = 10;
-  }
+  };
 
   render() {
     return (
