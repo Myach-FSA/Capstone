@@ -76,7 +76,7 @@ class Game extends Component {
           const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene);
           if (playerId === user) {
             const playerDummy = this.createCameraObj(scene, newPlayer);
-            control(newPlayer, this.state.info, playersObj);
+            control(newPlayer, this.state.info);
             followCamera.lockedTarget = playerDummy;
             scene.activeCamera = followCamera;
             followCamera.radius = 15; // how far from the object to follow
@@ -203,9 +203,16 @@ class Game extends Component {
       engine.resize();
     });
     window.addEventListener('beforeunload', () => {
-      database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true });
+      database.ref('games/' + gameId + '/playersInGame/' + user).remove();
+      // database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true });
       database.ref('playerPosition/' + user).remove();
       database.ref(user).remove();
+    });
+
+    database.ref(`games/${gameId}`).on('value', (players) => {
+      if (!players.val().hasOwnProperty('playersInGame')) {
+        firebase.database().ref(`games/${gameId}`).remove();
+      };
     });
   }
 
@@ -224,6 +231,7 @@ class Game extends Component {
     database.ref(user).off();
     database.ref('playerPosition/' + user).remove();
     database.ref('playerPosition/' + user).off();
+    database.ref(`games/${gameId}`).off();
     database.ref('games/' + gameId + '/winPosition').off();
     database.ref('games/' + gameId + '/playersInGame/winner').off();
     audio0.pause();
