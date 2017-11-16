@@ -50,11 +50,14 @@ class GameWaitRoom extends React.Component {
 
   componentWillUnmount() {
     const user = this.props.user;
-    firebase.database().ref(`games/${user.gameId}/gameInfo/admin`).once('value', (admin) => {
-      if (admin.val() === user.userId) {
-        firebase.database().ref(`games/${user.gameId}`).remove();
-      };
-    });
+    // Prevents the game from being deleted if the user is entering the map
+    if (this.props.history.location.pathname !== `/game/${user.gameId}/play`) {
+      firebase.database().ref(`games/${user.gameId}/gameInfo/admin`).once('value', (admin) => {
+        if (admin.val() === user.userId) {
+          firebase.database().ref(`games/${user.gameId}`).remove();
+        };
+      });
+    }
     firebase.database().ref('games').off();
   }
 
