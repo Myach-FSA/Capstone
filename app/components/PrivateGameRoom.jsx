@@ -21,14 +21,7 @@ class GameWaitRoom extends React.Component {
   componentDidMount() {
     const user = this.props.user;
     const userRef = firebase.database().ref(`games/${user.gameId}`);
-    window.addEventListener('beforeunload', () => {
-      firebase.database().ref(`games/${user.gameId}/playersInGame/${user.userId}`).remove();
-      firebase.database().ref(`games/${user.gameId}/gameInfo/admin`).once('value', (admin) => {
-        if (admin.val() === user.userId) {
-          firebase.database().ref('games/' + user.gameId).remove();
-        };
-      });
-    });
+    window.addEventListener('beforeunload', this.removeGame);
     userRef.once('value', (snapshot) => {
       var a = snapshot.exists();
       if (!a) {
@@ -59,6 +52,16 @@ class GameWaitRoom extends React.Component {
       });
     }
     firebase.database().ref('games').off();
+    window.removeEventListener('beforeunload', this.removeGame);
+  }
+
+  removeGame = () => {
+    firebase.database().ref(`games/${this.props.user.gameId}/playersInGame/${this.props.user.userId}`).remove();
+    firebase.database().ref(`games/${this.props.user.gameId}/gameInfo/admin`).once('value', (admin) => {
+      if (admin.val() === this.props.user.userId) {
+        firebase.database().ref('games/' + this.props.user.gameId).remove();
+      };
+    });
   }
 
   getPlayers = (gameId, bool) => {
