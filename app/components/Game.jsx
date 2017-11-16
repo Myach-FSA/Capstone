@@ -106,10 +106,10 @@ class Game extends Component {
           }
         }
       }
-      const removeGame = Object.keys(playersObj).every(player => playersObj[player].remove);
-      if (removeGame) {
-        database.ref('games/' + gameId).remove();
-      }
+      // const removeGame = Object.keys(playersObj).every(player => playersObj[player].remove);
+      // if (removeGame) {
+      //   database.ref('games/' + gameId).remove();
+      // }
     });
 
     database.ref('games/' + gameId).update({ 'winPosition': { x: 10, z: 10 } });
@@ -218,7 +218,8 @@ class Game extends Component {
   componentWillUnmount() {
     const user = this.props.user.userId;
     const gameId = this.props.user.gameId;
-    database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true });
+    // database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true });
+    database.ref('games/' + gameId + '/playersInGame/' + user).remove();
     database.ref('games/' + gameId + '/playersInGame').off();
     database.ref('games/' + gameId + '/playersInGame/' + user).remove().then(() => {
       database.ref('games/' + gameId).once('value').then(allPlayers => {

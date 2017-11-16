@@ -69,6 +69,8 @@ const Control = (user, info) => {
     }
   }
   const gameInterval = setInterval(gameLoop, 49);
+
+  // Need to clearinterval otherwise player position is always being sent
   database.ref(`/games/${info.gameId}/playersInGame`).on('value', (players) => {
     if (!players.val().hasOwnProperty(user.id)) {
       clearInterval(gameInterval);
