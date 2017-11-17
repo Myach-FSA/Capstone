@@ -9,7 +9,7 @@ import WinScreen from './WinScreen';
 import MuteSound from './MuteSound';
 import balls from './balls';
 import control from './Control';
-import {createPlayerOnConnect, setPosition, setTexture, playerPosition, createCameraObj} from '../utils/gameFn';
+import {createPlayerOnConnect, setPosition, setTexture, playerPosition, createCameraObj, followCameraView} from '../utils/gameFn';
 
 const database = firebase.database();
 const auth = firebase.auth();
@@ -73,18 +73,10 @@ class Game extends Component {
           newPlayersState.push(playerId);
           this.setState({ objects: newState });
           this.setState({ playersInGame: newPlayersState });
-          const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene);
           if (playerId === user) {
             const playerDummy = createCameraObj(scene, newPlayer);
             control(newPlayer, this.state.info);
-            followCamera.lockedTarget = playerDummy;
-            scene.activeCamera = followCamera;
-            followCamera.radius = 15; // how far from the object to follow
-            followCamera.heightOffset = 7; // how high above the object to place the camera
-            followCamera.rotationOffset = 180; // the viewing angle / 180
-            followCamera.cameraAcceleration = 0.05; // how fast to move
-            followCamera.maxCameraSpeed = 10; // speed limit / 0.05
-            followCamera.attachControl(canvas, true);
+            followCameraView(scene, playerDummy, canvas);
           }
           database.ref(newPlayer.id).on('value', (otherPlayer) => {
             if (otherPlayer.val()) {
