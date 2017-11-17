@@ -28,15 +28,16 @@ class Game extends Component {
       objects: [],
       info: {},
     };
+    this.engine;
   }
   componentDidMount() {
     audio0.play();
     const user = this.props.user.userId;
     const gameId = this.props.user.gameId;
     const canvas = this.refs.renderCanvas;
-    const engine = new BABYLON.Engine(canvas, true);
+    this.engine = new BABYLON.Engine(canvas, true);
     let texture;
-    const scene = createScene1(canvas, engine);
+    const scene = createScene1(canvas, this.engine);
 
     database.ref('games/' + gameId + '/playersInGame').on('value', (players) => {
       const playersObj = players.val();
@@ -111,7 +112,7 @@ class Game extends Component {
       }
     });
 
-    engine.runRenderLoop(() => {
+    this.engine.runRenderLoop(() => {
       if (winPos) {
         if ((torus.position.x !== winPos.x) || (torus.position.z !== winPos.z)) {
           torus.position.x = winPos.x;
@@ -161,7 +162,7 @@ class Game extends Component {
     });
 
     window.addEventListener('resize', () => {
-      engine.resize();
+      this.engine.resize();
     });
     window.addEventListener('beforeunload', () => {
       database.ref('games/' + gameId + '/playersInGame/' + user).remove();
@@ -179,6 +180,7 @@ class Game extends Component {
   componentWillUnmount() {
     const user = this.props.user.userId;
     const gameId = this.props.user.gameId;
+    this.engine.stopRenderLoop();
     database.ref('games/' + gameId + '/playersInGame/' + user).remove();
     database.ref('games/' + gameId + '/playersInGame').off();
     database.ref('games/' + gameId + '/playersInGame/' + user).remove().then(() => {
