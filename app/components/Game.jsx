@@ -1,7 +1,9 @@
 /* global BABYLON */
 
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import firebase from '../../fire';
+import { changeScore } from '../reducers/auth';
 import createScene1 from './Scene1';
 import InfoScreen from './InfoScreen';
 import ScoreTable from './ScoreTable';
@@ -9,20 +11,14 @@ import WinScreen from './WinScreen';
 import MuteSound from './MuteSound';
 import balls from './balls';
 import control from './Control';
-import {createPlayerOnConnect, setPosition, setTexture, playerPosition, createCameraObj, followCameraView} from '../utils/gameFn';
+import * as gameUtils from '../utils/gameFn';
 
 const database = firebase.database();
-const auth = firebase.auth();
-
-let sceneNum = 1;
 let torus;
 let winPos;
 let zAcceleration = 0;
 let xAcceleration = 0;
 const yAcceleration = 0;
-const changeScene = (num) => {
-  sceneNum = num;
-};
 
 class Game extends Component {
   constructor(props) {
@@ -39,9 +35,8 @@ class Game extends Component {
     const gameId = this.props.user.gameId;
     const canvas = this.refs.renderCanvas;
     const engine = new BABYLON.Engine(canvas, true);
-    let num = sceneNum;
     let texture;
-    let scene = createScene1(canvas, engine);
+    const scene = createScene1(canvas, engine);
 
     database.ref('games/' + gameId + '/playersInGame').on('value', (players) => {
       const playersObj = players.val();
@@ -50,20 +45,20 @@ class Game extends Component {
           database.ref('users/' + playerId + '/ball').once('value', (playersTexture) => {
             texture = playersTexture.val();
           });
-          const newPlayer = createPlayerOnConnect(scene, playerId, texture);
+          const newPlayer = gameUtils.createPlayerOnConnect(scene, playerId, texture);
           if (newPlayer.id === user) {
-            playerPosition(newPlayer);
-            setTexture(newPlayer, texture, scene);
+            gameUtils.playerPosition(newPlayer);
+            gameUtils.setTexture(newPlayer, texture, scene);
             this.setState({ info: { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, gameId } });
             database.ref('playerPosition/' + newPlayer.id).set(this.state.info);
           } else {
-            setTexture(newPlayer, texture, scene);
+            gameUtils.setTexture(newPlayer, texture, scene);
             database.ref('playerPosition/' + playerId).on('value', (playerInfo) => {
               if (playerInfo.val()) {
                 const x = playerInfo.val().x;
                 const y = playerInfo.val().y;
                 const z = playerInfo.val().z;
-                setPosition(newPlayer, x, y, z);
+                gameUtils.setPosition(newPlayer, x, y, z);
               }
             });
           }
@@ -74,9 +69,9 @@ class Game extends Component {
           this.setState({ objects: newState });
           this.setState({ playersInGame: newPlayersState });
           if (playerId === user) {
-            const playerDummy = createCameraObj(scene, newPlayer);
+            const playerDummy = gameUtils.createCameraObj(scene, newPlayer);
             control(newPlayer, this.state.info);
-            followCameraView(scene, playerDummy, canvas);
+            gameUtils.followCameraView(scene, playerDummy, canvas);
           }
           database.ref(newPlayer.id).on('value', (otherPlayer) => {
             if (otherPlayer.val()) {
@@ -123,57 +118,46 @@ class Game extends Component {
           torus.position.z = winPos.z;
         }
       }
-      if (!scene || (sceneNum !== num)) {
-        num = sceneNum;
-        switch (num) {
-        case 2:
-          scene = createScene2(canvas, engine);
-          break;
-        default: scene = createScene1(canvas, engine);
+      const me = this.state.objects.filter(player => player.id === user)[0];
+      if (me && me.absolutePosition.y < -25) {
+        while (me.position.y < 0) {
+          gameUtils.playerPosition(me);
         }
-        setTimeout(scene.render(), 500);
-      } else {
-        const me = this.state.objects.filter(player => player.id === user)[0];
-        if (me && me.absolutePosition.y < -25) {
-          while (me.position.y < 0) {
-            playerPosition(me);
-          }
-          database.ref(user).set({ 'xAcceleration': 0, 'zAcceleration': 0 });
-          me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
-          xAcceleration = 0;
-          zAcceleration = 0;
+        database.ref(user).set({ 'xAcceleration': 0, 'zAcceleration': 0 });
+        me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
+        xAcceleration = 0;
+        zAcceleration = 0;
+        database.ref('users/' + user + '/totalScore').transaction((score) => {
+          score -= 1;
+          return score;
+        });
+        database.ref('games/' + gameId + '/playersInGame/' + user + '/score').transaction((score) => {
+          this.props.changeScore(-1);
+          score -= 1;
+          return score;
+        });
+      }
+      if (winPos) {
+        if (me && (Math.floor(me.absolutePosition.x) === winPos.x) && (Math.floor(me.absolutePosition.z) === winPos.z)) {
           database.ref('users/' + user + '/totalScore').transaction((score) => {
-            score -= 1;
+            score += 1;
             return score;
           });
           database.ref('games/' + gameId + '/playersInGame/' + user + '/score').transaction((score) => {
-            this.props.changeScore(-1);
-            score -= 1;
+            this.props.changeScore(1);
+            score += 1;
+            if (score >= 10) {
+              database.ref('games/' + gameId + '/playersInGame/').update({ 'winner': user });
+              score = 0;
+            }
             return score;
           });
+          const x = Math.floor(Math.random() * 50 - 25);
+          const z = Math.floor(Math.random() * 50 - 25);
+          database.ref('games/' + gameId + '/winPosition').set({ 'x': x, 'z': z });
         }
-        if (winPos) {
-          if (me && (Math.floor(me.absolutePosition.x) === winPos.x) && (Math.floor(me.absolutePosition.z) === winPos.z)) {
-            database.ref('users/' + user + '/totalScore').transaction((score) => {
-              score += 1;
-              return score;
-            });
-            database.ref('games/' + gameId + '/playersInGame/' + user + '/score').transaction((score) => {
-              this.props.changeScore(1);
-              score += 1;
-              if (score >= 10) {
-                database.ref('games/' + gameId + '/playersInGame/').update({ 'winner': user });
-                score = 0;
-              }
-              return score;
-            });
-            const x = Math.floor(Math.random() * 50 - 25);
-            const z = Math.floor(Math.random() * 50 - 25);
-            database.ref('games/' + gameId + '/winPosition').set({ 'x': x, 'z': z });
-          }
-        }
-        scene.render();
       }
+      scene.render();
     });
 
     window.addEventListener('resize', () => {
@@ -232,12 +216,6 @@ class Game extends Component {
   }
 }
 
-// /* -----------------    CONTAINER     ------------------ */
-
-import { changeScore } from '../reducers/auth';
-import { connect } from 'react-redux';
-import store from '../store';
-
 const mapStateToProps = (state, ownProps) => ({
   user: state.auth.user
 });
@@ -245,7 +223,3 @@ const mapStateToProps = (state, ownProps) => ({
 const mapDispatch = ({ changeScore });
 
 export default connect(mapStateToProps, mapDispatch)(Game);
-
-// /* -----------------    CONTAINER     ------------------ */
-
-export { changeScene };

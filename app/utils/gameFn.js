@@ -1,17 +1,17 @@
 import balls from '../components/balls';
 
-export const createPlayerOnConnect = (sce, id, texture) => {
-  const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); // Params: name, subdivs, size, scene
+export const createPlayerOnConnect = (scene, id, texture) => {
+  const player = BABYLON.Mesh.CreateSphere(id, 16, 2, scene); // Params: name, subdivs, size, scene
   player.checkCollisions = true;
-  const ballMaterial = new BABYLON.StandardMaterial('material', sce);
-  const ballTexture = new BABYLON.Texture([balls][texture], sce);
+  const ballMaterial = new BABYLON.StandardMaterial('material', scene);
+  const ballTexture = new BABYLON.Texture([balls][texture], scene);
   player.material = ballMaterial;
   if (!player.physicsImpostor) {
     player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.SphereImpostor, {
       mass: 1,
       friction: 0.5,
       restitution: 0.7
-    }, sce);
+    }, scene);
   }
   return player;
 };

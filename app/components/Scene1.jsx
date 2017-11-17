@@ -1,6 +1,5 @@
 import React from 'react';
 import game, {createScene, getScene} from '../reducers';
-import {changeScene} from './Game';
 
 /* global BABYLON */
 const createScene1 = (canvas, engine) => {
