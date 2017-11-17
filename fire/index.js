@@ -2,13 +2,14 @@ const firebase = require('firebase');
 
 // -- // -- // -- // Firebase Config // -- // -- // -- //
 const config = {
-  apiKey: 'AIzaSyD5CuKXBrzpUH_m8ovpCdXCNbQ5uRKkPmI',
+  apiKey: 'AIzaSyBx2uMyZg32XKa7aCSY83YeJULnmNL3xLY',
   authDomain: 'myach-fsa.firebaseapp.com',
   databaseURL: 'https://myach-fsa.firebaseio.com',
   projectId: 'myach-fsa',
   storageBucket: 'myach-fsa.appspot.com',
   messagingSenderId: '51959276382'
 };
+
 // -- // -- // -- // -- // -- // -- // -- // -- // -- //
 
 // Initialize the app, but make sure to do it only once.
