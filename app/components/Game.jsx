@@ -1,7 +1,9 @@
 /* global BABYLON */
 
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import firebase from '../../fire';
+import { changeScore } from '../reducers/auth';
 import createScene1 from './Scene1';
 import InfoScreen from './InfoScreen';
 import ScoreTable from './ScoreTable';
@@ -9,19 +11,14 @@ import WinScreen from './WinScreen';
 import MuteSound from './MuteSound';
 import balls from './balls';
 import control from './Control';
+import * as gameUtils from '../utils/gameFn';
 
 const database = firebase.database();
-const auth = firebase.auth();
-
-let sceneNum = 1;
 let torus;
 let winPos;
 let zAcceleration = 0;
 let xAcceleration = 0;
 const yAcceleration = 0;
-const changeScene = (num) => {
-  sceneNum = num;
-};
 
 class Game extends Component {
   constructor(props) {
@@ -31,39 +28,38 @@ class Game extends Component {
       objects: [],
       info: {},
     };
+    this.engine;
   }
   componentDidMount() {
     audio0.play();
     const user = this.props.user.userId;
     const gameId = this.props.user.gameId;
     const canvas = this.refs.renderCanvas;
-    const engine = new BABYLON.Engine(canvas, true);
-    let num = sceneNum;
+    this.engine = new BABYLON.Engine(canvas, true);
     let texture;
-    let scene = createScene1(canvas, engine);
+    const scene = createScene1(canvas, this.engine);
 
     database.ref('games/' + gameId + '/playersInGame').on('value', (players) => {
       const playersObj = players.val();
       for (const playerId in playersObj) {
-        if (!this.state.playersInGame.includes(playerId) && playersObj[playerId].create && !playersObj[playerId].remove) {
-          database.ref('users/' + playerId + '/ball').on('value', (playersTexture) => {
+        if (!this.state.playersInGame.includes(playerId) && playersObj[playerId].create) {
+          database.ref('users/' + playerId + '/ball').once('value', (playersTexture) => {
             texture = playersTexture.val();
           });
-          const newPlayer = this.createPlayerOnConnect(scene, playerId, texture);
+          const newPlayer = gameUtils.createPlayerOnConnect(scene, playerId, texture);
           if (newPlayer.id === user) {
-            this.playerPosition(newPlayer);
-            this.setTexture(newPlayer, texture, scene);
-            this.setState({ info: { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, color: newPlayer.material.diffuseColor, gameId } });
+            gameUtils.playerPosition(newPlayer);
+            gameUtils.setTexture(newPlayer, texture, scene);
+            this.setState({ info: { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, gameId } });
             database.ref('playerPosition/' + newPlayer.id).set(this.state.info);
           } else {
-            this.setTexture(newPlayer, texture, scene);
+            gameUtils.setTexture(newPlayer, texture, scene);
             database.ref('playerPosition/' + playerId).on('value', (playerInfo) => {
               if (playerInfo.val()) {
                 const x = playerInfo.val().x;
                 const y = playerInfo.val().y;
                 const z = playerInfo.val().z;
-                const color = playerInfo.val().color;
-                this.setPosition(newPlayer, x, y, z);
+                gameUtils.setPosition(newPlayer, x, y, z);
               }
             });
           }
@@ -73,18 +69,10 @@ class Game extends Component {
           newPlayersState.push(playerId);
           this.setState({ objects: newState });
           this.setState({ playersInGame: newPlayersState });
-          const followCamera = new BABYLON.FollowCamera('followCam', new BABYLON.Vector3(0, 15, -45), scene);
           if (playerId === user) {
-            const playerDummy = this.createCameraObj(scene, newPlayer);
-            control(newPlayer, this.state.info, playersObj);
-            followCamera.lockedTarget = playerDummy;
-            scene.activeCamera = followCamera;
-            followCamera.radius = 15; // how far from the object to follow
-            followCamera.heightOffset = 7; // how high above the object to place the camera
-            followCamera.rotationOffset = 180; // the viewing angle / 180
-            followCamera.cameraAcceleration = 0.05; // how fast to move
-            followCamera.maxCameraSpeed = 10; // speed limit / 0.05
-            followCamera.attachControl(canvas, true);
+            const playerDummy = gameUtils.createCameraObj(scene, newPlayer);
+            control(newPlayer, this.state.info);
+            gameUtils.followCameraView(scene, playerDummy, canvas);
           }
           database.ref(newPlayer.id).on('value', (otherPlayer) => {
             if (otherPlayer.val()) {
@@ -94,21 +82,6 @@ class Game extends Component {
             }
           });
         }
-        for (let i = 0; i < this.state.objects.length; i++) {
-          if (playersObj[this.state.playersInGame[i]]) {
-            if (playersObj[this.state.playersInGame[i]].remove) {
-              database.ref('playerPosition/' + this.state.playersInGame[i]).off();
-              this.state.objects[i].dispose();
-              const newState = this.state.playersInGame.filter(player => player !== this.state.objects[i].id);
-              this.setState({ playersInGame: newState });
-              this.setState({ objects: this.state.objects.filter((_, j) => j !== this.state.objects.indexOf(this.state.objects[i])) });
-            }
-          }
-        }
-      }
-      const removeGame = Object.keys(playersObj).every(player => playersObj[player].remove);
-      if (removeGame) {
-        database.ref('games/' + gameId).remove();
       }
     });
 
@@ -139,80 +112,76 @@ class Game extends Component {
       }
     });
 
-    engine.runRenderLoop(() => {
+    this.engine.runRenderLoop(() => {
       if (winPos) {
         if ((torus.position.x !== winPos.x) || (torus.position.z !== winPos.z)) {
           torus.position.x = winPos.x;
           torus.position.z = winPos.z;
         }
       }
-      if (!scene || (sceneNum !== num)) {
-        num = sceneNum;
-        switch (num) {
-        case 2:
-          scene = createScene2(canvas, engine);
-          break;
-        default: scene = createScene1(canvas, engine);
+      const me = this.state.objects.filter(player => player.id === user)[0];
+      if (me && me.absolutePosition.y < -25) {
+        while (me.position.y < 0) {
+          gameUtils.playerPosition(me);
         }
-        setTimeout(scene.render(), 500);
-      } else {
-        const me = this.state.objects.filter(player => player.id === user)[0];
-        if (me && me.absolutePosition.y < -25) {
-          while (me.position.y < 0) {
-            this.playerPosition(me);
-          }
-          database.ref(user).set({ 'xAcceleration': 0, 'zAcceleration': 0 });
-          me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
-          xAcceleration = 0;
-          zAcceleration = 0;
+        database.ref(user).set({ 'xAcceleration': 0, 'zAcceleration': 0 });
+        me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
+        xAcceleration = 0;
+        zAcceleration = 0;
+        database.ref('users/' + user + '/totalScore').transaction((score) => {
+          score -= 1;
+          return score;
+        });
+        database.ref('games/' + gameId + '/playersInGame/' + user + '/score').transaction((score) => {
+          this.props.changeScore(-1);
+          score -= 1;
+          return score;
+        });
+      }
+      if (winPos) {
+        if (me && (Math.floor(me.absolutePosition.x) === winPos.x) && (Math.floor(me.absolutePosition.z) === winPos.z)) {
           database.ref('users/' + user + '/totalScore').transaction((score) => {
-            score -= 1;
+            score += 1;
             return score;
           });
           database.ref('games/' + gameId + '/playersInGame/' + user + '/score').transaction((score) => {
-            this.props.changeScore(-1);
-            score -= 1;
+            this.props.changeScore(1);
+            score += 1;
+            if (score >= 10) {
+              database.ref('games/' + gameId + '/playersInGame/').update({ 'winner': user });
+              score = 0;
+            }
             return score;
           });
+          const x = Math.floor(Math.random() * 50 - 25);
+          const z = Math.floor(Math.random() * 50 - 25);
+          database.ref('games/' + gameId + '/winPosition').set({ 'x': x, 'z': z });
         }
-        if (winPos) {
-          if (me && (Math.floor(me.absolutePosition.x) === winPos.x) && (Math.floor(me.absolutePosition.z) === winPos.z)) {
-            database.ref('users/' + user + '/totalScore').transaction((score) => {
-              score += 1;
-              return score;
-            });
-            database.ref('games/' + gameId + '/playersInGame/' + user + '/score').transaction((score) => {
-              this.props.changeScore(1);
-              score += 1;
-              if (score >= 10) {
-                database.ref('games/' + gameId + '/playersInGame/').update({ 'winner': user });
-                score = 0;
-              }
-              return score;
-            });
-            const x = Math.floor(Math.random() * 50 - 25);
-            const z = Math.floor(Math.random() * 50 - 25);
-            database.ref('games/' + gameId + '/winPosition').set({ 'x': x, 'z': z });
-          }
-        }
-        scene.render();
       }
+      scene.render();
     });
 
     window.addEventListener('resize', () => {
-      engine.resize();
+      this.engine.resize();
     });
     window.addEventListener('beforeunload', () => {
-      database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true });
+      database.ref('games/' + gameId + '/playersInGame/' + user).remove();
       database.ref('playerPosition/' + user).remove();
       database.ref(user).remove();
+    });
+
+    database.ref(`games/${gameId}`).on('value', (players) => {
+      if (!players.val().hasOwnProperty('playersInGame')) {
+        firebase.database().ref(`games/${gameId}`).remove();
+      };
     });
   }
 
   componentWillUnmount() {
     const user = this.props.user.userId;
     const gameId = this.props.user.gameId;
-    database.ref('games/' + gameId + '/playersInGame/' + user).update({ remove: true });
+    this.engine.stopRenderLoop();
+    database.ref('games/' + gameId + '/playersInGame/' + user).remove();
     database.ref('games/' + gameId + '/playersInGame').off();
     database.ref('games/' + gameId + '/playersInGame/' + user).remove().then(() => {
       database.ref('games/' + gameId).once('value').then(allPlayers => {
@@ -224,55 +193,17 @@ class Game extends Component {
     database.ref(user).off();
     database.ref('playerPosition/' + user).remove();
     database.ref('playerPosition/' + user).off();
+    database.ref(`games/${gameId}`).off();
     database.ref('games/' + gameId + '/winPosition').off();
     database.ref('games/' + gameId + '/playersInGame/winner').off();
     audio0.pause();
-  }
-
-  createPlayerOnConnect(sce, id, texture) {
-    const player = BABYLON.Mesh.CreateSphere(id, 16, 2, sce); // Params: name, subdivs, size, scene
-    player.checkCollisions = true;
-    const ballMaterial = new BABYLON.StandardMaterial('material', sce);
-    const ballTexture = new BABYLON.Texture([balls][texture], sce);
-    player.material = ballMaterial;
-    if (!player.physicsImpostor) {
-      player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.SphereImpostor, {
-        mass: 1,
-        friction: 0.5,
-        restitution: 0.7
-      }, sce);
-    }
-    return player;
-  }
-
-  setPosition(sphere, x, y, z) {
-    sphere.position.x = x;
-    sphere.position.y = y;
-    sphere.position.z = z;
-  }
-
-  setTexture(sphere, texture, scene) {
-    sphere.material.diffuseTexture = new BABYLON.Texture(balls[texture - 1].img, scene);
-  }
-
-  playerPosition(player) {
-    const randomPosition = (min) => Math.floor(Math.random() * min - min / 2);
-    player.position.y = 5;
-    player.position.x = randomPosition(40);
-    player.position.z = randomPosition(40);
-  }
-
-  createCameraObj(scene, par) {
-    const head = BABYLON.MeshBuilder.CreateSphere('camera', 16, scene);
-    head.parent = par;
-    return head;
   }
 
   createWinPoint(scene) {
     torus = BABYLON.Mesh.CreateTorus('torus', 2, 0.5, 10, scene);
     torus.position.x = 10;
     torus.position.z = 10;
-  }
+  };
 
   render() {
     return (
@@ -287,12 +218,6 @@ class Game extends Component {
   }
 }
 
-// /* -----------------    CONTAINER     ------------------ */
-
-import { changeScore } from '../reducers/auth';
-import { connect } from 'react-redux';
-import store from '../store';
-
 const mapStateToProps = (state, ownProps) => ({
   user: state.auth.user
 });
@@ -300,7 +225,3 @@ const mapStateToProps = (state, ownProps) => ({
 const mapDispatch = ({ changeScore });
 
 export default connect(mapStateToProps, mapDispatch)(Game);
-
-// /* -----------------    CONTAINER     ------------------ */
-
-export { changeScene };

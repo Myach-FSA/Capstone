@@ -2,11 +2,10 @@ import React, { Component } from 'react';
 import firebase from '../../fire';
 const database = firebase.database();
 
-let zAcceleration = 0;
-let xAcceleration = 0;
-
-const Control = (user, info, playerObj) => {
+const Control = (user, info) => {
   const keyState = {};
+  let zAcceleration = 0;
+  let xAcceleration = 0;
 
   window.onkeydown = function(e) {
     if (e.keyCode === 9) {
@@ -62,20 +61,22 @@ const Control = (user, info, playerObj) => {
       }
     }
     if (keyState[32]) {
-      var forceVector = new BABYLON.Vector3(0, 10, 0);
+      const forceVector = new BABYLON.Vector3(0, 10, 0);
       if (user.position.y < 1.1) {
         user.applyImpulse(forceVector, user.position);
       }
       database.ref(user.id).set({ xAcceleration, zAcceleration });
     }
   }
-
   const gameInterval = setInterval(gameLoop, 49);
-  database.ref(`/games/${info.gameId}/playersInGame`).on('value', (playersInGameArray) => {
-    if (playersInGameArray.val()[user.id].remove) {
+
+  // Need to clearinterval otherwise player position is always being sent
+  database.ref(`/games/${info.gameId}/playersInGame`).on('value', (players) => {
+    if (!players.val() || !players.val().hasOwnProperty(user.id)) {
       clearInterval(gameInterval);
       window.onkeydown = null;
       window.onkeyup = null;
+      database.ref(`/games/${info.gameId}/playersInGame`).off();
     }
   });
 };
