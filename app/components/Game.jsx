@@ -48,11 +48,11 @@ class Game extends Component {
         gameUtils.playerPosition(playerMesh);
         gameUtils.followCameraView(scene, cameraDummy, canvas);
         control(playerMesh, gameId);
-        database.ref(playerMesh.id).set({
+        database.ref(`${gameId}/${playerMesh.id}`).set({
           x: playerMesh.position.x, y: playerMesh.position.y, z: playerMesh.position.z, xAcceleration: 0, zAcceleration: 0
         });
       }
-      database.ref(playerMesh.id).on('value', (player) => {
+      database.ref(`${gameId}/${playerMesh.id}`).on('value', (player) => {
         if (player.val()) {
           const coords = player.val();
           gameUtils.setPosition(playerMesh, coords.x, coords.y, coords.z);
@@ -63,6 +63,7 @@ class Game extends Component {
     });
 
     database.ref('games/' + gameId +'/playersInGame').on('child_removed', (player) => {
+      database.ref(player.val().id).off();
       scene.getMeshByID(player.val().id).dispose();
     });
 
@@ -92,7 +93,7 @@ class Game extends Component {
     this.engine.runRenderLoop(() => {
       const userMesh = scene.getMeshByID(user);
       if (userMesh && userMesh.absolutePosition.y < -25) {
-        database.ref(user).update({ 'xAcceleration': 0, 'zAcceleration': 0 });
+        database.ref(`${gameId}/${user}`).update({ 'xAcceleration': 0, 'zAcceleration': 0 });
         gameUtils.playerPosition(userMesh);
         userMesh.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
         this.props.changeScore(-1);
@@ -131,8 +132,11 @@ class Game extends Component {
       });
     });
     database.ref('games/' + gameId + '/playersInGame').off();
+    database.ref(`${gameId}`).once('value').then(players => {
+      const playersArr = Object.keys(players.val());
+      playersArr.forEach((player) => { database.ref(`${gameId}/player`).off(); });
+    });
     database.ref(user).remove();
-    database.ref(user).off();
     database.ref('games/' + gameId + '/winPosition').off();
     database.ref('games/' + gameId + '/playersInGame/winner').off();
     audio0.pause();
@@ -145,7 +149,7 @@ class Game extends Component {
         <WinScreen user={this.props.user} database={database} />
         <InfoScreen />
         <ScoreTable gameId={this.props.user.gameId} />
-        <canvas className='gameDisplay ' ref="renderCanvas"></canvas>
+        <canvas className='gameDisplay' ref="renderCanvas"></canvas>
       </div>
     );
   }
