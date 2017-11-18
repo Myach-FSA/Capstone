@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import firebase from '../../fire';
 const database = firebase.database();
 
-const Control = (user, info) => {
+const Control = (user, gameId) => {
   const keyState = {};
   let zAcceleration = 0;
   let xAcceleration = 0;
@@ -71,12 +71,12 @@ const Control = (user, info) => {
   const gameInterval = setInterval(gameLoop, 49);
 
   // Need to clearinterval otherwise player position is always being sent
-  database.ref(`/games/${info.gameId}/playersInGame`).on('value', (players) => {
+  database.ref(`/games/${gameId}/playersInGame`).on('value', (players) => {
     if (!players.val() || !players.val().hasOwnProperty(user.id)) {
       clearInterval(gameInterval);
       window.onkeydown = null;
       window.onkeyup = null;
-      database.ref(`/games/${info.gameId}/playersInGame`).off();
+      database.ref(`/games/${gameId}/playersInGame`).off();
     }
   });
 };

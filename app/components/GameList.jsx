@@ -52,7 +52,7 @@ class GameList extends React.Component {
               Object.keys(this.state.games).map((game) => (
                   <tr key={game}>
                     <th id='tableList'>{game}</th>
-                    <th id='tableList'>[{Object.keys(this.state.games[game].playersInGame).length}]</th>
+                    {/* <th id='tableList'>[{Object.keys(this.state.games[game].playersInGame).length}]</th> */}
                     <th id='tableList'>Public</th>
                     <th id='tableList'><a name={game} onClick={(evt) => this.selectGame(evt)} className="button is-primary">JOIN</a></th>
                   </tr>

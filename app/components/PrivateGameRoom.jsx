@@ -29,7 +29,7 @@ class GameWaitRoom extends React.Component {
         firebase.database().ref(`games/${user.gameId}/gameInfo/`).set({ 'admin': user.userId, 'startGame': false });
       } else {
         this.setState({ isAdmin: false });
-        firebase.database().ref(`games/${user.gameId}/playersInGame/${user.userId}`).set({ 'id': user.userId, 'create': false, 'score': 0, 'ready': false });
+        // firebase.database().ref(`games/${user.gameId}/playersInGame/${user.userId}`).set({ 'id': user.userId, 'create': false, 'score': 0, 'ready': false });
       }
     });
     this.getPlayers(user.gameId, true);
@@ -86,9 +86,9 @@ class GameWaitRoom extends React.Component {
     userRef.once('value', (snapshot) => {
       var a = snapshot.exists();
       if (!a) {
-        database.ref(`games/${user.gameId}/playersInGame/${user.userId}`).set({ 'score': 0, 'create': true, 'ready': true });
+        database.ref(`games/${user.gameId}/playersInGame/${user.userId}`).set({ 'id': user.userId, 'score': 0, 'create': true, 'ready': true });
       } else {
-        database.ref(`games/${user.gameId}/playersInGame/${user.userId}`).update({ 'score': 0, 'create': true, 'ready': true });
+        database.ref(`games/${user.gameId}/playersInGame/${user.userId}`).update({ 'id': user.userId, 'score': 0, 'create': true, 'ready': true });
         if (this.state.isAdmin) {
           firebase.database().ref(`games/${user.gameId}/gameInfo/`).update({ 'startGame': true });
         }

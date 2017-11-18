@@ -29,6 +29,7 @@ class Game extends Component {
     this.engine;
     this.winPos;
     this.scored = false;
+    this.playersInGame = {};
   }
   componentDidMount() {
     audio0.play();
@@ -41,51 +42,84 @@ class Game extends Component {
     const torus = BABYLON.Mesh.CreateTorus('torus', 2, 0.5, 10, scene);
     gameUtils.setWinPoint(gameId);
 
-    database.ref('games/' + gameId + '/playersInGame').on('value', (players) => {
-      const playersObj = players.val();
-      for (const playerId in playersObj) {
-        if (!this.state.playersInGame.includes(playerId) && playersObj[playerId].create) {
-          database.ref('users/' + playerId + '/ball').once('value', (playersTexture) => {
-            texture = playersTexture.val();
-          });
-          const newPlayer = gameUtils.createPlayerOnConnect(scene, playerId, texture);
-          if (newPlayer.id === user) {
-            gameUtils.playerPosition(newPlayer);
-            gameUtils.setTexture(newPlayer, texture, scene);
-            this.setState({ info: { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, gameId } });
-            database.ref('playerPosition/' + newPlayer.id).set(this.state.info);
-          } else {
-            gameUtils.setTexture(newPlayer, texture, scene);
-            database.ref('playerPosition/' + playerId).on('value', (playerInfo) => {
-              if (playerInfo.val()) {
-                const coords = playerInfo.val();
-                gameUtils.setPosition(newPlayer, coords.x, coords.y, coords.z);
-              }
-            });
+    database.ref(`games/${gameId}/playersInGame`).on('child_added', function(snapshot, prevChildKey) {
+      const playerInfo = snapshot.val();
+      database.ref(`users/${playerInfo.id}/ball`).once('value', (playerTexture) => {
+        texture = playerTexture.val();
+      });
+      const playerMesh = gameUtils.createPlayerOnConnect(scene, playerInfo.id, texture);
+      if (playerMesh.id === user) {
+        console.log('playermesh, user');
+        gameUtils.playerPosition(playerMesh);
+        gameUtils.setTexture(playerMesh, texture, scene);
+        const cameraDummy = gameUtils.createCameraObj(scene, playerMesh);
+        control(playerMesh, gameId);
+        gameUtils.followCameraView(scene, cameraDummy, canvas);
+        database.ref(`playerPosition/${playerMesh.id}`).set({x: playerMesh.position.x, y: playerMesh.position.y, z: playerMesh.position.z});
+      } else {
+        gameUtils.setTexture(playerMesh, texture, scene);
+        database.ref(`playerPosition/${playerMesh.id}`).on('value', (playerInfo) => {
+          if (playerInfo.val()) {
+            const coords = playerInfo.val();
+            gameUtils.setPosition(playerMesh, coords.x, coords.y, coords.z);
           }
-          const newState = this.state.objects.slice();
-          const newPlayersState = this.state.playersInGame.slice();
-          newState.push(newPlayer);
-          newPlayersState.push(playerId);
-          this.setState({ objects: newState, playersInGame: newPlayersState });
-          if (playerId === user) {
-            const playerDummy = gameUtils.createCameraObj(scene, newPlayer);
-            control(newPlayer, this.state.info);
-            gameUtils.followCameraView(scene, playerDummy, canvas);
-          }
-          database.ref(newPlayer.id).on('value', (otherPlayer) => {
-            if (otherPlayer.val()) {
-              if (!newPlayer.physicsImpostor.isDisposed) {
-                newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(otherPlayer.val().zAcceleration, 0, otherPlayer.val().xAcceleration, 0));
-              }
-            }
-          });
-        }
+        });
       }
+      database.ref(`${playerMesh.id}`).on('value', (player) => {
+        playerMesh.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(player.val().zAcceleration, 0, player.val().xAcceleration, 0));
+      });
     });
+
+    // database.ref('games/' + gameId + '/playersInGame').on('value', (players) => {
+    //   const playersObj = players.val();
+    //   for (const playerId in playersObj) {
+    //     console.log('playersObj[playerId]', (!this.playersInGame[playerId]));
+    //     if (!this.playersInGame[playerId] && playersObj[playerId].create) {
+    //       database.ref('users/' + playerId + '/ball').once('value', (playersTexture) => {
+    //         texture = playersTexture.val();
+    //       });
+    //       const newPlayer = gameUtils.createPlayerOnConnect(scene, playerId, texture);
+    //       console.log(newPlayer);
+    //       if (newPlayer.id === user) {
+    //         gameUtils.playerPosition(newPlayer);
+    //         gameUtils.setTexture(newPlayer, texture, scene);
+    //         this.setState({ info: { x: newPlayer.position.x, y: newPlayer.position.y, z: newPlayer.position.z, gameId } });
+    //         database.ref('playerPosition/' + newPlayer.id).set(this.state.info);
+    //       } else {
+    //         gameUtils.setTexture(newPlayer, texture, scene);
+    //         database.ref('playerPosition/' + playerId).on('value', (playerInfo) => {
+    //           if (playerInfo.val()) {
+    //             const coords = playerInfo.val();
+    //             gameUtils.setPosition(newPlayer, coords.x, coords.y, coords.z);
+    //           }
+    //         });
+    //       }
+
+    //       const newState = this.state.objects.slice();
+    //       const newPlayersState = this.state.playersInGame.slice();
+    //       newState.push(newPlayer);
+    //       newPlayersState.push(playerId);
+    //       this.setState({ objects: newState, playersInGame: newPlayersState });
+    //       if (playerId === user) {
+    //         const playerDummy = gameUtils.createCameraObj(scene, newPlayer);
+    //         control(newPlayer, this.state.info);
+    //         gameUtils.followCameraView(scene, playerDummy, canvas);
+    //       }
+    //       database.ref(newPlayer.id).on('value', (otherPlayer) => {
+    //         if (otherPlayer.val()) {
+    //           if (!newPlayer.physicsImpostor.isDisposed) {
+    //             newPlayer.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(otherPlayer.val().zAcceleration, 0, otherPlayer.val().xAcceleration, 0));
+    //           }
+    //         }
+    //       });
+    //     }
+    //     this.playersInGame = JSON.parse(JSON.stringify(players.val()));
+    //   }
+    // });
 
     database.ref('games/' + gameId +'/playersInGame').on('child_removed', (snapshot) => {
       const removePlayer = this.state.objects.filter(player => player.id === snapshot.val().id);
+      console.log('disposing', removePlayer[0]);
       removePlayer[0].dispose();
     });
 
