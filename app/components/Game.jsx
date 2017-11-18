@@ -134,19 +134,17 @@ class Game extends Component {
     database.ref('games/' + gameId + '/playersInGame/winner').off();
     database.ref(`${gameId}`).once('value').then(async players => {
       const playersArr = Object.keys(players.val());
-      console.log(playersArr);
       for (const player of playersArr) {
         await database.ref(`${gameId}/${player}`).off();
       }
-      // playersArr.forEach((player) => { database.ref(`${gameId}/${player}`).off(); });
       database.ref(`${gameId}/${user}`).remove();
     });
-    // database.ref('games/' + gameId + '/playersInGame/' + user).remove().then(() => {
-    //   database.ref('games/' + gameId).once('value').then(allPlayers => {
-    //     allPlayers = allPlayers.val();
-    //     (!allPlayers.playersInGame) && database.ref('games/' + gameId).remove();
-    //   });
-    // });
+    database.ref('games/' + gameId + '/playersInGame/' + user).remove().then(() => {
+      database.ref('games/' + gameId).once('value').then(allPlayers => {
+        allPlayers = allPlayers.val();
+        (!allPlayers.playersInGame) && database.ref('games/' + gameId).remove();
+      });
+    });
     audio0.pause();
   }
 

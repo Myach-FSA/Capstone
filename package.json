@@ -4,11 +4,11 @@
   "description": "A happy little burning skeleton.",
   "main": "index.js",
   "engines": {
-    "node": ">= 7.0.0"
+    "node": ">= 8.5.0"
   },
   "scripts": {
     "dev": "node dev",
-    "validate": "check-node-version --node '>= 7.0.0'",
+    "validate": "check-node-version --node '>= 8.5.0'",
     "setup": "./bin/setup",
     "prep": "npm run validate && npm run setup",
     "postinstall": "npm run prep",
