@@ -69,8 +69,7 @@ class Game extends Component {
           const newPlayersState = this.state.playersInGame.slice();
           newState.push(newPlayer);
           newPlayersState.push(playerId);
-          this.setState({ objects: newState });
-          this.setState({ playersInGame: newPlayersState });
+          this.setState({ objects: newState, playersInGame: newPlayersState });
           if (playerId === user) {
             const playerDummy = gameUtils.createCameraObj(scene, newPlayer);
             control(newPlayer, this.state.info);
@@ -146,12 +145,6 @@ class Game extends Component {
       database.ref('playerPosition/' + user).remove();
       database.ref(user).remove();
     });
-
-    database.ref(`games/${gameId}`).on('value', (players) => {
-      if (!players.val().hasOwnProperty('playersInGame')) {
-        firebase.database().ref(`games/${gameId}`).remove();
-      };
-    });
   }
 
   componentWillUnmount() {
@@ -170,14 +163,12 @@ class Game extends Component {
     database.ref(user).off();
     database.ref('playerPosition/' + user).remove();
     database.ref('playerPosition/' + user).off();
-    database.ref(`games/${gameId}`).off();
     database.ref('games/' + gameId + '/winPosition').off();
     database.ref('games/' + gameId + '/playersInGame/winner').off();
     audio0.pause();
   }
 
   render() {
-    console.log('rendering');
     return (
       <div>
         <MuteSound />
