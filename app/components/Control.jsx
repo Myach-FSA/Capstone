@@ -71,12 +71,12 @@ const Control = (user, gameId) => {
   const gameInterval = setInterval(gameLoop, 49);
 
   // Need to clearinterval otherwise player position is always being sent
-  database.ref(`/games/${gameId}/playersInGame`).on('value', (players) => {
+  database.ref(`${gameId}`).on('value', (players) => {
     if (!players.val() || !players.val().hasOwnProperty(user.id)) {
       clearInterval(gameInterval);
       window.onkeydown = null;
       window.onkeyup = null;
-      database.ref(`/games/${gameId}/playersInGame`).off();
+      database.ref(`${gameId}`).off();
     }
   });
 };
