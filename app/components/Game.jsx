@@ -14,7 +14,6 @@ import control from './Control';
 import * as gameUtils from '../utils/gameFn';
 
 const database = firebase.database();
-let winPos;
 let zAcceleration = 0;
 let xAcceleration = 0;
 const yAcceleration = 0;
@@ -28,6 +27,8 @@ class Game extends Component {
       info: {},
     };
     this.engine;
+    this.winPos;
+    this.scored = false;
   }
   componentDidMount() {
     audio0.play();
@@ -87,11 +88,11 @@ class Game extends Component {
     });
 
     database.ref('games/' + gameId + '/winPosition').on('value', (position) => {
-      console.log(!!position.val());
+      this.scored = false;
       if (position.val()) {
         torus.position.x= position.val().x;
         torus.position.z= position.val().z;
-        winPos = position.val();
+        this.winPos = position.val();
       }
     });
 
@@ -136,8 +137,10 @@ class Game extends Component {
           return score;
         });
       }
-      if (winPos) {
-        if (me && (Math.floor(me.absolutePosition.x) === winPos.x) && (Math.floor(me.absolutePosition.z) === winPos.z)) {
+      if (this.winPos && !this.scored) {
+        console.log('checking position');
+        if (me && (Math.floor(me.absolutePosition.x) === this.winPos.x) && (Math.floor(me.absolutePosition.z) === this.winPos.z)) {
+          this.scored = true;
           gameUtils.setWinPoint(gameId);
           database.ref('users/' + user + '/totalScore').transaction((score) => {
             score += 1;
