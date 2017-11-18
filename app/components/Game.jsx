@@ -58,10 +58,8 @@ class Game extends Component {
             gameUtils.setTexture(newPlayer, texture, scene);
             database.ref('playerPosition/' + playerId).on('value', (playerInfo) => {
               if (playerInfo.val()) {
-                const x = playerInfo.val().x;
-                const y = playerInfo.val().y;
-                const z = playerInfo.val().z;
-                gameUtils.setPosition(newPlayer, x, y, z);
+                const coords = playerInfo.val();
+                gameUtils.setPosition(newPlayer, coords.x, coords.y, coords.z);
               }
             });
           }
@@ -86,11 +84,16 @@ class Game extends Component {
       }
     });
 
+    database.ref('games/' + gameId +'/playersInGame').on('child_removed', (snapshot) => {
+      const removePlayer = this.state.objects.filter(player => player.id === snapshot.val().id);
+      removePlayer[0].dispose();
+    });
+
     database.ref('games/' + gameId + '/winPosition').on('value', (position) => {
       this.scored = false;
       if (position.val()) {
-        torus.position.x= position.val().x;
-        torus.position.z= position.val().z;
+        torus.position.x = position.val().x;
+        torus.position.z = position.val().z;
         this.winPos = position.val();
       }
     });
@@ -120,11 +123,9 @@ class Game extends Component {
         me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
         xAcceleration = 0;
         zAcceleration = 0;
+        this.props.changeScore(-1);
         database.ref('users/' + user + '/totalScore').transaction(score => score -= 1);
-        database.ref('games/' + gameId + '/playersInGame/' + user + '/score').transaction((score) => {
-          this.props.changeScore(-1);
-          return score -= 1;
-        });
+        database.ref('games/' + gameId + '/playersInGame/' + user + '/score').transaction((score) => score -= 1);
       }
       if (this.winPos && !this.scored) {
         if (me && (Math.floor(me.absolutePosition.x) === this.winPos.x) && (Math.floor(me.absolutePosition.z) === this.winPos.z)) {

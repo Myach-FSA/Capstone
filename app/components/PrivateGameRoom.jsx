@@ -25,11 +25,11 @@ class GameWaitRoom extends React.Component {
     userRef.once('value', (snapshot) => {
       var a = snapshot.exists();
       if (!a) {
-        firebase.database().ref(`games/${user.gameId}`).set({ playersInGame: { [user.userId]: { 'create': false, 'score': 0, 'ready': false } } });
+        firebase.database().ref(`games/${user.gameId}`).set({ playersInGame: { [user.userId]: { 'id': user.userId, 'create': false, 'score': 0, 'ready': false } } });
         firebase.database().ref(`games/${user.gameId}/gameInfo/`).set({ 'admin': user.userId, 'startGame': false });
       } else {
         this.setState({ isAdmin: false });
-        firebase.database().ref(`games/${user.gameId}/playersInGame/${user.userId}`).set({ 'create': false, 'score': 0, 'ready': false });
+        firebase.database().ref(`games/${user.gameId}/playersInGame/${user.userId}`).set({ 'id': user.userId, 'create': false, 'score': 0, 'ready': false });
       }
     });
     this.getPlayers(user.gameId, true);
