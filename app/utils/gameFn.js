@@ -51,11 +51,8 @@ export const followCameraView = (scene, playerDummy, canvas) => {
   followCamera.attachControl(canvas, true);
 };
 
-export const createWinPoint = (scene, gameId) => {
+export const setWinPoint = (gameId) => {
   const x = Math.floor(Math.random() * 50 - 25);
   const z = Math.floor(Math.random() * 50 - 25);
-  const torus = BABYLON.Mesh.CreateTorus('torus', 2, 0.5, 10, scene);
-  torus.position.x = x;
-  torus.position.z = z;
   firebase.database().ref(`games/${gameId}/winPosition`).set({x, z});
 };

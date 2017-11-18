@@ -15,8 +15,8 @@ import * as gameUtils from '../utils/gameFn';
 
 const database = firebase.database();
 let winPos;
-const zAcceleration = 0;
-const xAcceleration = 0;
+let zAcceleration = 0;
+let xAcceleration = 0;
 const yAcceleration = 0;
 
 class Game extends Component {
@@ -37,6 +37,8 @@ class Game extends Component {
     this.engine = new BABYLON.Engine(canvas, true);
     let texture;
     const scene = createScene1(canvas, this.engine);
+    const torus = BABYLON.Mesh.CreateTorus('torus', 2, 0.5, 10, scene);
+    gameUtils.setWinPoint(gameId);
 
     database.ref('games/' + gameId + '/playersInGame').on('value', (players) => {
       const playersObj = players.val();
@@ -84,10 +86,13 @@ class Game extends Component {
       }
     });
 
-    // database.ref('games/' + gameId).update({ 'winPosition': { x: 10, z: 10 } });
-    gameUtils.createWinPoint(scene, gameId);
     database.ref('games/' + gameId + '/winPosition').on('value', (position) => {
-      winPos = position.val();
+      console.log(!!position.val());
+      if (position.val()) {
+        torus.position.x= position.val().x;
+        torus.position.z= position.val().z;
+        winPos = position.val();
+      }
     });
 
     database.ref('games/' + gameId + '/playersInGame/winner').on('value', (winner) => {
@@ -112,51 +117,43 @@ class Game extends Component {
     });
 
     this.engine.runRenderLoop(() => {
-      // if (winPos) {
-      //   if ((torus.position.x !== winPos.x) || (torus.position.z !== winPos.z)) {
-      //     torus.position.x = winPos.x;
-      //     torus.position.z = winPos.z;
-      //   }
-      // }
-      // const me = this.state.objects.filter(player => player.id === user)[0];
-      // if (me && me.absolutePosition.y < -25) {
-      //   while (me.position.y < 0) {
-      //     gameUtils.playerPosition(me);
-      //   }
-      //   database.ref(user).set({ 'xAcceleration': 0, 'zAcceleration': 0 });
-      //   me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
-      //   xAcceleration = 0;
-      //   zAcceleration = 0;
-      //   database.ref('users/' + user + '/totalScore').transaction((score) => {
-      //     score -= 1;
-      //     return score;
-      //   });
-      //   database.ref('games/' + gameId + '/playersInGame/' + user + '/score').transaction((score) => {
-      //     this.props.changeScore(-1);
-      //     score -= 1;
-      //     return score;
-      //   });
-      // }
-      // if (winPos) {
-      //   if (me && (Math.floor(me.absolutePosition.x) === winPos.x) && (Math.floor(me.absolutePosition.z) === winPos.z)) {
-      //     database.ref('users/' + user + '/totalScore').transaction((score) => {
-      //       score += 1;
-      //       return score;
-      //     });
-      //     database.ref('games/' + gameId + '/playersInGame/' + user + '/score').transaction((score) => {
-      //       this.props.changeScore(1);
-      //       score += 1;
-      //       if (score >= 10) {
-      //         database.ref('games/' + gameId + '/playersInGame/').update({ 'winner': user });
-      //         score = 0;
-      //       }
-      //       return score;
-      //     });
-      //     const x = Math.floor(Math.random() * 50 - 25);
-      //     const z = Math.floor(Math.random() * 50 - 25);
-      //     database.ref('games/' + gameId + '/winPosition').set({ 'x': x, 'z': z });
-      //   }
-      // }
+      const me = this.state.objects.filter(player => player.id === user)[0];
+      if (me && me.absolutePosition.y < -25) {
+        while (me.position.y < 0) {
+          gameUtils.playerPosition(me);
+        }
+        database.ref(user).set({ 'xAcceleration': 0, 'zAcceleration': 0 });
+        me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
+        xAcceleration = 0;
+        zAcceleration = 0;
+        database.ref('users/' + user + '/totalScore').transaction((score) => {
+          score -= 1;
+          return score;
+        });
+        database.ref('games/' + gameId + '/playersInGame/' + user + '/score').transaction((score) => {
+          this.props.changeScore(-1);
+          score -= 1;
+          return score;
+        });
+      }
+      if (winPos) {
+        if (me && (Math.floor(me.absolutePosition.x) === winPos.x) && (Math.floor(me.absolutePosition.z) === winPos.z)) {
+          gameUtils.setWinPoint(gameId);
+          database.ref('users/' + user + '/totalScore').transaction((score) => {
+            score += 1;
+            return score;
+          });
+          database.ref('games/' + gameId + '/playersInGame/' + user + '/score').transaction((score) => {
+            this.props.changeScore(1);
+            score += 1;
+            if (score >= 10) {
+              database.ref('games/' + gameId + '/playersInGame/').update({ 'winner': user });
+              score = 0;
+            }
+            return score;
+          });
+        }
+      }
       scene.render();
     });
 
