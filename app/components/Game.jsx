@@ -54,15 +54,15 @@ class Game extends Component {
         gameUtils.playerPosition(playerMesh);
         control(playerMesh, gameId);
         gameUtils.followCameraView(scene, cameraDummy, canvas);
-        database.ref(`playerPosition/${playerMesh.id}`).set({x: playerMesh.position.x, y: playerMesh.position.y, z: playerMesh.position.z});
-      } else {
-        database.ref(`playerPosition/${playerMesh.id}`).on('value', (playerCoords) => {
-          if (playerCoords.val()) {
-            const coords = playerCoords.val();
-            gameUtils.setPosition(playerMesh, coords.x, coords.y, coords.z);
-          }
-        });
+        // changed
+        database.ref(playerMesh.id).set({x: playerMesh.position.x, y: playerMesh.position.y, z: playerMesh.position.z, xAcceleration, zAcceleration});
       }
+      database.ref(playerMesh.id).on('value', (playerCoords) => {
+        if (playerCoords.val()) {
+          const coords = playerCoords.val();
+          gameUtils.setPosition(playerMesh, coords.x, coords.y, coords.z);
+        }
+      });
       database.ref(`${playerMesh.id}`).on('value', (player) => {
         playerMesh.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(player.val().zAcceleration, 0, player.val().xAcceleration, 0));
       });
@@ -101,7 +101,7 @@ class Game extends Component {
         while (me.position.y < 0) {
           gameUtils.playerPosition(me);
         }
-        database.ref(user).set({ 'xAcceleration': 0, 'zAcceleration': 0 });
+        database.ref(user).update({ 'xAcceleration': 0, 'zAcceleration': 0 });
         me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
         xAcceleration = 0;
         zAcceleration = 0;

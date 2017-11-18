@@ -32,32 +32,32 @@ const Control = (user, gameId) => {
     keyState[e.keyCode || e.which] = false;
   }, true);
 
-  database.ref(user.id).set({ xAcceleration: 0, zAcceleration: 0 });
+  database.ref(user.id).update({ xAcceleration: 0, zAcceleration: 0 });
 
   function gameLoop() {
-    database.ref('playerPosition/' + user.id).set({ x: user.position.x, y: user.position.y, z: user.position.z });
+    database.ref(user.id).update({ x: user.position.x, y: user.position.y, z: user.position.z });
     if (keyState[37] || keyState[65]) {
       if (xAcceleration < 5) {
         xAcceleration += 0.5;
-        database.ref(user.id).set({ xAcceleration, zAcceleration });
+        database.ref(user.id).update({ xAcceleration, zAcceleration });
       }
     }
     if (keyState[39] || keyState[68]) {
       if (xAcceleration > -5) {
         xAcceleration -= 0.5;
-        database.ref(user.id).set({ xAcceleration, zAcceleration });
+        database.ref(user.id).update({ xAcceleration, zAcceleration });
       }
     }
     if (keyState[38] || keyState[87]) {
       if (zAcceleration < 5) {
         zAcceleration += 0.5;
-        database.ref(user.id).set({ xAcceleration, zAcceleration });
+        database.ref(user.id).update({ xAcceleration, zAcceleration });
       }
     }
     if (keyState[40] || keyState[83]) {
       if (zAcceleration > -5) {
         zAcceleration -= 0.5;
-        database.ref(user.id).set({ xAcceleration, zAcceleration });
+        database.ref(user.id).update({ xAcceleration, zAcceleration });
       }
     }
     if (keyState[32]) {
@@ -65,7 +65,7 @@ const Control = (user, gameId) => {
       if (user.position.y < 1.1) {
         user.applyImpulse(forceVector, user.position);
       }
-      database.ref(user.id).set({ xAcceleration, zAcceleration });
+      database.ref(user.id).update({ xAcceleration, zAcceleration });
     }
   }
   const gameInterval = setInterval(gameLoop, 49);
