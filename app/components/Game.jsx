@@ -12,11 +12,11 @@ import MuteSound from './MuteSound';
 import balls from './balls';
 import control from './Control';
 import * as gameUtils from '../utils/gameFn';
+import {incrementScoreBy} from '../utils/scoreFn';
 
 const database = firebase.database();
 let zAcceleration = 0;
 let xAcceleration = 0;
-const yAcceleration = 0;
 
 class Game extends Component {
   constructor(props) {
@@ -99,15 +99,9 @@ class Game extends Component {
     database.ref('games/' + gameId + '/playersInGame/winner').on('value', (winner) => {
       if (winner.val()) {
         if (user === winner.val()) {
-          database.ref('users/' + user + '/wins').transaction((wins) => {
-            wins += 1;
-            return wins;
-          });
+          database.ref('users/' + user + '/wins').transaction((wins) => wins += 1);
         } else {
-          database.ref('users/' + user + '/losses').transaction((losses) => {
-            losses += 1;
-            return losses;
-          });
+          database.ref('users/' + user + '/losses').transaction((losses) => losses += 1);
         }
 
         const myScore = this.props.user.totalScore;
@@ -127,34 +121,18 @@ class Game extends Component {
         me.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
         xAcceleration = 0;
         zAcceleration = 0;
-        database.ref('users/' + user + '/totalScore').transaction((score) => {
-          score -= 1;
-          return score;
-        });
+        database.ref('users/' + user + '/totalScore').transaction(score => score -= 1);
         database.ref('games/' + gameId + '/playersInGame/' + user + '/score').transaction((score) => {
           this.props.changeScore(-1);
-          score -= 1;
-          return score;
+          return score -= 1;
         });
       }
       if (this.winPos && !this.scored) {
-        console.log('checking position');
         if (me && (Math.floor(me.absolutePosition.x) === this.winPos.x) && (Math.floor(me.absolutePosition.z) === this.winPos.z)) {
           this.scored = true;
+          this.props.changeScore(1);
           gameUtils.setWinPoint(gameId);
-          database.ref('users/' + user + '/totalScore').transaction((score) => {
-            score += 1;
-            return score;
-          });
-          database.ref('games/' + gameId + '/playersInGame/' + user + '/score').transaction((score) => {
-            this.props.changeScore(1);
-            score += 1;
-            if (score >= 10) {
-              database.ref('games/' + gameId + '/playersInGame/').update({ 'winner': user });
-              score = 0;
-            }
-            return score;
-          });
+          incrementScoreBy(1, gameId, user);
         }
       }
       scene.render();
@@ -181,14 +159,13 @@ class Game extends Component {
     const gameId = this.props.user.gameId;
     window.removeEventListener('resize', () => { this.engine.resize(); });
     this.engine.stopRenderLoop();
-    database.ref('games/' + gameId + '/playersInGame/' + user).remove();
-    database.ref('games/' + gameId + '/playersInGame').off();
     database.ref('games/' + gameId + '/playersInGame/' + user).remove().then(() => {
       database.ref('games/' + gameId).once('value').then(allPlayers => {
         allPlayers = allPlayers.val();
         (!allPlayers.playersInGame) && database.ref('games/' + gameId).remove();
       });
     });
+    database.ref('games/' + gameId + '/playersInGame').off();
     database.ref(user).remove();
     database.ref(user).off();
     database.ref('playerPosition/' + user).remove();
@@ -200,6 +177,7 @@ class Game extends Component {
   }
 
   render() {
+    console.log('rendering');
     return (
       <div>
         <MuteSound />
