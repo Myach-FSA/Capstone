@@ -30,9 +30,10 @@ class Game extends Component {
     const gameId = this.props.user.gameId;
     const canvas = this.refs.renderCanvas;
     this.engine = new BABYLON.Engine(canvas, true);
-    let texture;
     const scene = createScene1(canvas, this.engine);
     const torus = BABYLON.Mesh.CreateTorus('torus', 2, 0.5, 10, scene);
+    let texture;
+
     gameUtils.setWinPoint(gameId);
 
     database.ref(`games/${gameId}/playersInGame`).on('child_added', function(snapshot, prevChildKey) {
@@ -47,13 +48,16 @@ class Game extends Component {
         gameUtils.playerPosition(playerMesh);
         gameUtils.followCameraView(scene, cameraDummy, canvas);
         control(playerMesh, gameId);
-        database.ref(playerMesh.id).set({x: playerMesh.position.x, y: playerMesh.position.y, z: playerMesh.position.z, xAcceleration: 0, zAcceleration: 0});
+        database.ref(playerMesh.id).set({
+          x: playerMesh.position.x, y: playerMesh.position.y, z: playerMesh.position.z, xAcceleration: 0, zAcceleration: 0
+        });
       }
       database.ref(playerMesh.id).on('value', (player) => {
         if (player.val()) {
           const coords = player.val();
           gameUtils.setPosition(playerMesh, coords.x, coords.y, coords.z);
-          playerMesh.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(player.val().zAcceleration, 0, player.val().xAcceleration, 0));
+          playerMesh.physicsImpostor.setAngularVelocity(
+            new BABYLON.Quaternion(player.val().zAcceleration, 0, player.val().xAcceleration, 0));
         }
       });
     });
@@ -88,10 +92,8 @@ class Game extends Component {
     this.engine.runRenderLoop(() => {
       const userMesh = scene.getMeshByID(user);
       if (userMesh && userMesh.absolutePosition.y < -25) {
-        while (userMesh.position.y < 0) {
-          gameUtils.playerPosition(userMesh);
-        }
         database.ref(user).update({ 'xAcceleration': 0, 'zAcceleration': 0 });
+        gameUtils.playerPosition(userMesh);
         userMesh.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
         this.props.changeScore(-1);
         database.ref('users/' + user + '/totalScore').transaction(score => score -= 1);
