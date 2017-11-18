@@ -62,12 +62,12 @@ class Game extends Component {
       });
     });
 
-    database.ref('games/' + gameId +'/playersInGame').on('child_removed', (player) => {
-      database.ref(player.val().id).off();
+    database.ref(`games/${gameId}/playersInGame`).on('child_removed', (player) => {
+      database.ref(`${gameId}/${player.val().id}`).off();
       scene.getMeshByID(player.val().id).dispose();
     });
 
-    database.ref('games/' + gameId + '/winPosition').on('value', (position) => {
+    database.ref(`games/${gameId}/winPosition`).on('value', (position) => {
       this.scored = false;
       if (position.val()) {
         torus.position.x = position.val().x;
@@ -76,17 +76,17 @@ class Game extends Component {
       }
     });
 
-    database.ref('games/' + gameId + '/playersInGame/winner').on('value', (winner) => {
+    database.ref(`games/${gameId}/playersInGame/winner`).on('value', (winner) => {
       if (winner.val()) {
         if (user === winner.val()) {
-          database.ref('users/' + user + '/wins').transaction(wins => wins += 1);
+          database.ref(`users/${user}/wins`).transaction(wins => wins += 1);
         } else {
-          database.ref('users/' + user + '/losses').transaction(losses => losses += 1);
+          database.ref(`users/${user}/losses`).transaction(losses => losses += 1);
         }
         const myScore = this.props.user.totalScore;
         this.props.changeScore(-myScore);
-        database.ref('games/' + gameId + '/playersInGame/' + user).update({ 'score': 0 });
-        database.ref('games/' + gameId + '/playersInGame/winner').remove();
+        database.ref(`games/${gameId}/playersInGame/${user}`).update({ 'score': 0 });
+        database.ref(`games/${gameId}/playersInGame/winner`).remove();
       }
     });
 
@@ -97,11 +97,11 @@ class Game extends Component {
         gameUtils.playerPosition(userMesh);
         userMesh.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
         this.props.changeScore(-1);
-        database.ref('users/' + user + '/totalScore').transaction(score => score -= 1);
-        database.ref('games/' + gameId + '/playersInGame/' + user + '/score').transaction((score) => score -= 1);
+        database.ref(`users/${user}/totalScore`).transaction(score => score -= 1);
+        database.ref(`games/${gameId}/playersInGame/${user}/score`).transaction((score) => score -= 1);
       }
       if (this.winPos && !this.scored) {
-        if (userMesh && (Math.floor(userMesh.absolutePosition.x) === this.winPos.x) && (Math.floor(userMesh.absolutePosition.z) === this.winPos.z)) {
+        if ((Math.floor(userMesh.absolutePosition.x) === this.winPos.x) && (Math.floor(userMesh.absolutePosition.z) === this.winPos.z)) {
           this.scored = true;
           this.props.changeScore(1);
           gameUtils.setWinPoint(gameId);
@@ -115,7 +115,7 @@ class Game extends Component {
       this.engine.resize();
     });
     window.addEventListener('beforeunload', () => {
-      database.ref('games/' + gameId + '/playersInGame/' + user).remove();
+      database.ref(`games/${gameId}/playersInGame/${user}`).remove();
       database.ref(`${gameId}/${user}`).remove();
     });
   }
@@ -125,13 +125,13 @@ class Game extends Component {
     const gameId = this.props.user.gameId;
     window.removeEventListener('resize', () => { this.engine.resize(); });
     window.removeEventListener('beforeunload', () => {
-      database.ref('games/' + gameId + '/playersInGame/' + user).remove();
+      database.ref(`games/${gameId}/playersInGame/${user}`).remove();
       database.ref(`${gameId}/${user}`).remove();
     });
     this.engine.stopRenderLoop();
-    database.ref('games/' + gameId + '/playersInGame').off();
-    database.ref('games/' + gameId + '/winPosition').off();
-    database.ref('games/' + gameId + '/playersInGame/winner').off();
+    database.ref(`games/${gameId}/playersInGame`).off();
+    database.ref(`games/${gameId}/winPosition`).off();
+    database.ref(`games/${gameId}/playersInGame/winner`).off();
     database.ref(`${gameId}`).once('value').then(async players => {
       const playersArr = Object.keys(players.val());
       for (const player of playersArr) {
@@ -139,10 +139,10 @@ class Game extends Component {
       }
       database.ref(`${gameId}/${user}`).remove();
     });
-    database.ref('games/' + gameId + '/playersInGame/' + user).remove().then(() => {
-      database.ref('games/' + gameId).once('value').then(allPlayers => {
+    database.ref(`games/${gameId}/playersInGame/${user}`).remove().then(() => {
+      database.ref(`games/${gameId}`).once('value').then(allPlayers => {
         allPlayers = allPlayers.val();
-        (!allPlayers.playersInGame) && database.ref('games/' + gameId).remove();
+        (!allPlayers.playersInGame) && database.ref(`games/${gameId}`).remove();
       });
     });
     audio0.pause();
