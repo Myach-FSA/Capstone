@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const LiveReloadPlugin = require('webpack-livereload-plugin')
     , devMode = require('.').isDevelopment
@@ -10,7 +10,7 @@ const LiveReloadPlugin = require('webpack-livereload-plugin')
  * usable stack traces. Set to `true` if you want to speed up development.
  */
 
-    , USE_FAST_SOURCE_MAPS = false
+    , USE_FAST_SOURCE_MAPS = false;
 const webpack = require('webpack');
 
 module.exports = {
@@ -33,7 +33,7 @@ module.exports = {
       use: [{
         loader: 'babel-loader',
         options: {
-          presets: ['react', 'es2015', 'stage-2']
+          presets: ['react', 'es2017', 'stage-2']
         }
       }]
     }]

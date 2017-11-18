@@ -50,3 +50,9 @@ export const followCameraView = (scene, playerDummy, canvas) => {
   followCamera.maxCameraSpeed = 10; // speed limit / 0.05
   followCamera.attachControl(canvas, true);
 };
+
+export const setWinPoint = (gameId) => {
+  const x = Math.floor(Math.random() * 50 - 25);
+  const z = Math.floor(Math.random() * 50 - 25);
+  firebase.database().ref(`games/${gameId}/winPosition`).set({x, z});
+};
