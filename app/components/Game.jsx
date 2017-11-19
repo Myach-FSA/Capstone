@@ -14,7 +14,7 @@ import control from './Control';
 import * as gameUtils from '../utils/gameFn';
 import {incrementScoreBy} from '../utils/scoreFn';
 
-const database = firebase.database();
+const db = firebase.database();
 
 class Game extends Component {
   constructor(props) {
@@ -32,27 +32,31 @@ class Game extends Component {
     this.engine = new BABYLON.Engine(canvas, true);
     const scene = createScene1(canvas, this.engine);
     const torus = BABYLON.Mesh.CreateTorus('torus', 2, 0.5, 10, scene);
-    let texture;
 
     gameUtils.setWinPoint(gameId);
 
-    database.ref(`games/${gameId}/playersInGame`).on('child_added', function(snapshot, prevChildKey) {
-      const playerInfo = snapshot.val();
-      database.ref(`users/${playerInfo.id}/ball`).once('value', (playerTexture) => {
-        texture = playerTexture.val();
-      });
+    db.ref(`games/${gameId}/playersInGame`).on('child_added', async (player) => {
+      const playerInfo = player.val();
+      let texture = await db.ref(`users/${playerInfo.id}/ball`).once('value');
+      texture = texture.val();
       const playerMesh = gameUtils.createPlayerOnConnect(scene, playerInfo.id, texture);
+
       gameUtils.setTexture(playerMesh, texture, scene);
       if (playerMesh.id === user) {
         const cameraDummy = gameUtils.createCameraObj(scene, playerMesh);
         gameUtils.playerPosition(playerMesh);
         gameUtils.followCameraView(scene, cameraDummy, canvas);
         control(playerMesh, gameId);
-        database.ref(`${gameId}/${playerMesh.id}`).set({
-          x: playerMesh.position.x, y: playerMesh.position.y, z: playerMesh.position.z, xAcceleration: 0, zAcceleration: 0
+        await db.ref(`${gameId}/${playerMesh.id}`).set({
+          x: playerMesh.position.x,
+          y: playerMesh.position.y,
+          z: playerMesh.position.z,
+          xAcceleration: 0,
+          zAcceleration: 0,
         });
       }
-      database.ref(`${gameId}/${playerMesh.id}`).on('value', (player) => {
+
+      db.ref(`${gameId}/${playerMesh.id}`).on('value', (player) => {
         if (player.val()) {
           const coords = player.val();
           gameUtils.setPosition(playerMesh, coords.x, coords.y, coords.z);
@@ -62,12 +66,12 @@ class Game extends Component {
       });
     });
 
-    database.ref(`games/${gameId}/playersInGame`).on('child_removed', (player) => {
-      database.ref(`${gameId}/${player.val().id}`).off();
+    db.ref(`games/${gameId}/playersInGame`).on('child_removed', (player) => {
+      db.ref(`${gameId}/${player.val().id}`).off();
       scene.getMeshByID(player.val().id).dispose();
     });
 
-    database.ref(`games/${gameId}/winPosition`).on('value', (position) => {
+    db.ref(`games/${gameId}/winPosition`).on('value', (position) => {
       this.scored = false;
       if (position.val()) {
         torus.position.x = position.val().x;
@@ -76,29 +80,29 @@ class Game extends Component {
       }
     });
 
-    database.ref(`games/${gameId}/playersInGame/winner`).on('value', (winner) => {
+    db.ref(`games/${gameId}/playersInGame/winner`).on('value', (winner) => {
       if (winner.val()) {
         if (user === winner.val()) {
-          database.ref(`users/${user}/wins`).transaction(wins => wins += 1);
+          db.ref(`users/${user}/wins`).transaction(wins => wins += 1);
         } else {
-          database.ref(`users/${user}/losses`).transaction(losses => losses += 1);
+          db.ref(`users/${user}/losses`).transaction(losses => losses += 1);
         }
         const myScore = this.props.user.totalScore;
         this.props.changeScore(-myScore);
-        database.ref(`games/${gameId}/playersInGame/${user}`).update({ 'score': 0 });
-        database.ref(`games/${gameId}/playersInGame/winner`).remove();
+        db.ref(`games/${gameId}/playersInGame/${user}`).update({ 'score': 0 });
+        db.ref(`games/${gameId}/playersInGame/winner`).remove();
       }
     });
 
     this.engine.runRenderLoop(() => {
       const userMesh = scene.getMeshByID(user);
       if (userMesh && userMesh.absolutePosition.y < -25) {
-        database.ref(`${gameId}/${user}`).update({ 'xAcceleration': 0, 'zAcceleration': 0 });
+        db.ref(`${gameId}/${user}`).update({ 'xAcceleration': 0, 'zAcceleration': 0 });
         gameUtils.playerPosition(userMesh);
         userMesh.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
         this.props.changeScore(-1);
-        database.ref(`users/${user}/totalScore`).transaction(score => score -= 1);
-        database.ref(`games/${gameId}/playersInGame/${user}/score`).transaction((score) => score -= 1);
+        db.ref(`users/${user}/totalScore`).transaction(score => score -= 1);
+        db.ref(`games/${gameId}/playersInGame/${user}/score`).transaction((score) => score -= 1);
       }
       if (this.winPos && !this.scored) {
         if ((Math.floor(userMesh.absolutePosition.x) === this.winPos.x) && (Math.floor(userMesh.absolutePosition.z) === this.winPos.z)) {
@@ -115,8 +119,8 @@ class Game extends Component {
       this.engine.resize();
     });
     window.addEventListener('beforeunload', () => {
-      database.ref(`games/${gameId}/playersInGame/${user}`).remove();
-      database.ref(`${gameId}/${user}`).remove();
+      db.ref(`games/${gameId}/playersInGame/${user}`).remove();
+      db.ref(`${gameId}/${user}`).remove();
     });
   }
 
@@ -125,25 +129,24 @@ class Game extends Component {
     const gameId = this.props.user.gameId;
     window.removeEventListener('resize', () => { this.engine.resize(); });
     window.removeEventListener('beforeunload', () => {
-      database.ref(`games/${gameId}/playersInGame/${user}`).remove();
-      database.ref(`${gameId}/${user}`).remove();
+      db.ref(`games/${gameId}/playersInGame/${user}`).remove();
+      db.ref(`${gameId}/${user}`).remove();
     });
     this.engine.stopRenderLoop();
-    database.ref(`games/${gameId}/playersInGame`).off();
-    database.ref(`games/${gameId}/winPosition`).off();
-    database.ref(`games/${gameId}/playersInGame/winner`).off();
-    database.ref(`${gameId}`).once('value').then(async players => {
+    db.ref(`games/${gameId}/playersInGame`).off();
+    db.ref(`games/${gameId}/winPosition`).off();
+    db.ref(`games/${gameId}/playersInGame/winner`).off();
+    db.ref(`${gameId}`).once('value').then(players => {
       const playersArr = Object.keys(players.val());
       for (const player of playersArr) {
-        await database.ref(`${gameId}/${player}`).off();
+        db.ref(`${gameId}/${player}`).off();
       }
-      database.ref(`${gameId}/${user}`).remove();
+      db.ref(`${gameId}/${user}`).remove();
     });
-    database.ref(`games/${gameId}/playersInGame/${user}`).remove().then(() => {
-      database.ref(`games/${gameId}`).once('value').then(allPlayers => {
-        allPlayers = allPlayers.val();
-        (!allPlayers.playersInGame) && database.ref(`games/${gameId}`).remove();
-      });
+    db.ref(`games/${gameId}/playersInGame/${user}`).remove();
+    db.ref(`games/${gameId}`).once('value').then(allPlayers => {
+      allPlayers = allPlayers.val();
+      if (!allPlayers.playersInGame) db.ref(`games/${gameId}`).remove();
     });
     audio0.pause();
   }
@@ -152,7 +155,7 @@ class Game extends Component {
     return (
       <div>
         <MuteSound />
-        <WinScreen user={this.props.user} database={database} />
+        <WinScreen user={this.props.user} database={db} />
         <InfoScreen />
         <ScoreTable gameId={this.props.user.gameId} />
         <canvas className='gameDisplay' ref="renderCanvas"></canvas>
