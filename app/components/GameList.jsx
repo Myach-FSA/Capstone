@@ -10,14 +10,23 @@ class GameList extends React.Component {
   constructor() {
     super();
     this.state = {
-      games: false,
+      gamesObj: {},
+      games: [],
     };
     this.selectGame = this.selectGame.bind(this);
   }
-  componentWillMount() {
+  componentDidMount() {
     const database = firebase.database();
     firebase.database().ref('games').once('value').then(allGames => {
-      this.setState({ games: allGames.val() });
+      if (allGames.exists()) {
+        const games = Object.keys(allGames.val());
+        const gamesToList = games.filter((game) => {
+          if (allGames.val()[game].hasOwnProperty('playersInGame')) {
+            return true;
+          }
+        });
+        this.setState({ gamesObj: allGames.val(), games: gamesToList });
+      }
     });
   }
 
@@ -48,11 +57,11 @@ class GameList extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {this.state.games &&
-              Object.keys(this.state.games).map((game) => (
+            {
+              this.state.games.map((game) => (
                   <tr key={game}>
                     <th id='tableList'>{game}</th>
-                    {/* <th id='tableList'>[{Object.keys(this.state.games[game].playersInGame).length}]</th> */}
+                    <th id='tableList'>[{Object.keys(this.state.gamesObj[game].playersInGame).length}]</th>
                     <th id='tableList'>Public</th>
                     <th id='tableList'><a name={game} onClick={(evt) => this.selectGame(evt)} className="button is-primary">JOIN</a></th>
                   </tr>
