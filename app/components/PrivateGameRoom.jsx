@@ -18,23 +18,23 @@ class GameWaitRoom extends React.Component {
       publicGame: false,
       canPlay: false,
     };
+    this.userId = this.props.user.userId;
+    this.gameId = this.props.user.gameId;
   }
 
   componentDidMount() {
-    const user = this.props.user.userId;
-    const gameId = this.props.user.gameId;
-    const userRef = db.ref(`games/${gameId}`);
+    const userRef = db.ref(`games/${this.gameId}`);
     window.addEventListener('beforeunload', this.removeGame);
     userRef.once('value', (game) => {
       if (!game.exists()) {
-        db.ref(`games/${gameId}`).set({ playersInGame: { [user]: { 'id': user, 'create': false, 'score': 0, 'ready': false } } });
-        db.ref(`games/${gameId}/gameInfo/`).set({'admin': user, 'startGame': false, 'connectedPlayers': {[user]: user}});
+        db.ref(`games/${this.gameId}`).set({ playersInGame: { [this.userId]: { 'id': this.userId, 'create': false, 'score': 0, 'ready': false } } });
+        db.ref(`games/${this.gameId}/gameInfo/`).set({'admin': this.userId, 'startGame': false, 'connectedPlayers': {[this.userId]: this.userId}});
       } else {
-        db.ref(`games/${gameId}/gameInfo/connectedPlayers`).update({[user]: user});
+        db.ref(`games/${this.gameId}/gameInfo/connectedPlayers`).update({[this.userId]: this.userId});
         this.setState({isAdmin: false});
       }
     });
-    db.ref(`games/${gameId}/gameInfo/connectedPlayers`).on('value', players => {
+    db.ref(`games/${this.gameId}/gameInfo/connectedPlayers`).on('value', players => {
       if (players.val()) {
         const allPlayers = Object.keys(players.val());
         this.setState({numberOfPlayers: allPlayers.length});
@@ -49,44 +49,36 @@ class GameWaitRoom extends React.Component {
   }
 
   componentWillUnmount() {
-    const user = this.props.user;
     // Prevents the game from being deleted if the user is entering the map
-    if (this.props.history.location.pathname !== `/game/${user.gameId}/play`) {
-      db.ref(`games/${user.gameId}/gameInfo/connectedPlayers/${user.userId}`).remove();
-      db.ref(`games/${user.gameId}/gameInfo/admin`).once('value', (admin) => {
-        if (admin.val() === user.userId) db.ref(`games/${user.gameId}`).remove();
+    if (this.props.history.location.pathname !== `/game/${this.gameId}/play`) {
+      db.ref(`games/${this.gameId}/gameInfo/connectedPlayers/${this.userId}`).remove();
+      db.ref(`games/${this.gameId}/gameInfo/admin`).once('value', (admin) => {
+        if (admin.val() === this.userId) db.ref(`games/${this.gameId}`).remove();
       });
     }
-    db.ref(`games/${user.gameId}/gameInfo/connectedPlayers`).off();
+    db.ref(`games/${this.gameId}/gameInfo/connectedPlayers`).off();
     window.removeEventListener('beforeunload', this.removeGame);
   }
 
   removeGame = () => {
-    if (this.state.isAdmin) db.ref(`games/${this.props.user.gameId}`).remove();
-    db.ref(`games/${this.props.user.gameId}/playersInGame/${this.props.user.userId}`).remove();
-    db.ref(`games/${this.props.user.gameId}/gameInfo/connectedPlayers/${this.props.user.userId}`).remove();
+    if (this.state.isAdmin) db.ref(`games/${this.gameId}`).remove();
+    db.ref(`games/${this.gameId}/playersInGame/${this.userId}`).remove();
+    db.ref(`games/${this.gameId}/gameInfo/connectedPlayers/${this.userId}`).remove();
   }
 
   startGame = (gameInfo) => {
-    const user = this.props.user;
-    const userRef = db.ref(`games/${user.gameId}`);
-    const database = db;
     let name = document.getElementById('nickname').value;
 
-    if (name === '') name = 'Anonymous ID: ' + user.userId.substr(0, 4);
+    if (!name) name = `ID: ${this.userId.substr(0, 4)}`;
     this.props.submitName(name);
-    db.ref(`users/${user.userId}`).update({ 'username': name });
-    userRef.once('value', (snapshot) => {
-      var a = snapshot.exists();
-      if (!a) {
-        database.ref(`games/${user.gameId}/playersInGame/${user.userId}`).set({ 'id': user.userId, 'score': 0, 'create': true, 'ready': true });
-      } else {
-        database.ref(`games/${user.gameId}/playersInGame/${user.userId}`).update({ 'id': user.userId, 'score': 0, 'create': true, 'ready': true });
-        if (this.state.isAdmin) {
-          db.ref(`games/${user.gameId}/gameInfo/`).update({ 'startGame': true });
-        }
+    db.ref(`users/${this.userId}`).update({ 'username': name });
+    db.ref(`games/${this.gameId}`).once('value', (snapshot) => {
+      db.ref(`games/${this.gameId}/playersInGame/${this.userId}`).set({ 'id': this.userId, 'score': 0, 'create': true, 'ready': true });
+      if (this.state.isAdmin) {
+        db.ref(`games/${this.gameId}/gameInfo/`).update({ 'startGame': true });
       }
-    });
+    }
+    );
   }
 
   render() {
