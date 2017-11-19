@@ -7,6 +7,8 @@ import SceneList from './SceneList';
 import ChooseBall from './ChooseBall';
 import { submitName } from '../reducers/auth';
 
+const db = firebase.database();
+
 class GameWaitRoom extends React.Component {
   constructor(props) {
     super(props);
@@ -19,20 +21,24 @@ class GameWaitRoom extends React.Component {
   }
 
   componentDidMount() {
-    const user = this.props.user;
-    const userRef = firebase.database().ref(`games/${user.gameId}`);
+    const user = this.props.user.userId;
+    const gameId = this.props.user.gameId;
+    const userRef = db.ref(`games/${gameId}`);
     window.addEventListener('beforeunload', this.removeGame);
-    userRef.once('value', (snapshot) => {
-      var a = snapshot.exists();
-      if (!a) {
-        firebase.database().ref(`games/${user.gameId}`).set({ playersInGame: { [user.userId]: { 'id': user.userId, 'create': false, 'score': 0, 'ready': false } } });
-        firebase.database().ref(`games/${user.gameId}/gameInfo/`).set({ 'admin': user.userId, 'startGame': false });
+    userRef.once('value', (game) => {
+      if (!game.exists()) {
+        db.ref(`games/${gameId}`).set({ playersInGame: { user: { 'id': user, 'create': false, 'score': 0, 'ready': false } } });
+        db.ref(`games/${gameId}/gameInfo/`).set({'admin': user, 'startGame': false, 'connectedPlayers': {[user]: user}});
       } else {
-        this.setState({ isAdmin: false });
-        // firebase.database().ref(`games/${user.gameId}/playersInGame/${user.userId}`).set({ 'id': user.userId, 'create': false, 'score': 0, 'ready': false });
+        db.ref(`games/${gameId}/gameInfo/connectedPlayers`).update({[user]: user});
       }
     });
-    this.getPlayers(user.gameId, true);
+    db.ref(`games/${gameId}/gameInfo/connectedPlayers`).on('value', players => {
+      if (players.val()) {
+        const allPlayers = Object.keys(players.val());
+        this.setState({numberOfPlayers: allPlayers.length});
+      }
+    });
   }
 
   shouldComponentUpdate(nextProps) {
@@ -45,44 +51,33 @@ class GameWaitRoom extends React.Component {
     const user = this.props.user;
     // Prevents the game from being deleted if the user is entering the map
     if (this.props.history.location.pathname !== `/game/${user.gameId}/play`) {
-      firebase.database().ref(`games/${user.gameId}/gameInfo/admin`).once('value', (admin) => {
-        if (admin.val() === user.userId) {
-          firebase.database().ref(`games/${user.gameId}`).remove();
-        };
+      db.ref(`games/${user.gameId}/gameInfo/connectedPlayers/${user.userId}`).remove();
+      db.ref(`games/${user.gameId}/gameInfo/admin`).once('value', (admin) => {
+        if (admin.val() === user.userId) db.ref(`games/${user.gameId}`).remove();
       });
     }
-    firebase.database().ref('games').off();
+    db.ref(`games/${user.gameId}/gameInfo/connectedPlayers`).off();
     window.removeEventListener('beforeunload', this.removeGame);
   }
 
   removeGame = () => {
-    firebase.database().ref(`games/${this.props.user.gameId}/playersInGame/${this.props.user.userId}`).remove();
-    firebase.database().ref(`games/${this.props.user.gameId}/gameInfo/admin`).once('value', (admin) => {
+    db.ref(`games/${this.props.user.gameId}/playersInGame/${this.props.user.userId}`).remove();
+    db.ref(`games/${this.props.user.gameId}/gameInfo/admin`).once('value', (admin) => {
       if (admin.val() === this.props.user.userId) {
-        firebase.database().ref('games/' + this.props.user.gameId).remove();
+        db.ref('games/' + this.props.user.gameId).remove();
       };
     });
   }
 
-  getPlayers = (gameId, bool) => {
-    if (bool) {
-      firebase.database().ref('games').on('value', players => {
-        if (players.val() && players.val()[gameId]) {
-          this.setState({ numberOfPlayers: Object.keys(players.val()[gameId].playersInGame).length });
-        }
-      });
-    }
-  }
-
-  sendInfo = (info) => {
+  startGame = (gameInfo) => {
     const user = this.props.user;
-    const userRef = firebase.database().ref(`games/${user.gameId}`);
-    const database = firebase.database();
+    const userRef = db.ref(`games/${user.gameId}`);
+    const database = db;
     let name = document.getElementById('nickname').value;
 
     if (name === '') name = 'Anonymous ID: ' + user.userId.substr(0, 4);
     this.props.submitName(name);
-    firebase.database().ref(`users/${user.userId}`).update({ 'username': name });
+    db.ref(`users/${user.userId}`).update({ 'username': name });
     userRef.once('value', (snapshot) => {
       var a = snapshot.exists();
       if (!a) {
@@ -90,7 +85,7 @@ class GameWaitRoom extends React.Component {
       } else {
         database.ref(`games/${user.gameId}/playersInGame/${user.userId}`).update({ 'id': user.userId, 'score': 0, 'create': true, 'ready': true });
         if (this.state.isAdmin) {
-          firebase.database().ref(`games/${user.gameId}/gameInfo/`).update({ 'startGame': true });
+          db.ref(`games/${user.gameId}/gameInfo/`).update({ 'startGame': true });
         }
       }
     });
@@ -102,7 +97,7 @@ class GameWaitRoom extends React.Component {
         className="button is-success"
         type="submit"
         title="playbutton"
-        onClick={() => { this.sendInfo(); }}
+        onClick={() => { this.startGame(); }}
       >
         Ready!
     </button>;

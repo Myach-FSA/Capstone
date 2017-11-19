@@ -61,7 +61,7 @@ class Game extends Component {
           const coords = player.val();
           gameUtils.setPosition(playerMesh, coords.x, coords.y, coords.z);
           playerMesh.physicsImpostor.setAngularVelocity(
-            new BABYLON.Quaternion(player.val().zAcceleration, 0, player.val().xAcceleration, 0));
+            new BABYLON.Quaternion(coords.zAcceleration, 0, coords.xAcceleration, 0));
         }
       });
     });
@@ -102,7 +102,7 @@ class Game extends Component {
         userMesh.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0, 0, 0));
         this.props.changeScore(-1);
         db.ref(`users/${user}/totalScore`).transaction(score => score -= 1);
-        db.ref(`games/${gameId}/playersInGame/${user}/score`).transaction((score) => score -= 1);
+        db.ref(`games/${gameId}/playersInGame/${user}/score`).transaction(score => score -= 1);
       }
       if (this.winPos && !this.scored) {
         if ((Math.floor(userMesh.absolutePosition.x) === this.winPos.x) && (Math.floor(userMesh.absolutePosition.z) === this.winPos.z)) {
