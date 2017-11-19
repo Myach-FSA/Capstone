@@ -27,10 +27,11 @@ class GameWaitRoom extends React.Component {
     window.addEventListener('beforeunload', this.removeGame);
     userRef.once('value', (game) => {
       if (!game.exists()) {
-        db.ref(`games/${gameId}`).set({ playersInGame: { user: { 'id': user, 'create': false, 'score': 0, 'ready': false } } });
+        db.ref(`games/${gameId}`).set({ playersInGame: { [user]: { 'id': user, 'create': false, 'score': 0, 'ready': false } } });
         db.ref(`games/${gameId}/gameInfo/`).set({'admin': user, 'startGame': false, 'connectedPlayers': {[user]: user}});
       } else {
         db.ref(`games/${gameId}/gameInfo/connectedPlayers`).update({[user]: user});
+        this.setState({isAdmin: false});
       }
     });
     db.ref(`games/${gameId}/gameInfo/connectedPlayers`).on('value', players => {
@@ -61,12 +62,9 @@ class GameWaitRoom extends React.Component {
   }
 
   removeGame = () => {
+    if (this.state.isAdmin) db.ref(`games/${this.props.user.gameId}`).remove();
     db.ref(`games/${this.props.user.gameId}/playersInGame/${this.props.user.userId}`).remove();
-    db.ref(`games/${this.props.user.gameId}/gameInfo/admin`).once('value', (admin) => {
-      if (admin.val() === this.props.user.userId) {
-        db.ref('games/' + this.props.user.gameId).remove();
-      };
-    });
+    db.ref(`games/${this.props.user.gameId}/gameInfo/connectedPlayers/${this.props.user.userId}`).remove();
   }
 
   startGame = (gameInfo) => {
