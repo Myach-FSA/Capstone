@@ -6,7 +6,7 @@ Balance a ball to get to the next level! Fight the elements and use physics to s
 
 ## Description
 
-This is a single-player game. You can set up an account, choose a ball, and click PLAY NOW to start. This game will be hosted on Firebase. We will be using Babylon.js.
+This is a multiplayer game. You can set up an account, choose a ball, and click PLAY NOW to start. This game will be hosted on Firebase. We will be using Babylon.js.
 
 ## Contribution guide
 
