@@ -68,7 +68,6 @@ class GameWaitRoom extends React.Component {
 
   startGame = (gameInfo) => {
     let name = document.getElementById('nickname').value;
-
     if (!name) name = `ID: ${this.userId.substr(0, 4)}`;
     this.props.submitName(name);
     db.ref(`users/${this.userId}`).update({ 'username': name });
@@ -77,8 +76,8 @@ class GameWaitRoom extends React.Component {
       if (this.state.isAdmin) {
         db.ref(`games/${this.gameId}/gameInfo/`).update({ 'startGame': true });
       }
-    }
-    );
+    });
+    this.props.history.push(`/game/${this.props.user.gameId}/play`);
   }
 
   render() {
@@ -127,9 +126,7 @@ class GameWaitRoom extends React.Component {
           <h5 id="greenText">Current number of connected players: {this.state.numberOfPlayers}</h5>
           <div id='centerButtons' className="field is-grouped">
             <p className="control">
-              <Link to={`/game/${this.props.user.gameId}/play`}>
                 {playNowButton}
-              </Link>
             </p>
           </div>
         </div>
