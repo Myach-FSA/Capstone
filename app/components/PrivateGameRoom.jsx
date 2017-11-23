@@ -40,10 +40,16 @@ class GameWaitRoom extends React.Component {
         this.setState({numberOfPlayers: allPlayers.length});
       }
     });
-    db.ref(`games/${this.gameId}/gameInfo/startGame`).on('value', gameInfo => {
+    db.ref(`games/${this.gameId}/gameInfo`).on('value', gameInfo => {
       if (gameInfo.val()) {
-        if (gameInfo.val()) {
+        const lobbyInfo = gameInfo.val();
+        const allPlayers = Object.keys(lobbyInfo.connectedPlayers);
+        const playersNotReady = allPlayers.filter((player, index) => !lobbyInfo.connectedPlayers[allPlayers[index]]);
+        if (gameInfo.val().startGame && !playersNotReady.length) {
           this.props.history.push(`/game/${this.props.user.gameId}/play`);
+        } else if (gameInfo.val().startGame) {
+          window.alert(`Players not ready: \n ${playersNotReady}`);
+          db.ref(`games/${this.gameId}/gameInfo/`).update({ 'startGame': false });
         }
       }
     });
@@ -64,7 +70,7 @@ class GameWaitRoom extends React.Component {
       });
     }
     db.ref(`games/${this.gameId}/gameInfo/connectedPlayers`).off();
-    db.ref(`games/${this.gameId}/gameInfo/startGame`).off();
+    db.ref(`games/${this.gameId}/gameInfo`).off();
     window.removeEventListener('beforeunload', this.removeGame);
   }
 
@@ -85,8 +91,7 @@ class GameWaitRoom extends React.Component {
     db.ref(`users/${this.userId}`).update({ 'username': name });
     db.ref(`games/${this.gameId}/gameInfo`).once('value', (gameInfo) => {
       db.ref(`games/${this.gameId}/playersInGame/${this.userId}`).set({ 'id': this.userId, 'score': 0, 'create': true, 'ready': true });
-      const allReadyCheck = Object.values(gameInfo.val().connectedPlayers).includes(false);
-      if (this.state.isAdmin && !allReadyCheck) {
+      if (this.state.isAdmin) {
         db.ref(`games/${this.gameId}/gameInfo/`).update({ 'startGame': true });
       }
     });
