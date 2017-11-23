@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM, { render } from 'react-dom';
-import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import firebase from 'firebase';
 import SceneList from './SceneList';
 import ChooseBall from './ChooseBall';
 import { submitName } from '../reducers/auth';
+import Button from './Button';
 
 const db = firebase.database();
 
@@ -28,9 +28,9 @@ class GameWaitRoom extends React.Component {
     userRef.once('value', (game) => {
       if (!game.exists()) {
         db.ref(`games/${this.gameId}`).set({ playersInGame: { [this.userId]: { 'id': this.userId, 'create': false, 'score': 0, 'ready': false } } });
-        db.ref(`games/${this.gameId}/gameInfo/`).set({'admin': this.userId, 'startGame': false, 'connectedPlayers': {[this.userId]: this.userId}});
+        db.ref(`games/${this.gameId}/gameInfo/`).set({'admin': this.userId, 'startGame': false, 'connectedPlayers': {[this.userId]: false}});
       } else {
-        db.ref(`games/${this.gameId}/gameInfo/connectedPlayers`).update({[this.userId]: this.userId});
+        db.ref(`games/${this.gameId}/gameInfo/connectedPlayers`).update({[this.userId]: false});
         this.setState({isAdmin: false});
       }
     });
@@ -66,10 +66,14 @@ class GameWaitRoom extends React.Component {
     db.ref(`games/${this.gameId}/gameInfo/connectedPlayers/${this.userId}`).remove();
   }
 
-  startGame = (gameInfo) => {
+  ready = async (gameInfo) => {
     let name = document.getElementById('nickname').value;
     if (!name) name = `ID: ${this.userId.substr(0, 4)}`;
     this.props.submitName(name);
+    const playersReady = await db.ref(`games/${this.gameId}/gameInfo/connectedPlayers`).once('value');
+    const check = playersReady.val();
+    const ready = this.state.isAdmin ? true: !check[this.userId];
+    db.ref(`games/${this.gameId}/gameInfo/connectedPlayers`).update({[this.userId]: ready});
     db.ref(`users/${this.userId}`).update({ 'username': name });
     db.ref(`games/${this.gameId}`).once('value', (snapshot) => {
       db.ref(`games/${this.gameId}/playersInGame/${this.userId}`).set({ 'id': this.userId, 'score': 0, 'create': true, 'ready': true });
@@ -77,31 +81,14 @@ class GameWaitRoom extends React.Component {
         db.ref(`games/${this.gameId}/gameInfo/`).update({ 'startGame': true });
       }
     });
-    this.props.history.push(`/game/${this.props.user.gameId}/play`);
+    // this.props.history.push(`/game/${this.props.user.gameId}/play`);
   }
 
   render() {
-    const showPlayButton =
-      <button
-        className="button is-success"
-        type="submit"
-        title="playbutton"
-        onClick={() => { this.startGame(); }}
-      >
-        Ready!
-    </button>;
-
-    const disablePlayButon =
-      <button
-        className="button is-success"
-        type="submit"
-        title="playbutton"
-        disabled
-      >
-        Play Now!
-    </button>;
-
-    const playNowButton = this.props.user.ball ? showPlayButton : disablePlayButon;
+    const buttonState = !!this.props.user.ball;
+    const startButton = <Button ready={this.ready} title={'Start'} disabled={buttonState}/>;
+    const readyButton = <Button ready={this.ready} title={'Ready'} disabled={buttonState} />;
+    const playNowButton = this.state.isAdmin ? startButton : readyButton;
 
     return (
       <div className='space'>
