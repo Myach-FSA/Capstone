@@ -1,8 +1,6 @@
 import React from 'react';
-import ReactDOM, { render } from 'react-dom';
 import { connect } from 'react-redux';
 import firebase from 'firebase';
-import SceneList from './SceneList';
 import ChooseBall from './ChooseBall';
 import { submitName } from '../reducers/auth';
 import Button from './Button';
@@ -15,17 +13,14 @@ class GameWaitRoom extends React.Component {
     this.state = {
       isAdmin: true,
       numberOfPlayers: 0,
-      publicGame: false,
-      canPlay: false,
     };
     this.userId = this.props.user.userId;
     this.gameId = this.props.user.gameId;
   }
 
   componentDidMount() {
-    const userRef = db.ref(`games/${this.gameId}`);
     window.addEventListener('beforeunload', this.removeGame);
-    userRef.once('value', (game) => {
+    db.ref(`games/${this.gameId}`).once('value', (game) => {
       if (!game.exists()) {
         db.ref(`games/${this.gameId}`).set({ playersInGame: { [this.userId]: { 'id': this.userId, 'create': false, 'score': 0, 'ready': false } } });
         db.ref(`games/${this.gameId}/gameInfo/`).set({'admin': this.userId, 'startGame': false, 'connectedPlayers': {[this.userId]: false}});
@@ -34,31 +29,21 @@ class GameWaitRoom extends React.Component {
         this.setState({isAdmin: false});
       }
     });
-    db.ref(`games/${this.gameId}/gameInfo/connectedPlayers`).on('value', players => {
-      if (players.val()) {
-        const allPlayers = Object.keys(players.val());
-        this.setState({numberOfPlayers: allPlayers.length});
-      }
-    });
+
     db.ref(`games/${this.gameId}/gameInfo`).on('value', gameInfo => {
-      if (gameInfo.val()) {
-        const lobbyInfo = gameInfo.val();
-        const allPlayers = Object.keys(lobbyInfo.connectedPlayers);
-        const playersNotReady = allPlayers.filter((player, index) => !lobbyInfo.connectedPlayers[allPlayers[index]]);
-        if (gameInfo.val().startGame && !playersNotReady.length) {
+      const lobby = gameInfo.val();
+      if (lobby) {
+        const allPlayers = Object.keys(lobby.connectedPlayers);
+        this.setState({numberOfPlayers: allPlayers.length});
+        const playersNotReady = allPlayers.filter((player, index) => !lobby.connectedPlayers[allPlayers[index]]);
+        if (lobby.startGame && !playersNotReady.length) {
           this.props.history.push(`/game/${this.props.user.gameId}/play`);
-        } else if (gameInfo.val().startGame) {
+        } else if (lobby.startGame) {
           window.alert(`Players not ready: \n ${playersNotReady}`);
           db.ref(`games/${this.gameId}/gameInfo/`).update({ 'startGame': false });
         }
       }
     });
-  }
-
-  shouldComponentUpdate(nextProps) {
-    const differentBallId = this.props.user.ball !== nextProps.ball;
-    this.setState({ canPlay: true });
-    return differentBallId;
   }
 
   componentWillUnmount() {
@@ -69,7 +54,6 @@ class GameWaitRoom extends React.Component {
         if (admin.val() === this.userId) db.ref(`games/${this.gameId}`).remove();
       });
     }
-    db.ref(`games/${this.gameId}/gameInfo/connectedPlayers`).off();
     db.ref(`games/${this.gameId}/gameInfo`).off();
     window.removeEventListener('beforeunload', this.removeGame);
   }
