@@ -8,10 +8,10 @@ const Home = () => (
       <PlayNow />
     </div>
     <div className='notification homeScreen'>
-      <img id='tutorial' src="/assets/howtoplay.webp" />
+      <img id='tutorial' src="/assets/howtoplay.png" />
     </div>
     <div className="slider">
-      <img id="photoobj" className="media-object" src='assets/textures/blue_walkway_thin.webp' />
+      <img id="photoobj" className="media-object" src='assets/textures/blue_walkway_thin.png' />
     </div>
   </section>
 );
