@@ -40,6 +40,13 @@ class GameWaitRoom extends React.Component {
         this.setState({numberOfPlayers: allPlayers.length});
       }
     });
+    db.ref(`games/${this.gameId}/gameInfo/startGame`).on('value', gameInfo => {
+      if (gameInfo.val()) {
+        if (gameInfo.val()) {
+          this.props.history.push(`/game/${this.props.user.gameId}/play`);
+        }
+      }
+    });
   }
 
   shouldComponentUpdate(nextProps) {
@@ -57,6 +64,7 @@ class GameWaitRoom extends React.Component {
       });
     }
     db.ref(`games/${this.gameId}/gameInfo/connectedPlayers`).off();
+    db.ref(`games/${this.gameId}/gameInfo/startGame`).off();
     window.removeEventListener('beforeunload', this.removeGame);
   }
 
@@ -75,19 +83,19 @@ class GameWaitRoom extends React.Component {
     const ready = this.state.isAdmin ? true: !check[this.userId];
     db.ref(`games/${this.gameId}/gameInfo/connectedPlayers`).update({[this.userId]: ready});
     db.ref(`users/${this.userId}`).update({ 'username': name });
-    db.ref(`games/${this.gameId}`).once('value', (snapshot) => {
+    db.ref(`games/${this.gameId}/gameInfo`).once('value', (gameInfo) => {
       db.ref(`games/${this.gameId}/playersInGame/${this.userId}`).set({ 'id': this.userId, 'score': 0, 'create': true, 'ready': true });
-      if (this.state.isAdmin) {
+      const allReadyCheck = Object.values(gameInfo.val().connectedPlayers).includes(false);
+      if (this.state.isAdmin && !allReadyCheck) {
         db.ref(`games/${this.gameId}/gameInfo/`).update({ 'startGame': true });
       }
     });
-    // this.props.history.push(`/game/${this.props.user.gameId}/play`);
   }
 
   render() {
-    const buttonState = !!this.props.user.ball;
-    const startButton = <Button ready={this.ready} title={'Start'} disabled={buttonState}/>;
-    const readyButton = <Button ready={this.ready} title={'Ready'} disabled={buttonState} />;
+    const buttonState = this.props.user.ball;
+    const startButton = <Button ready={this.ready} title={'Start'} disabled={!buttonState}/>;
+    const readyButton = <Button ready={this.ready} title={'Ready'} disabled={!buttonState} />;
     const playNowButton = this.state.isAdmin ? startButton : readyButton;
 
     return (
